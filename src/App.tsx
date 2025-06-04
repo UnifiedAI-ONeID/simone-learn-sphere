@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 import { SessionTimeoutWarning } from "./components/SessionTimeoutWarning";
+import { usePerformanceTracking } from "./hooks/usePerformanceTracking";
+import { useEngagementTracking } from "./hooks/useEngagementTracking";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -15,6 +18,23 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+// Performance tracking wrapper for route components
+const RouteWithTracking = ({ children, routeName }: { children: React.ReactNode; routeName: string }) => {
+  const { trackPerformance } = usePerformanceTracking();
+  const { trackEngagement } = useEngagementTracking();
+
+  useEffect(() => {
+    const startTime = Date.now();
+    trackEngagement('page_view', undefined, { page: routeName });
+    
+    return () => {
+      trackPerformance(routeName, startTime);
+    };
+  }, [routeName, trackPerformance, trackEngagement]);
+
+  return <>{children}</>;
+};
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -60,27 +80,37 @@ const AppRoutes = () => (
     <Routes>
       <Route path="/" element={
         <PublicRoute>
-          <Index />
+          <RouteWithTracking routeName="/">
+            <Index />
+          </RouteWithTracking>
         </PublicRoute>
       } />
       <Route path="/auth" element={
         <PublicRoute>
-          <Auth />
+          <RouteWithTracking routeName="/auth">
+            <Auth />
+          </RouteWithTracking>
         </PublicRoute>
       } />
       <Route path="/student-dashboard" element={
         <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
-          <StudentDashboard />
+          <RouteWithTracking routeName="/student-dashboard">
+            <StudentDashboard />
+          </RouteWithTracking>
         </RoleProtectedRoute>
       } />
       <Route path="/educator-dashboard" element={
         <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
-          <EducatorDashboard />
+          <RouteWithTracking routeName="/educator-dashboard">
+            <EducatorDashboard />
+          </RouteWithTracking>
         </RoleProtectedRoute>
       } />
       <Route path="/admin-dashboard" element={
         <RoleProtectedRoute allowedRoles={['admin']}>
-          <AdminDashboard />
+          <RouteWithTracking routeName="/admin-dashboard">
+            <AdminDashboard />
+          </RouteWithTracking>
         </RoleProtectedRoute>
       } />
       <Route path="*" element={<NotFound />} />

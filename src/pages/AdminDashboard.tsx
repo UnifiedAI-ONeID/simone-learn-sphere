@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { SecurityDashboard } from '@/components/SecurityDashboard';
+import { MetricsDashboard } from '@/components/MetricsDashboard';
+import { RealTimeUserActivity } from '@/components/RealTimeUserActivity';
 import { 
   Users, 
   BookOpen, 
@@ -10,17 +12,12 @@ import {
   TrendingUp,
   Shield,
   Settings,
-  BarChart
+  BarChart,
+  Activity,
+  Target
 } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const platformStats = {
-    totalUsers: 15420,
-    totalCourses: 1230,
-    totalRevenue: 124500,
-    activeUsers: 8760
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <DashboardHeader 
@@ -31,82 +28,34 @@ const AdminDashboard = () => {
       />
 
       <div className="p-6 max-w-7xl mx-auto">
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-5">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+        <Tabs defaultValue="metrics" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:grid-cols-6">
+            <TabsTrigger value="metrics">Success Metrics</TabsTrigger>
+            <TabsTrigger value="activity">Live Activity</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-6">
-            {/* Platform Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-8 w-8 text-blue-600" />
-                    <div>
-                      <p className="text-2xl font-bold">{platformStats.totalUsers.toLocaleString()}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Total Users</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center space-x-2">
-                    <BookOpen className="h-8 w-8 text-purple-600" />
-                    <div>
-                      <p className="text-2xl font-bold">{platformStats.totalCourses.toLocaleString()}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Total Courses</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="h-8 w-8 text-green-600" />
-                    <div>
-                      <p className="text-2xl font-bold">${platformStats.totalRevenue.toLocaleString()}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Platform Revenue</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center space-x-2">
-                    <TrendingUp className="h-8 w-8 text-orange-600" />
-                    <div>
-                      <p className="text-2xl font-bold">{platformStats.activeUsers.toLocaleString()}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Active Users</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          <TabsContent value="metrics" className="space-y-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold mb-2">Success Metrics Dashboard</h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                Real-time tracking of your platform's key performance indicators
+              </p>
             </div>
+            <MetricsDashboard />
+          </TabsContent>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Platform Overview</CardTitle>
-                <CardDescription>Administrative insights and controls</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <BarChart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Comprehensive Analytics</h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Advanced admin tools and detailed platform analytics coming soon!
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="activity" className="space-y-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold mb-2">Real-Time Activity Monitor</h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                Live user engagement and session tracking
+              </p>
+            </div>
+            <RealTimeUserActivity />
           </TabsContent>
 
           <TabsContent value="users">
@@ -119,7 +68,7 @@ const AdminDashboard = () => {
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-300">
-                    User management tools coming soon!
+                    Advanced user management tools coming soon!
                   </p>
                 </div>
               </CardContent>

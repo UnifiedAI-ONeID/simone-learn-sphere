@@ -9,6 +9,145 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      courses: {
+        Row: {
+          created_at: string
+          description: string | null
+          educator_id: string
+          id: string
+          is_published: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          educator_id: string
+          id?: string
+          is_published?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          educator_id?: string
+          id?: string
+          is_published?: boolean | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      lesson_completions: {
+        Row: {
+          completed_at: string
+          completion_percentage: number | null
+          id: string
+          lesson_id: string
+          time_spent: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          completion_percentage?: number | null
+          id?: string
+          lesson_id: string
+          time_spent?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          completion_percentage?: number | null
+          id?: string
+          lesson_id?: string
+          time_spent?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_completions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          content: string | null
+          course_id: string
+          created_at: string
+          estimated_duration: number | null
+          id: string
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          course_id: string
+          created_at?: string
+          estimated_duration?: number | null
+          id?: string
+          order_index: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          course_id?: string
+          created_at?: string
+          estimated_duration?: number | null
+          id?: string
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_metrics: {
+        Row: {
+          endpoint: string
+          id: string
+          ip_address: string | null
+          response_time_ms: number
+          status_code: number | null
+          timestamp: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          endpoint: string
+          id?: string
+          ip_address?: string | null
+          response_time_ms: number
+          status_code?: number | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          endpoint?: string
+          id?: string
+          ip_address?: string | null
+          response_time_ms?: number
+          status_code?: number | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -72,14 +211,90 @@ export type Database = {
         }
         Relationships: []
       }
+      user_engagement: {
+        Row: {
+          action_type: string
+          id: string
+          metadata: Json | null
+          resource_id: string | null
+          session_duration: number | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          id?: string
+          metadata?: Json | null
+          resource_id?: string | null
+          session_duration?: number | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          id?: string
+          metadata?: Json | null
+          resource_id?: string | null
+          session_duration?: number | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          id: string
+          ip_address: string | null
+          is_active: boolean | null
+          session_end: string | null
+          session_start: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          session_end?: string | null
+          session_start?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          session_end?: string | null
+          session_start?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_average_response_time: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_concurrent_users: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_educator_creation_rate: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_weekly_completion_rate: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
       log_security_event: {
         Args: {
