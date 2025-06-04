@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +16,7 @@ import { cleanupAuthState } from '@/utils/authCleanup';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [userRole, setUserRole] = useState('student');
+  const [userRole, setUserRole] = useState<'student' | 'educator' | 'admin'>('student');
   const [signInData, setSignInData] = useState<Partial<SignInFormData>>({});
   const [signUpData, setSignUpData] = useState<Partial<SignUpFormData>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -51,7 +50,7 @@ const Auth = () => {
         password: data.password || '',
         firstName: sanitizeInput(data.firstName || ''),
         lastName: sanitizeInput(data.lastName || ''),
-        role: data.role || 'student'
+        role: userRole // Use the userRole state directly which is already typed correctly
       };
       
       const validated = signUpSchema.parse(sanitized);
@@ -138,7 +137,7 @@ const Auth = () => {
   };
 
   const handleSignUp = async () => {
-    const validated = validateAndSanitizeSignUp({ ...signUpData, role: userRole });
+    const validated = validateAndSanitizeSignUp(signUpData);
     if (!validated) return;
 
     const identifier = validated.email;
@@ -212,21 +211,21 @@ const Auth = () => {
 
   const roles = [
     {
-      id: 'student',
+      id: 'student' as const,
       title: 'Student',
       description: 'Learn with personalized AI-powered experiences',
       icon: GraduationCap,
       color: 'bg-blue-100 text-blue-800 border-blue-200'
     },
     {
-      id: 'educator',
+      id: 'educator' as const,
       title: 'Educator',
       description: 'Create and monetize educational content',
       icon: User,
       color: 'bg-purple-100 text-purple-800 border-purple-200'
     },
     {
-      id: 'admin',
+      id: 'admin' as const,
       title: 'Admin',
       description: 'Manage platform and user analytics',
       icon: Shield,
