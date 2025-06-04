@@ -53,12 +53,14 @@ const Index = () => {
       name: "Fiona Wong",
       role: "Co-Founder & CEO",
       avatar: "FW",
+      avatarUrl: "/lovable-uploads/d6a21c1b-8b9b-4811-a5eb-eafac22bca5f.png",
       description: "Passionate about democratizing education and empowering educators worldwide"
     },
     {
       name: "Simon Luke",
       role: "Co-Founder & CTO",
       avatar: "SL",
+      avatarUrl: "/lovable-uploads/7a68d4b0-5778-4fc6-bd9d-8d45d0d83da0.png",
       description: "Building innovative AI-powered solutions for the future of learning"
     }
   ];
@@ -258,7 +260,7 @@ const Index = () => {
                 <CardHeader className="pb-4">
                   <div className="flex justify-center mb-4">
                     <Avatar className="w-20 h-20 ring-4 ring-purple-100 dark:ring-purple-800">
-                      <AvatarImage src="" alt={founder.name} />
+                      <AvatarImage src={founder.avatarUrl} alt={founder.name} />
                       <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xl font-semibold">
                         {founder.avatar}
                       </AvatarFallback>
