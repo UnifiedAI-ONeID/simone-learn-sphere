@@ -102,7 +102,7 @@ export const MetricsDashboard = () => {
               </div>
               {getStatusBadge(metrics.educatorCreationRate, 50)}
             </div>
-            <p className="text-xs text-gray-500 mt-2">Target: >50% quarterly</p>
+            <p className="text-xs text-gray-500 mt-2">Target: {'>'}50% quarterly</p>
           </CardContent>
         </Card>
 
