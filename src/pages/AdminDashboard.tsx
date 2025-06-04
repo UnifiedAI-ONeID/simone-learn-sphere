@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import { 
   Users, 
   BookOpen, 
@@ -9,8 +9,7 @@ import {
   TrendingUp,
   Shield,
   Settings,
-  BarChart,
-  Globe
+  BarChart
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -23,23 +22,12 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b bg-white dark:bg-gray-800 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Admin Dashboard 🛡️
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Platform oversight and analytics
-            </p>
-          </div>
-          <Badge variant="secondary" className="px-3 py-1">
-            <Shield className="w-4 h-4 mr-1" />
-            Admin Access
-          </Badge>
-        </div>
-      </header>
+      <DashboardHeader 
+        title="Admin Dashboard 🛡️"
+        subtitle="Platform oversight and analytics"
+        badgeText="Admin Access"
+        badgeIcon={Shield}
+      />
 
       <div className="p-6 max-w-7xl mx-auto">
         <Tabs defaultValue="overview" className="space-y-6">

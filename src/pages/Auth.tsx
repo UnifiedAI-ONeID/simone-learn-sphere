@@ -7,31 +7,129 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Brain, User, GraduationCap, Shield } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userRole, setUserRole] = useState('student');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleAuth = async (type: 'login' | 'signup') => {
-    setIsLoading(true);
-    // Simulate auth process
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success(`${type === 'login' ? 'Welcome back!' : 'Account created successfully!'}`);
-    
-    // Navigate based on role
-    if (userRole === 'educator') {
-      navigate('/educator-dashboard');
-    } else if (userRole === 'admin') {
-      navigate('/admin-dashboard');
-    } else {
-      navigate('/student-dashboard');
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
     }
-    
-    setIsLoading(false);
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        toast({
+          title: "Success",
+          description: "Welcome back!",
+        });
+        
+        // Get user profile to determine redirect
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        const role = profile?.role || 'student';
+        if (role === 'educator') {
+          navigate('/educator-dashboard');
+        } else if (role === 'admin') {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/student-dashboard');
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign in",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!email || !password || !firstName || !lastName) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            role: userRole,
+          },
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        toast({
+          title: "Success",
+          description: "Account created successfully! Please check your email for verification.",
+        });
+        
+        // Navigate based on role
+        if (userRole === 'educator') {
+          navigate('/educator-dashboard');
+        } else if (userRole === 'admin') {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/student-dashboard');
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const roles = [
@@ -129,25 +227,29 @@ const Auth = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="login-email">Email</Label>
                   <Input 
-                    id="email" 
+                    id="login-email" 
                     type="email" 
                     placeholder="Enter your email"
-                    aria-describedby="email-help"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="login-password">Password</Label>
                   <Input 
-                    id="password" 
+                    id="login-password" 
                     type="password" 
                     placeholder="Enter your password"
-                    aria-describedby="password-help"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
                   />
                 </div>
                 <Button 
-                  onClick={() => handleAuth('login')}
+                  onClick={handleSignIn}
                   disabled={isLoading}
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                 >
@@ -170,7 +272,9 @@ const Auth = () => {
                     <Input 
                       id="firstname" 
                       placeholder="First name"
-                      aria-describedby="firstname-help"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      disabled={isLoading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -178,7 +282,9 @@ const Auth = () => {
                     <Input 
                       id="lastname" 
                       placeholder="Last name"
-                      aria-describedby="lastname-help"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -188,7 +294,9 @@ const Auth = () => {
                     id="signup-email" 
                     type="email" 
                     placeholder="Enter your email"
-                    aria-describedby="signup-email-help"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -197,11 +305,13 @@ const Auth = () => {
                     id="signup-password" 
                     type="password" 
                     placeholder="Create a password"
-                    aria-describedby="signup-password-help"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
                   />
                 </div>
                 <Button 
-                  onClick={() => handleAuth('signup')}
+                  onClick={handleSignUp}
                   disabled={isLoading}
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                 >
