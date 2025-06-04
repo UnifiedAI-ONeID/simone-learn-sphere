@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BookOpen, Users, Brain, Trophy, Moon, Sun, Accessibility } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -44,6 +45,21 @@ const Index = () => {
       icon: Trophy,
       title: "Gamified Learning",
       description: "Badges, points, streaks, and challenges to boost engagement"
+    }
+  ];
+
+  const coFounders = [
+    {
+      name: "Fiona Wong",
+      role: "Co-Founder & CEO",
+      avatar: "FW",
+      description: "Passionate about democratizing education and empowering educators worldwide"
+    },
+    {
+      name: "Simon Luke",
+      role: "Co-Founder & CTO",
+      avatar: "SL",
+      description: "Building innovative AI-powered solutions for the future of learning"
     }
   ];
 
@@ -218,6 +234,44 @@ const Index = () => {
                 <CardContent>
                   <CardDescription className="text-gray-600 dark:text-gray-300">
                     {feature.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Co-Founders Section */}
+        <div className="mx-auto max-w-7xl mt-24">
+          <div className="text-center space-y-4 mb-16">
+            <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Meet Our Co-Founders
+            </h3>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Passionate leaders dedicated to transforming education through innovation and technology.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {coFounders.map((founder, index) => (
+              <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-800 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+                <CardHeader className="pb-4">
+                  <div className="flex justify-center mb-4">
+                    <Avatar className="w-20 h-20 ring-4 ring-purple-100 dark:ring-purple-800">
+                      <AvatarImage src="" alt={founder.name} />
+                      <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xl font-semibold">
+                        {founder.avatar}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <CardTitle className="text-xl text-gray-900 dark:text-white">{founder.name}</CardTitle>
+                  <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                    {founder.role}
+                  </Badge>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-600 dark:text-gray-300 text-base">
+                    {founder.description}
                   </CardDescription>
                 </CardContent>
               </Card>
