@@ -13,6 +13,8 @@ import { signUpSchema, signInSchema, SignUpFormData, SignInFormData } from '@/sc
 import { authRateLimiter } from '@/utils/rateLimiter';
 import { getAuthErrorMessage, sanitizeInput } from '@/utils/errorHandling';
 import { cleanupAuthState } from '@/utils/authCleanup';
+import { useSecurityAudit } from '@/hooks/useSecurityAudit';
+import { getClientIP, sanitizeUserAgent } from '@/utils/securityUtils';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +24,7 @@ const Auth = () => {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { logSecurityEvent } = useSecurityAudit();
 
   const validateAndSanitizeSignIn = (data: Partial<SignInFormData>): SignInFormData | null => {
     try {
@@ -99,11 +102,29 @@ const Auth = () => {
 
       if (error) {
         authRateLimiter.recordAttempt(identifier, true);
+        
+        // Log failed login attempt
+        const clientIP = await getClientIP();
+        await logSecurityEvent('failed_login', {
+          email: validated.email,
+          error_message: error.message,
+          attempt_time: new Date().toISOString()
+        }, clientIP, sanitizeUserAgent(navigator.userAgent));
+        
         throw error;
       }
 
       if (data.user) {
         authRateLimiter.recordAttempt(identifier, false);
+        
+        // Log successful login
+        const clientIP = await getClientIP();
+        await logSecurityEvent('successful_login', {
+          user_id: data.user.id,
+          email: validated.email,
+          login_time: new Date().toISOString()
+        }, clientIP, sanitizeUserAgent(navigator.userAgent));
+        
         toast({
           title: "Success",
           description: "Welcome back!",
@@ -179,11 +200,30 @@ const Auth = () => {
 
       if (error) {
         authRateLimiter.recordAttempt(identifier, true);
+        
+        // Log failed signup attempt
+        const clientIP = await getClientIP();
+        await logSecurityEvent('failed_signup', {
+          email: validated.email,
+          error_message: error.message,
+          attempt_time: new Date().toISOString()
+        }, clientIP, sanitizeUserAgent(navigator.userAgent));
+        
         throw error;
       }
 
       if (data.user) {
         authRateLimiter.recordAttempt(identifier, false);
+        
+        // Log successful signup
+        const clientIP = await getClientIP();
+        await logSecurityEvent('successful_signup', {
+          user_id: data.user.id,
+          email: validated.email,
+          role: validated.role,
+          signup_time: new Date().toISOString()
+        }, clientIP, sanitizeUserAgent(navigator.userAgent));
+        
         toast({
           title: "Success",
           description: "Account created successfully! Please check your email for verification.",

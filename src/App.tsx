@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
+import { SessionTimeoutWarning } from "./components/SessionTimeoutWarning";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -54,34 +55,37 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AppRoutes = () => (
-  <Routes>
-    <Route path="/" element={
-      <PublicRoute>
-        <Index />
-      </PublicRoute>
-    } />
-    <Route path="/auth" element={
-      <PublicRoute>
-        <Auth />
-      </PublicRoute>
-    } />
-    <Route path="/student-dashboard" element={
-      <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
-        <StudentDashboard />
-      </RoleProtectedRoute>
-    } />
-    <Route path="/educator-dashboard" element={
-      <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
-        <EducatorDashboard />
-      </RoleProtectedRoute>
-    } />
-    <Route path="/admin-dashboard" element={
-      <RoleProtectedRoute allowedRoles={['admin']}>
-        <AdminDashboard />
-      </RoleProtectedRoute>
-    } />
-    <Route path="*" element={<NotFound />} />
-  </Routes>
+  <>
+    <SessionTimeoutWarning />
+    <Routes>
+      <Route path="/" element={
+        <PublicRoute>
+          <Index />
+        </PublicRoute>
+      } />
+      <Route path="/auth" element={
+        <PublicRoute>
+          <Auth />
+        </PublicRoute>
+      } />
+      <Route path="/student-dashboard" element={
+        <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
+          <StudentDashboard />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/educator-dashboard" element={
+        <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
+          <EducatorDashboard />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/admin-dashboard" element={
+        <RoleProtectedRoute allowedRoles={['admin']}>
+          <AdminDashboard />
+        </RoleProtectedRoute>
+      } />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </>
 );
 
 const App = () => (
