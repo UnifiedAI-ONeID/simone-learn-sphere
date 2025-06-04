@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { secureSignOut, cleanupAuthState } from '@/utils/authCleanup';
 
 interface AuthContextType {
   user: User | null;
@@ -48,9 +49,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      await secureSignOut(supabase);
     } catch (error) {
       console.error('Error signing out:', error);
+      // Force cleanup and redirect even if sign out fails
+      cleanupAuthState();
+      window.location.href = '/auth';
     }
   };
 

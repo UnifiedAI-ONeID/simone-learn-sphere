@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -65,19 +66,19 @@ const AppRoutes = () => (
       </PublicRoute>
     } />
     <Route path="/student-dashboard" element={
-      <ProtectedRoute>
+      <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
         <StudentDashboard />
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     } />
     <Route path="/educator-dashboard" element={
-      <ProtectedRoute>
+      <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
         <EducatorDashboard />
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     } />
     <Route path="/admin-dashboard" element={
-      <ProtectedRoute>
+      <RoleProtectedRoute allowedRoles={['admin']}>
         <AdminDashboard />
-      </ProtectedRoute>
+      </RoleProtectedRoute>
     } />
     <Route path="*" element={<NotFound />} />
   </Routes>

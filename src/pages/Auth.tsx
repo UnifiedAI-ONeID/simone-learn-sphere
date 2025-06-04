@@ -10,22 +10,74 @@ import { Brain, User, GraduationCap, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { signUpSchema, signInSchema, SignUpFormData, SignInFormData } from '@/schemas/authSchemas';
+import { authRateLimiter } from '@/utils/rateLimiter';
+import { getAuthErrorMessage, sanitizeInput } from '@/utils/errorHandling';
+import { cleanupAuthState } from '@/utils/authCleanup';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userRole, setUserRole] = useState('student');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [signInData, setSignInData] = useState<Partial<SignInFormData>>({});
+  const [signUpData, setSignUpData] = useState<Partial<SignUpFormData>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const validateAndSanitizeSignIn = (data: Partial<SignInFormData>): SignInFormData | null => {
+    try {
+      const sanitized = {
+        email: sanitizeInput(data.email || ''),
+        password: data.password || ''
+      };
+      
+      const validated = signInSchema.parse(sanitized);
+      setValidationErrors({});
+      return validated;
+    } catch (error: any) {
+      const errors: Record<string, string> = {};
+      error.errors?.forEach((err: any) => {
+        errors[err.path[0]] = err.message;
+      });
+      setValidationErrors(errors);
+      return null;
+    }
+  };
+
+  const validateAndSanitizeSignUp = (data: Partial<SignUpFormData>): SignUpFormData | null => {
+    try {
+      const sanitized = {
+        email: sanitizeInput(data.email || ''),
+        password: data.password || '',
+        firstName: sanitizeInput(data.firstName || ''),
+        lastName: sanitizeInput(data.lastName || ''),
+        role: data.role || 'student'
+      };
+      
+      const validated = signUpSchema.parse(sanitized);
+      setValidationErrors({});
+      return validated;
+    } catch (error: any) {
+      const errors: Record<string, string> = {};
+      error.errors?.forEach((err: any) => {
+        errors[err.path[0]] = err.message;
+      });
+      setValidationErrors(errors);
+      return null;
+    }
+  };
+
   const handleSignIn = async () => {
-    if (!email || !password) {
+    const validated = validateAndSanitizeSignIn(signInData);
+    if (!validated) return;
+
+    const identifier = validated.email;
+    
+    if (authRateLimiter.isBlocked(identifier)) {
+      const timeRemaining = Math.ceil(authRateLimiter.getBlockTimeRemaining(identifier) / 1000 / 60);
       toast({
-        title: "Error",
-        description: "Please fill in all fields",
+        title: "Too many attempts",
+        description: `Please wait ${timeRemaining} minutes before trying again.`,
         variant: "destructive",
       });
       return;
@@ -33,16 +85,26 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
+      cleanupAuthState();
+      
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.warn('Pre-signin cleanup failed, continuing');
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: validated.email,
+        password: validated.password,
       });
 
       if (error) {
+        authRateLimiter.recordAttempt(identifier, true);
         throw error;
       }
 
       if (data.user) {
+        authRateLimiter.recordAttempt(identifier, false);
         toast({
           title: "Success",
           description: "Welcome back!",
@@ -57,17 +119,17 @@ const Auth = () => {
 
         const role = profile?.role || 'student';
         if (role === 'educator') {
-          navigate('/educator-dashboard');
+          window.location.href = '/educator-dashboard';
         } else if (role === 'admin') {
-          navigate('/admin-dashboard');
+          window.location.href = '/admin-dashboard';
         } else {
-          navigate('/student-dashboard');
+          window.location.href = '/student-dashboard';
         }
       }
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to sign in",
+        title: "Sign in failed",
+        description: getAuthErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -76,10 +138,16 @@ const Auth = () => {
   };
 
   const handleSignUp = async () => {
-    if (!email || !password || !firstName || !lastName) {
+    const validated = validateAndSanitizeSignUp({ ...signUpData, role: userRole });
+    if (!validated) return;
+
+    const identifier = validated.email;
+    
+    if (authRateLimiter.isBlocked(identifier)) {
+      const timeRemaining = Math.ceil(authRateLimiter.getBlockTimeRemaining(identifier) / 1000 / 60);
       toast({
-        title: "Error",
-        description: "Please fill in all fields",
+        title: "Too many attempts",
+        description: `Please wait ${timeRemaining} minutes before trying again.`,
         variant: "destructive",
       });
       return;
@@ -87,44 +155,54 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
+      cleanupAuthState();
+      
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.warn('Pre-signup cleanup failed, continuing');
+      }
+
       const redirectUrl = `${window.location.origin}/`;
       
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: validated.email,
+        password: validated.password,
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            first_name: firstName,
-            last_name: lastName,
-            role: userRole,
+            first_name: validated.firstName,
+            last_name: validated.lastName,
+            role: validated.role,
           },
         },
       });
 
       if (error) {
+        authRateLimiter.recordAttempt(identifier, true);
         throw error;
       }
 
       if (data.user) {
+        authRateLimiter.recordAttempt(identifier, false);
         toast({
           title: "Success",
           description: "Account created successfully! Please check your email for verification.",
         });
         
         // Navigate based on role
-        if (userRole === 'educator') {
-          navigate('/educator-dashboard');
-        } else if (userRole === 'admin') {
-          navigate('/admin-dashboard');
+        if (validated.role === 'educator') {
+          window.location.href = '/educator-dashboard';
+        } else if (validated.role === 'admin') {
+          window.location.href = '/admin-dashboard';
         } else {
-          navigate('/student-dashboard');
+          window.location.href = '/student-dashboard';
         }
       }
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to create account",
+        title: "Sign up failed",
+        description: getAuthErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -232,10 +310,14 @@ const Auth = () => {
                     id="login-email" 
                     type="email" 
                     placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={signInData.email || ''}
+                    onChange={(e) => setSignInData(prev => ({ ...prev, email: e.target.value }))}
                     disabled={isLoading}
+                    className={validationErrors.email ? 'border-red-500' : ''}
                   />
+                  {validationErrors.email && (
+                    <p className="text-sm text-red-600">{validationErrors.email}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Password</Label>
@@ -243,10 +325,14 @@ const Auth = () => {
                     id="login-password" 
                     type="password" 
                     placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={signInData.password || ''}
+                    onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
                     disabled={isLoading}
+                    className={validationErrors.password ? 'border-red-500' : ''}
                   />
+                  {validationErrors.password && (
+                    <p className="text-sm text-red-600">{validationErrors.password}</p>
+                  )}
                 </div>
                 <Button 
                   onClick={handleSignIn}
@@ -272,20 +358,28 @@ const Auth = () => {
                     <Input 
                       id="firstname" 
                       placeholder="First name"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
+                      value={signUpData.firstName || ''}
+                      onChange={(e) => setSignUpData(prev => ({ ...prev, firstName: e.target.value }))}
                       disabled={isLoading}
+                      className={validationErrors.firstName ? 'border-red-500' : ''}
                     />
+                    {validationErrors.firstName && (
+                      <p className="text-xs text-red-600">{validationErrors.firstName}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastname">Last Name</Label>
                     <Input 
                       id="lastname" 
                       placeholder="Last name"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
+                      value={signUpData.lastName || ''}
+                      onChange={(e) => setSignUpData(prev => ({ ...prev, lastName: e.target.value }))}
                       disabled={isLoading}
+                      className={validationErrors.lastName ? 'border-red-500' : ''}
                     />
+                    {validationErrors.lastName && (
+                      <p className="text-xs text-red-600">{validationErrors.lastName}</p>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -294,10 +388,14 @@ const Auth = () => {
                     id="signup-email" 
                     type="email" 
                     placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={signUpData.email || ''}
+                    onChange={(e) => setSignUpData(prev => ({ ...prev, email: e.target.value }))}
                     disabled={isLoading}
+                    className={validationErrors.email ? 'border-red-500' : ''}
                   />
+                  {validationErrors.email && (
+                    <p className="text-sm text-red-600">{validationErrors.email}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
@@ -305,10 +403,17 @@ const Auth = () => {
                     id="signup-password" 
                     type="password" 
                     placeholder="Create a password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={signUpData.password || ''}
+                    onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
                     disabled={isLoading}
+                    className={validationErrors.password ? 'border-red-500' : ''}
                   />
+                  {validationErrors.password && (
+                    <p className="text-sm text-red-600">{validationErrors.password}</p>
+                  )}
+                  <p className="text-xs text-gray-600">
+                    Must be 8+ characters with uppercase, lowercase, and number
+                  </p>
                 </div>
                 <Button 
                   onClick={handleSignUp}
