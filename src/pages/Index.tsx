@@ -1,12 +1,260 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { isMobile, isTablet } from 'react-device-detect';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen, Users, Brain, Trophy, Moon, Sun, Accessibility } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Index = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const navigate = useNavigate();
+  const isMobileDevice = isMobile || isTablet;
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+    toast.success(`Switched to ${isDarkMode ? 'light' : 'dark'} mode`);
+  };
+
+  const handleGetStarted = () => {
+    toast.success('Welcome to SimoneLabs!');
+    navigate('/auth');
+  };
+
+  const features = [
+    {
+      icon: Brain,
+      title: "AI-Powered Course Creation",
+      description: "Generate course outlines, quizzes, and content with advanced AI assistance"
+    },
+    {
+      icon: BookOpen,
+      title: "Flexible Learning Delivery",
+      description: "Support for self-paced, live, and cohort-based educational experiences"
+    },
+    {
+      icon: Users,
+      title: "Community & Collaboration",
+      description: "Discussion forums, mentorship, and study groups to enhance learning"
+    },
+    {
+      icon: Trophy,
+      title: "Gamified Learning",
+      description: "Badges, points, streaks, and challenges to boost engagement"
+    }
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100'}`}>
+      {/* Navigation Header */}
+      <header className="relative z-10 px-4 py-6 md:px-6 lg:px-8">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-blue-600">
+              <Brain className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              SimoneLabs
+            </h1>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="text-gray-600 hover:text-purple-600 dark:text-gray-300 dark:hover:text-purple-400"
+              aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+            >
+              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-600 hover:text-purple-600 dark:text-gray-300 dark:hover:text-purple-400"
+              aria-label="Accessibility features"
+              onClick={() => toast.success('Accessibility tools available throughout the platform')}
+            >
+              <Accessibility className="h-5 w-5" />
+            </Button>
+          </div>
+        </nav>
+      </header>
+
+      {/* Hero Section - Device Responsive */}
+      <main className="px-4 py-12 md:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          {isMobileDevice ? (
+            // Mobile-First Landing
+            <div className="text-center space-y-8">
+              <div className="space-y-4">
+                <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                  📱 Mobile-Optimized Learning
+                </Badge>
+                <h2 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+                  Learn & Teach
+                  <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                    On the Go
+                  </span>
+                </h2>
+                <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                  Access powerful educational tools from your mobile device. Create courses, learn with AI assistance, and connect with a global community of learners.
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <Button 
+                  onClick={handleGetStarted}
+                  size="lg" 
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 text-lg"
+                >
+                  Start Learning Today
+                </Button>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Free to start • No credit card required
+                </p>
+              </div>
+            </div>
+          ) : (
+            // Desktop Landing
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                    🚀 Democratizing Education Worldwide
+                  </Badge>
+                  <h2 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-white lg:text-6xl">
+                    Empower Your
+                    <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                      Teaching Journey
+                    </span>
+                  </h2>
+                  <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl">
+                    Create immersive educational experiences with AI-powered tools. Build, deliver, and monetize courses while connecting with learners globally.
+                  </p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button 
+                    onClick={handleGetStarted}
+                    size="lg" 
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4"
+                  >
+                    Get Started Free
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    className="border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/20 px-8 py-4"
+                    onClick={() => toast.success('Demo coming soon!')}
+                  >
+                    Watch Demo
+                  </Button>
+                </div>
+                
+                <div className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Free to start</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>No credit card required</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Fully accessible</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Visual Element */}
+              <div className="relative">
+                <div className="relative rounded-2xl bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-blue-900/20 p-8">
+                  <div className="grid grid-cols-2 gap-4">
+                    {features.map((feature, index) => (
+                      <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        <CardHeader className="pb-3">
+                          <feature.icon className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                        </CardHeader>
+                        <CardContent>
+                          <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {feature.title}
+                          </CardTitle>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Features Section */}
+        <div className="mx-auto max-w-7xl mt-24">
+          <div className="text-center space-y-4 mb-16">
+            <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Everything You Need to Succeed
+            </h3>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              From AI-powered course creation to community building, SimoneLabs provides all the tools for modern education.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-800">
+                <CardHeader>
+                  <div className="mx-auto w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center mb-4">
+                    <feature.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <CardTitle className="text-gray-900 dark:text-white">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-600 dark:text-gray-300">
+                    {feature.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="mx-auto max-w-4xl mt-24 text-center">
+          <Card className="border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
+            <CardContent className="py-12">
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Ready to Transform Education?
+              </h3>
+              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+                Join thousands of educators who are already creating amazing learning experiences with SimoneLabs.
+              </p>
+              <Button 
+                onClick={handleGetStarted}
+                size="lg" 
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-12 py-4 text-lg"
+              >
+                Start Your Journey
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="mt-24 border-t border-gray-200 dark:border-gray-800 py-12">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+          <div className="text-center text-gray-500 dark:text-gray-400">
+            <p>&copy; 2024 SimoneLabs. Democratizing education worldwide.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
