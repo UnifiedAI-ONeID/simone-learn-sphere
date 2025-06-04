@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { LogOut, Brain } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 interface DashboardHeaderProps {
   title: string;
@@ -15,20 +16,27 @@ interface DashboardHeaderProps {
 export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIcon }: DashboardHeaderProps) => {
   const { signOut } = useAuth();
   const { toast } = useToast();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {
+    if (isSigningOut) return;
+    
+    setIsSigningOut(true);
     try {
       await signOut();
       toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
       });
     } catch (error) {
+      console.error('Sign out error:', error);
       toast({
-        title: "Error",
-        description: "Failed to sign out",
+        title: "Sign out error",
+        description: "There was an issue signing you out. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSigningOut(false);
     }
   };
 
@@ -57,10 +65,11 @@ export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIc
             variant="outline" 
             size="sm"
             onClick={handleSignOut}
+            disabled={isSigningOut}
             className="flex items-center space-x-2"
           >
             <LogOut className="h-4 w-4" />
-            <span>Sign Out</span>
+            <span>{isSigningOut ? 'Signing Out...' : 'Sign Out'}</span>
           </Button>
         </div>
       </div>
