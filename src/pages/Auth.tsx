@@ -95,9 +95,6 @@ const Auth = () => {
         provider,
         options: {
           redirectTo: redirectUrl,
-          data: {
-            role: userRole,
-          },
         },
       });
 
