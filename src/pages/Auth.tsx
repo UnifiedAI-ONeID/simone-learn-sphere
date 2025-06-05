@@ -130,21 +130,8 @@ const Auth = () => {
           description: "Welcome back!",
         });
         
-        // Get user profile to determine redirect
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-
-        const role = profile?.role || 'student';
-        if (role === 'educator') {
-          window.location.href = '/educator-dashboard';
-        } else if (role === 'admin') {
-          window.location.href = '/admin-dashboard';
-        } else {
-          window.location.href = '/student-dashboard';
-        }
+        // Navigate to student dashboard by default - RoleProtectedRoute will handle role-based access
+        window.location.href = '/student-dashboard';
       }
     } catch (error: any) {
       toast({
@@ -229,14 +216,8 @@ const Auth = () => {
           description: "Account created successfully! Please check your email for verification.",
         });
         
-        // Navigate based on role
-        if (validated.role === 'educator') {
-          window.location.href = '/educator-dashboard';
-        } else if (validated.role === 'admin') {
-          window.location.href = '/admin-dashboard';
-        } else {
-          window.location.href = '/student-dashboard';
-        }
+        // Navigate to student dashboard by default - RoleProtectedRoute will handle role-based access
+        window.location.href = '/student-dashboard';
       }
     } catch (error: any) {
       toast({

@@ -14,6 +14,7 @@ import EducatorDashboard from './pages/EducatorDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TranslationProvider } from '@/contexts/TranslationContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { RoleProtectedRoute } from '@/components/RoleProtectedRoute';
 
 // Separate component that uses useAuth
 const AppContent = () => {
@@ -69,27 +70,29 @@ const AppContent = () => {
 
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/auth" element={user ? <Navigate to="/admin-dashboard" /> : <Auth />} />
+          <Route path="/auth" element={user ? <Navigate to="/student-dashboard" /> : <Auth />} />
+          
+          {/* Admin Dashboard - Only accessible by admins */}
           <Route
             path="/admin-dashboard"
             element={
-              user ? (
+              <RoleProtectedRoute allowedRoles={['admin']} fallbackPath="/student-dashboard">
                 <AdminDashboard />
-              ) : (
-                <Navigate to="/auth" />
-              )
+              </RoleProtectedRoute>
             }
           />
+          
+          {/* Educator Dashboard - Accessible by educators and admins */}
           <Route
             path="/educator-dashboard"
             element={
-              user ? (
+              <RoleProtectedRoute allowedRoles={['educator', 'admin']} fallbackPath="/student-dashboard">
                 <EducatorDashboard />
-              ) : (
-                <Navigate to="/auth" />
-              )
+              </RoleProtectedRoute>
             }
           />
+          
+          {/* Student Dashboard - Accessible by all authenticated users */}
           <Route
             path="/student-dashboard"
             element={
