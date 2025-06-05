@@ -5,7 +5,7 @@ import { SecurityDashboard } from '@/components/SecurityDashboard';
 import { UserManagement } from '@/components/UserManagement';
 import { ImpersonationBanner } from '@/components/ImpersonationBanner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Shield, BarChart3, Settings } from 'lucide-react';
+import { Users, Shield, BarChart3, Settings, Crown } from 'lucide-react';
 
 const AdminDashboard = () => {
   return (
@@ -16,6 +16,8 @@ const AdminDashboard = () => {
         <DashboardHeader 
           title="Admin Dashboard"
           subtitle="Manage platform operations, users, and security"
+          badgeText="Administrator"
+          badgeIcon={Crown}
         />
         
         <Tabs defaultValue="metrics" className="space-y-6">

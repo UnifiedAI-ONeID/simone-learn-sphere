@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Clock, Trophy, TrendingUp, Play, CheckCircle } from 'lucide-react';
+import { BookOpen, Clock, Trophy, TrendingUp, Play, CheckCircle, GraduationCap } from 'lucide-react';
 
 const StudentDashboard = () => {
   // Mock data for demonstration
@@ -74,6 +74,8 @@ const StudentDashboard = () => {
         <DashboardHeader 
           title="Student Dashboard"
           subtitle="Continue your learning journey"
+          badgeText="Student"
+          badgeIcon={GraduationCap}
         />
         
         {/* Stats Grid */}

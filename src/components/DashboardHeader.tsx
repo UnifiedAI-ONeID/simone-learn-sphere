@@ -3,18 +3,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LogOut, Brain } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
 interface DashboardHeaderProps {
   title: string;
   subtitle: string;
-  badgeText: string;
-  badgeIcon: React.ComponentType<{ className?: string }>;
+  badgeText?: string;
+  badgeIcon?: React.ComponentType<{ className?: string }>;
 }
 
 export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIcon }: DashboardHeaderProps) => {
   const { signOut } = useAuth();
+  const { role } = useUserRole();
   const { toast } = useToast();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -40,6 +42,10 @@ export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIc
     }
   };
 
+  // Use provided badge info or fall back to role-based defaults
+  const displayBadgeText = badgeText || (role ? role.charAt(0).toUpperCase() + role.slice(1) : 'User');
+  const DisplayBadgeIcon = BadgeIcon || Brain;
+
   return (
     <header className="border-b bg-white dark:bg-gray-800 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -58,8 +64,8 @@ export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIc
         </div>
         <div className="flex items-center space-x-4">
           <Badge variant="secondary" className="px-3 py-1">
-            <BadgeIcon className="w-4 h-4 mr-1" />
-            {badgeText}
+            <DisplayBadgeIcon className="w-4 h-4 mr-1" />
+            {displayBadgeText}
           </Badge>
           <Button 
             variant="outline" 

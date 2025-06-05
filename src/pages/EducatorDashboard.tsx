@@ -4,7 +4,7 @@ import { ImpersonationBanner } from '@/components/ImpersonationBanner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Users, DollarSign, TrendingUp, Plus, Edit, Eye } from 'lucide-react';
+import { BookOpen, Users, DollarSign, TrendingUp, Plus, Edit, Eye, Presentation } from 'lucide-react';
 
 const EducatorDashboard = () => {
   // Mock data for demonstration
@@ -85,6 +85,8 @@ const EducatorDashboard = () => {
           <DashboardHeader 
             title="Educator Dashboard"
             subtitle="Manage your courses and track your success"
+            badgeText="Educator"
+            badgeIcon={Presentation}
           />
           <Button className="bg-purple-600 hover:bg-purple-700">
             <Plus className="h-4 w-4 mr-2" />
