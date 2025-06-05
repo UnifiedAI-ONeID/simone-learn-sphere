@@ -16,6 +16,7 @@ import { cleanupAuthState } from '@/utils/authCleanup';
 import { useSecurityAudit } from '@/hooks/useSecurityAudit';
 import { getClientIP, sanitizeUserAgent } from '@/utils/securityUtils';
 import { TranslatedText } from '@/components/TranslatedText';
+import { getRoleBasedRoute } from '@/utils/roleRouting';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -124,17 +125,34 @@ const Auth = () => {
           login_time: new Date().toISOString()
         }, clientIP, sanitizeUserAgent(navigator.userAgent));
         
+        // Get user role and redirect appropriately
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+        
+        const userRole = profileData?.role || 'student';
+        const redirectRoute = getRoleBasedRoute(userRole);
+        
         toast({
           title: <TranslatedText text="Success" />,
           description: <TranslatedText text="Welcome back!" />,
         });
         
-        window.location.href = '/student-dashboard';
+        navigate(redirectRoute);
       }
     } catch (error: any) {
+      let errorMessage = getAuthErrorMessage(error);
+      
+      // Handle email confirmation specifically
+      if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the confirmation link before signing in.';
+      }
+      
       toast({
         title: <TranslatedText text="Sign in failed" />,
-        description: <TranslatedText text={getAuthErrorMessage(error)} />,
+        description: <TranslatedText text={errorMessage} />,
         variant: "destructive",
       });
     } finally {
@@ -207,12 +225,24 @@ const Auth = () => {
           signup_time: new Date().toISOString()
         }, clientIP, sanitizeUserAgent(navigator.userAgent));
         
+        // Check if email confirmation is required
+        if (!data.session) {
+          toast({
+            title: <TranslatedText text="Account created!" />,
+            description: <TranslatedText text="Please check your email for a confirmation link before signing in." />,
+          });
+          return;
+        }
+        
+        // If logged in immediately, redirect based on role
+        const redirectRoute = getRoleBasedRoute(validated.role);
+        
         toast({
           title: <TranslatedText text="Success" />,
-          description: <TranslatedText text="Account created successfully! Please check your email for verification." />,
+          description: <TranslatedText text="Account created successfully!" />,
         });
         
-        window.location.href = '/student-dashboard';
+        navigate(redirectRoute);
       }
     } catch (error: any) {
       toast({

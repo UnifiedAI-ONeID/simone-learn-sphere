@@ -16,10 +16,13 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TranslationProvider } from '@/contexts/TranslationContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { RoleProtectedRoute } from '@/components/RoleProtectedRoute';
+import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { useUserRole } from '@/hooks/useUserRole';
 
 // Separate component that uses useAuth
 const AppContent = () => {
   const { user, signOut, loading } = useAuth();
+  const { role, loading: roleLoading } = useUserRole();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', localStorage.theme === 'dark');
@@ -29,7 +32,7 @@ const AppContent = () => {
     await signOut();
   };
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
@@ -71,13 +74,13 @@ const AppContent = () => {
 
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/auth" element={user ? <Navigate to="/student-dashboard" /> : <Auth />} />
+          <Route path="/auth" element={user ? <Navigate to={getRoleBasedRoute(role)} /> : <Auth />} />
           
           {/* Admin Dashboard - Only accessible by admins */}
           <Route
             path="/admin-dashboard"
             element={
-              <RoleProtectedRoute allowedRoles={['admin']} fallbackPath="/student-dashboard">
+              <RoleProtectedRoute allowedRoles={['admin']} fallbackPath={getRoleBasedRoute(role)}>
                 <AdminDashboard />
               </RoleProtectedRoute>
             }
@@ -87,7 +90,7 @@ const AppContent = () => {
           <Route
             path="/educator-dashboard"
             element={
-              <RoleProtectedRoute allowedRoles={['educator', 'admin']} fallbackPath="/student-dashboard">
+              <RoleProtectedRoute allowedRoles={['educator', 'admin']} fallbackPath={getRoleBasedRoute(role)}>
                 <EducatorDashboard />
               </RoleProtectedRoute>
             }

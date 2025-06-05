@@ -2,6 +2,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
+import { getRoleBasedRoute } from '@/utils/roleRouting';
 
 interface RoleProtectedRouteProps {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ interface RoleProtectedRouteProps {
 export const RoleProtectedRoute = ({ 
   children, 
   allowedRoles, 
-  fallbackPath = '/student-dashboard' 
+  fallbackPath 
 }: RoleProtectedRouteProps) => {
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
@@ -30,7 +31,9 @@ export const RoleProtectedRoute = ({
   }
 
   if (!role || !allowedRoles.includes(role)) {
-    return <Navigate to={fallbackPath} replace />;
+    // Use provided fallback or determine based on user's actual role
+    const redirectPath = fallbackPath || getRoleBasedRoute(role);
+    return <Navigate to={redirectPath} replace />;
   }
 
   return <>{children}</>;

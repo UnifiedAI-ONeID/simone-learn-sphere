@@ -25,13 +25,20 @@ export const useUserRole = () => {
 
         if (error) {
           console.error('Error fetching user role:', error);
-          setRole(null);
+          // If profile doesn't exist, default to student role
+          if (error.code === 'PGRST116') {
+            console.log('Profile not found, defaulting to student role');
+            setRole('student');
+          } else {
+            setRole(null);
+          }
         } else {
-          setRole(data?.role || null);
+          setRole(data?.role || 'student');
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
-        setRole(null);
+        // Default to student role on error
+        setRole('student');
       } finally {
         setLoading(false);
       }
