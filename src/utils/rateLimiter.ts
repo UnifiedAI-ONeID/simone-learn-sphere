@@ -5,9 +5,9 @@ interface RateLimitAttempt {
   blockedUntil?: number;
 }
 
-const ATTEMPT_WINDOW = 15 * 60 * 1000; // 15 minutes
-const MAX_ATTEMPTS = 5;
-const BLOCK_DURATION = 30 * 60 * 1000; // 30 minutes
+const ATTEMPT_WINDOW = 10 * 60 * 1000; // 10 minutes (reduced from 15)
+const MAX_ATTEMPTS = 7; // Increased from 5
+const BLOCK_DURATION = 15 * 60 * 1000; // 15 minutes (reduced from 30)
 
 export class RateLimiter {
   private attempts: Map<string, RateLimitAttempt> = new Map();
@@ -69,6 +69,11 @@ export class RateLimiter {
 
     const remaining = attempt.blockedUntil - Date.now();
     return Math.max(0, remaining);
+  }
+
+  // Add method to clear all blocks (useful for development)
+  clearAllBlocks(): void {
+    this.attempts.clear();
   }
 }
 

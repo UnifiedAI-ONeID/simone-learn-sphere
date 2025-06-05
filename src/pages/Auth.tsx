@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -27,6 +27,11 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { logSecurityEvent } = useSecurityAudit();
+
+  // Clear any existing auth state on component mount
+  useEffect(() => {
+    cleanupAuthState();
+  }, []);
 
   const validateAndSanitizeSignIn = (data: Partial<SignInFormData>): SignInFormData | null => {
     try {
@@ -89,10 +94,14 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
+      // Clean up existing state thoroughly
       cleanupAuthState();
       
+      // Multiple sign out attempts to ensure clean state
       try {
         await supabase.auth.signOut({ scope: 'global' });
+        // Wait a moment for cleanup
+        await new Promise(resolve => setTimeout(resolve, 500));
       } catch (err) {
         console.warn('Pre-signin cleanup failed, continuing');
       }
@@ -125,14 +134,9 @@ const Auth = () => {
           login_time: new Date().toISOString()
         }, clientIP, sanitizeUserAgent(navigator.userAgent));
         
-        // Get user role and redirect appropriately
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-        
-        const userRole = profileData?.role || 'student';
+        // Ensure profile exists before redirecting
+        const profile = await ensureProfileExists(supabase, data.user);
+        const userRole = profile?.role || 'student';
         const redirectRoute = getRoleBasedRoute(userRole);
         
         toast({
@@ -140,14 +144,25 @@ const Auth = () => {
           description: "Welcome back!",
         });
         
-        navigate(redirectRoute);
+        // Use replace to prevent back button issues
+        navigate(redirectRoute, { replace: true });
       }
     } catch (error: any) {
       let errorMessage = getAuthErrorMessage(error);
       
-      // Handle email confirmation specifically
+      // Handle specific error cases
       if (error.message?.includes('Email not confirmed')) {
         errorMessage = 'Please check your email and click the confirmation link before signing in.';
+        toast({
+          title: "Email confirmation required",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
       }
       
       toast({
@@ -178,10 +193,12 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
+      // Clean up existing state
       cleanupAuthState();
       
       try {
         await supabase.auth.signOut({ scope: 'global' });
+        await new Promise(resolve => setTimeout(resolve, 500));
       } catch (err) {
         console.warn('Pre-signup cleanup failed, continuing');
       }
@@ -234,20 +251,33 @@ const Auth = () => {
           return;
         }
         
-        // If logged in immediately, redirect based on role
-        const redirectRoute = getRoleBasedRoute(validated.role);
+        // If logged in immediately, ensure profile exists and redirect
+        const profile = await ensureProfileExists(supabase, data.user);
+        const userRole = profile?.role || validated.role;
+        const redirectRoute = getRoleBasedRoute(userRole);
         
         toast({
           title: "Success",
           description: "Account created successfully!",
         });
         
-        navigate(redirectRoute);
+        navigate(redirectRoute, { replace: true });
       }
     } catch (error: any) {
+      let errorMessage = getAuthErrorMessage(error);
+      
+      // Handle specific signup errors
+      if (error.message?.includes('User already registered')) {
+        errorMessage = 'An account with this email already exists. Please sign in instead.';
+      }
+      
+      if (error.message?.includes('Password should be at least')) {
+        errorMessage = 'Password must be at least 6 characters long.';
+      }
+      
       toast({
         title: "Sign up failed",
-        description: getAuthErrorMessage(error),
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
