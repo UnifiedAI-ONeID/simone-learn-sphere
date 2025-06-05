@@ -18,11 +18,11 @@ const Index = () => {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
-    toast.success(`Switched to ${isDarkMode ? 'light' : 'dark'} mode`);
+    toast.success(<TranslatedText text={`Switched to ${isDarkMode ? 'light' : 'dark'} mode`} />);
   };
 
   const handleGetStarted = () => {
-    toast.success('Welcome to SimoneLabs!');
+    toast.success(<TranslatedText text="Welcome to SimoneLabs!" />);
     navigate('/auth');
   };
 
@@ -76,7 +76,7 @@ const Index = () => {
               <Brain className="h-6 w-6 text-white" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              SimoneLabs
+              <TranslatedText text="SimoneLabs" />
             </h1>
           </div>
           
@@ -97,7 +97,7 @@ const Index = () => {
               size="icon"
               className="text-gray-600 hover:text-purple-600 dark:text-gray-300 dark:hover:text-purple-400"
               aria-label="Accessibility features"
-              onClick={() => toast.success('Accessibility tools available throughout the platform')}
+              onClick={() => toast.success(<TranslatedText text="Accessibility tools available throughout the platform" />)}
             >
               <Accessibility className="h-5 w-5" />
             </Button>
@@ -170,7 +170,7 @@ const Index = () => {
                     variant="outline" 
                     size="lg"
                     className="border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/20 px-8 py-4"
-                    onClick={() => toast.success('Demo coming soon!')}
+                    onClick={() => toast.success(<TranslatedText text="Demo coming soon!" />)}
                   >
                     <TranslatedText text="Watch Demo" />
                   </Button>
@@ -179,15 +179,15 @@ const Index = () => {
                 <div className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Free to start</span>
+                    <TranslatedText text="Free to start" />
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>No credit card required</span>
+                    <TranslatedText text="No credit card required" />
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Fully accessible</span>
+                    <TranslatedText text="Fully accessible" />
                   </div>
                 </div>
               </div>
@@ -203,7 +203,7 @@ const Index = () => {
                         </CardHeader>
                         <CardContent>
                           <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {feature.title}
+                            <TranslatedText text={feature.title} />
                           </CardTitle>
                         </CardContent>
                       </Card>
@@ -219,10 +219,10 @@ const Index = () => {
         <div className="mx-auto max-w-7xl mt-24">
           <div className="text-center space-y-4 mb-16">
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Everything You Need to Succeed
+              <TranslatedText text="Everything You Need to Succeed" />
             </h3>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              From AI-powered course creation to community building, SimoneLabs provides all the tools for modern education.
+              <TranslatedText text="From AI-powered course creation to community building, SimoneLabs provides all the tools for modern education." />
             </p>
           </div>
           
@@ -233,11 +233,13 @@ const Index = () => {
                   <div className="mx-auto w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-white" />
                   </div>
-                  <CardTitle className="text-gray-900 dark:text-white">{feature.title}</CardTitle>
+                  <CardTitle className="text-gray-900 dark:text-white">
+                    <TranslatedText text={feature.title} />
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-600 dark:text-gray-300">
-                    {feature.description}
+                    <TranslatedText text={feature.description} />
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -249,10 +251,10 @@ const Index = () => {
         <div className="mx-auto max-w-7xl mt-24">
           <div className="text-center space-y-4 mb-16">
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Meet Our Co-Founders
+              <TranslatedText text="Meet Our Co-Founders" />
             </h3>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Passionate leaders dedicated to transforming education through innovation and technology.
+              <TranslatedText text="Passionate leaders dedicated to transforming education through innovation and technology." />
             </p>
           </div>
           
@@ -268,14 +270,16 @@ const Index = () => {
                       </AvatarFallback>
                     </Avatar>
                   </div>
-                  <CardTitle className="text-xl text-gray-900 dark:text-white">{founder.name}</CardTitle>
+                  <CardTitle className="text-xl text-gray-900 dark:text-white">
+                    <TranslatedText text={founder.name} />
+                  </CardTitle>
                   <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                    {founder.role}
+                    <TranslatedText text={founder.role} />
                   </Badge>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-600 dark:text-gray-300 text-base">
-                    {founder.description}
+                    <TranslatedText text={founder.description} />
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -288,17 +292,17 @@ const Index = () => {
           <Card className="border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
             <CardContent className="py-12">
               <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                Ready to Transform Education?
+                <TranslatedText text="Ready to Transform Education?" />
               </h3>
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-                Join thousands of educators who are already creating amazing learning experiences with SimoneLabs.
+                <TranslatedText text="Join thousands of educators who are already creating amazing learning experiences with SimoneLabs." />
               </p>
               <Button 
                 onClick={handleGetStarted}
                 size="lg" 
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-12 py-4 text-lg"
               >
-                Start Your Journey
+                <TranslatedText text="Start Your Journey" />
               </Button>
             </CardContent>
           </Card>
@@ -309,7 +313,9 @@ const Index = () => {
       <footer className="mt-24 border-t border-gray-200 dark:border-gray-800 py-12">
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
           <div className="text-center text-gray-500 dark:text-gray-400">
-            <p>&copy; 2024 SimoneLabs. Democratizing education worldwide.</p>
+            <p>
+              <TranslatedText text="© 2024 SimoneLabs. Democratizing education worldwide." />
+            </p>
           </div>
         </div>
       </footer>
