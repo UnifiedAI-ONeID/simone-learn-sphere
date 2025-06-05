@@ -4,6 +4,7 @@ import { TranslatedText } from '@/components/TranslatedText';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { BookOpen, Clock, Trophy, TrendingUp, Play, CheckCircle, GraduationCap } from 'lucide-react';
 
 const StudentDashboard = () => {
@@ -120,14 +121,14 @@ const StudentDashboard = () => {
                       <h3 className="font-medium text-gray-900 dark:text-white">
                         <TranslatedText text={course.title} />
                       </h3>
-                      <div className="text-sm text-gray-600 dark:text-gray-300">
+                      <Badge variant="secondary">
                         <TranslatedText text={course.category} />
-                      </div>
+                      </Badge>
                       {course.progress === 100 && (
-                        <div className="flex items-center text-green-600">
-                          <CheckCircle className="h-4 w-4 mr-1" />
+                        <Badge className="bg-green-100 text-green-800 border-green-200">
+                          <CheckCircle className="h-3 w-3 mr-1" />
                           <TranslatedText text="Completed" />
-                        </div>
+                        </Badge>
                       )}
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">

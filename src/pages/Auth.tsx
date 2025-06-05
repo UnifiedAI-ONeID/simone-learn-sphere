@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { Brain, User, GraduationCap, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -294,9 +295,9 @@ const Auth = () => {
                     <div className="text-sm text-gray-600">{role.description}</div>
                   </div>
                   {userRole === role.id && (
-                    <div className="bg-white text-current px-2 py-1 rounded-full text-sm">
+                    <Badge variant="secondary" className="bg-white text-current">
                       <TranslatedText text="Selected" />
-                    </div>
+                    </Badge>
                   )}
                 </div>
               </div>
