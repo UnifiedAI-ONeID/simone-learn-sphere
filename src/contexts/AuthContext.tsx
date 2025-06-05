@@ -48,16 +48,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Handle profile creation/validation on sign in
         if (event === 'SIGNED_IN' && session?.user) {
-          // Use setTimeout to prevent potential deadlocks
-          setTimeout(async () => {
-            if (mounted) {
-              try {
-                await ensureProfileExists(supabase, session.user);
-              } catch (error) {
-                console.error('Error ensuring profile exists:', error);
-              }
-            }
-          }, 100);
+          try {
+            await ensureProfileExists(supabase, session.user);
+          } catch (error) {
+            console.error('Error ensuring profile exists:', error);
+          }
         }
 
         // Clear any stale data on sign out

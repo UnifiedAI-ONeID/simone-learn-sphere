@@ -26,29 +26,13 @@ export const cleanupAuthState = () => {
 
 export const secureSignOut = async (supabase: any) => {
   try {
-    // Clean up auth state first
+    // Attempt global sign out
+    await supabase.auth.signOut({ scope: 'global' });
+    
+    // Clean up auth state after successful sign out
     cleanupAuthState();
     
-    // Attempt global sign out with retry mechanism
-    let attempts = 0;
-    const maxAttempts = 3;
-    
-    while (attempts < maxAttempts) {
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-        break;
-      } catch (err) {
-        attempts++;
-        if (attempts >= maxAttempts) {
-          console.warn('Global sign out failed after multiple attempts, continuing with cleanup');
-          break;
-        }
-        // Wait before retry
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-    }
-    
-    // Force page reload for complete cleanup
+    // Redirect to auth page
     window.location.href = '/auth';
   } catch (error) {
     console.error('Sign out error:', error);
