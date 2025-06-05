@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,14 +8,14 @@ import { LogOut } from 'lucide-react';
 
 import Index from './pages/Index';
 import Auth from './pages/Auth';
-import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import StudentDashboard from './pages/StudentDashboard';
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from './contexts/AuthContext';
 import { TranslationProvider } from '@/contexts/TranslationContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
 function App() {
-  const { user, logout, loading } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const [queryClient] = useState(() => new QueryClient());
 
   useEffect(() => {
@@ -22,7 +23,7 @@ function App() {
   }, []);
 
   const handleLogout = async () => {
-    await logout();
+    await signOut();
   };
 
   return (
@@ -61,12 +62,12 @@ function App() {
 
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
+              <Route path="/auth" element={user ? <Navigate to="/admin-dashboard" /> : <Auth />} />
               <Route
-                path="/dashboard"
+                path="/admin-dashboard"
                 element={
                   user ? (
-                    <Dashboard />
+                    <AdminDashboard />
                   ) : (
                     <Navigate to="/auth" />
                   )
