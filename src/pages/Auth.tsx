@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, SignUpFormData, SignInFormData } from '@/schemas/authSchemas';
 import { authRateLimiter } from '@/utils/rateLimiter';
 import { getAuthErrorMessage, sanitizeInput } from '@/utils/errorHandling';
-import { cleanupAuthState } from '@/utils/authCleanup';
+import { cleanupAuthState, ensureProfileExists } from '@/utils/authCleanup';
 import { useSecurityAudit } from '@/hooks/useSecurityAudit';
 import { getClientIP, sanitizeUserAgent } from '@/utils/securityUtils';
 import { TranslatedText } from '@/components/TranslatedText';
