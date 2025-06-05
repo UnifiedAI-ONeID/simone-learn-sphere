@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
+import { TranslatedText } from '@/components/TranslatedText';
 import { LogOut } from 'lucide-react';
 
 import Index from './pages/Index';
@@ -60,7 +61,7 @@ const AppContent = () => {
                     className="text-gray-600 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    Logout
+                    <TranslatedText text="Logout" />
                   </Button>
                 </div>
               </div>

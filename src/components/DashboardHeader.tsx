@@ -1,6 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { TranslatedText } from '@/components/TranslatedText';
 import { LogOut, Brain } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -55,17 +56,17 @@ export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIc
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {title}
+              <TranslatedText text={title} />
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              {subtitle}
+              <TranslatedText text={subtitle} />
             </p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
           <Badge variant="secondary" className="px-3 py-1">
             <DisplayBadgeIcon className="w-4 h-4 mr-1" />
-            {displayBadgeText}
+            <TranslatedText text={displayBadgeText} />
           </Badge>
           <Button 
             variant="outline" 
@@ -75,7 +76,9 @@ export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIc
             className="flex items-center space-x-2"
           >
             <LogOut className="h-4 w-4" />
-            <span>{isSigningOut ? 'Signing Out...' : 'Sign Out'}</span>
+            <span>
+              <TranslatedText text={isSigningOut ? 'Signing Out...' : 'Sign Out'} />
+            </span>
           </Button>
         </div>
       </div>

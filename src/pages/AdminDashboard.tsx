@@ -4,6 +4,7 @@ import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { SecurityDashboard } from '@/components/SecurityDashboard';
 import { UserManagement } from '@/components/UserManagement';
 import { ImpersonationBanner } from '@/components/ImpersonationBanner';
+import { TranslatedText } from '@/components/TranslatedText';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, Shield, BarChart3, Settings, Crown } from 'lucide-react';
 
@@ -24,19 +25,19 @@ const AdminDashboard = () => {
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="metrics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              Metrics
+              <TranslatedText text="Metrics" />
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              Users
+              <TranslatedText text="Users" />
             </TabsTrigger>
             <TabsTrigger value="security" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              Security
+              <TranslatedText text="Security" />
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
-              Settings
+              <TranslatedText text="Settings" />
             </TabsTrigger>
           </TabsList>
           
@@ -56,10 +57,10 @@ const AdminDashboard = () => {
             <div className="text-center py-8">
               <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                Settings Coming Soon
+                <TranslatedText text="Settings Coming Soon" />
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Platform settings and configuration options will be available here.
+                <TranslatedText text="Platform settings and configuration options will be available here." />
               </p>
             </div>
           </TabsContent>
