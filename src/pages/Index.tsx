@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BookOpen, Users, Brain, Trophy, Moon, Sun, Accessibility } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -112,9 +111,9 @@ const Index = () => {
             // Mobile-First Landing
             <div className="text-center space-y-8">
               <div className="space-y-4">
-                <Badge variant="secondary\" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                <div className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 inline-block rounded-full">
                   📱 <TranslatedText text="Mobile-Optimized Learning" />
-                </Badge>
+                </div>
                 <h2 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
                   <TranslatedText text="Learn & Teach" />
                   <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
@@ -144,9 +143,9 @@ const Index = () => {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-8">
                 <div className="space-y-4">
-                  <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                  <div className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 inline-block rounded-full">
                     🚀 <TranslatedText text="Democratizing Education Worldwide" />
-                  </Badge>
+                  </div>
                   <h2 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-white lg:text-6xl">
                     <TranslatedText text="Empower Your" />
                     <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
@@ -273,9 +272,9 @@ const Index = () => {
                   <CardTitle className="text-xl text-gray-900 dark:text-white">
                     <TranslatedText text={founder.name} />
                   </CardTitle>
-                  <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                  <div className="text-sm font-medium text-purple-600 dark:text-purple-400">
                     <TranslatedText text={founder.role} />
-                  </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-600 dark:text-gray-300 text-base">
