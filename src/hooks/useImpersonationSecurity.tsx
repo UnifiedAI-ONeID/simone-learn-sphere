@@ -15,6 +15,17 @@ interface ImpersonationSecurityState {
   };
 }
 
+interface ImpersonationContext {
+  session_id: string;
+  target_user_id: string;
+  target_role: string;
+  target_first_name: string;
+  target_last_name: string;
+  target_email: string;
+  started_at: string;
+  max_duration_minutes: number;
+}
+
 export const useImpersonationSecurity = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -38,7 +49,7 @@ export const useImpersonationSecurity = () => {
       }
 
       if (data && data.length > 0) {
-        const session = data[0];
+        const session = data[0] as ImpersonationContext;
         
         // Calculate time remaining
         const startTime = new Date(session.started_at);

@@ -12,7 +12,10 @@ import { TranslatedText } from '@/components/TranslatedText';
 const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-950/20 dark:via-orange-950/20 dark:to-yellow-950/20">
-      <DashboardHeader />
+      <DashboardHeader 
+        title="Admin Dashboard"
+        subtitle="Comprehensive platform management and analytics"
+      />
       
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
