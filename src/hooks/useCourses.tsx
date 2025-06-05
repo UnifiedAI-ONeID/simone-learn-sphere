@@ -57,7 +57,7 @@ export const useCourses = () => {
 
       if (error) throw error;
 
-      // Get enrollment counts for each course
+      // Get enrollment counts for each course and format pricing
       const coursesWithCounts = await Promise.all(
         (data || []).map(async (course) => {
           const { count } = await supabase
@@ -68,6 +68,9 @@ export const useCourses = () => {
           return {
             ...course,
             enrollment_count: count || 0,
+            pricing: Array.isArray(course.pricing) && course.pricing.length > 0 
+              ? course.pricing[0] 
+              : { price: 0, currency: 'USD', is_free: true, discount_percentage: 0 }
           };
         })
       );
@@ -92,8 +95,15 @@ export const useCourses = () => {
       const { data, error } = await supabase
         .from('courses')
         .insert({
-          ...courseData,
+          title: courseData.title || 'Untitled Course',
+          description: courseData.description || '',
           educator_id: user.id,
+          category_id: courseData.category_id,
+          difficulty_level: courseData.difficulty_level || 'beginner',
+          estimated_duration: courseData.estimated_duration || 1,
+          thumbnail_url: courseData.thumbnail_url || '',
+          tags: courseData.tags || [],
+          is_published: courseData.is_published || false,
         })
         .select()
         .single();
@@ -121,7 +131,16 @@ export const useCourses = () => {
     try {
       const { error } = await supabase
         .from('courses')
-        .update(updates)
+        .update({
+          title: updates.title,
+          description: updates.description,
+          category_id: updates.category_id,
+          difficulty_level: updates.difficulty_level,
+          estimated_duration: updates.estimated_duration,
+          thumbnail_url: updates.thumbnail_url,
+          tags: updates.tags,
+          is_published: updates.is_published,
+        })
         .eq('id', courseId);
 
       if (error) throw error;

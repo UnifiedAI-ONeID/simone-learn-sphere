@@ -18,7 +18,10 @@ const EducatorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      <DashboardHeader />
+      <DashboardHeader 
+        title="Educator Dashboard"
+        subtitle="Manage your courses and track student engagement"
+      />
       <div className="container mx-auto px-6 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 max-w-lg">

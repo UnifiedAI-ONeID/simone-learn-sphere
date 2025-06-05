@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface Lesson {
   id: string;
@@ -17,6 +18,7 @@ export interface Lesson {
 }
 
 export const useLessons = (courseId: string) => {
+  const { user } = useAuth();
   const { toast } = useToast();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,10 +48,20 @@ export const useLessons = (courseId: string) => {
   };
 
   const completeLesson = async (lessonId: string, timeSpent: number = 0) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to complete lessons",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     try {
       const { error } = await supabase
         .from('lesson_completions')
         .insert({
+          user_id: user.id,
           lesson_id: lessonId,
           time_spent: timeSpent,
         });

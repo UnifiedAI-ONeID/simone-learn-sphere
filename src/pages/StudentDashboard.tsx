@@ -18,7 +18,10 @@ const StudentDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <DashboardHeader />
+      <DashboardHeader 
+        title="Student Dashboard"
+        subtitle="Track your learning progress and discover new courses"
+      />
       <div className="container mx-auto px-6 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 max-w-md">

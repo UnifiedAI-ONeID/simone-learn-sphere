@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, Trophy, Flame, Clock, Target, PlayCircle, Award, TrendingUp } from 'lucide-react';
 import { useEnrollments } from '@/hooks/useEnrollments';
 import { useGamification } from '@/hooks/useGamification';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, CircularProgressbar } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const EnhancedStudentDashboard: React.FC = () => {
   const { enrollments, loading: enrollmentsLoading } = useEnrollments();
