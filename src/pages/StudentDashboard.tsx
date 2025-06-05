@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +17,7 @@ import {
   Target,
   Calendar
 } from 'lucide-react';
+import { TranslatedText } from '@/components/TranslatedText';
 
 const StudentDashboard = () => {
   const { trackPageView } = useEngagementTracking();
@@ -59,10 +59,18 @@ const StudentDashboard = () => {
       <div className="p-6 max-w-7xl mx-auto">
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="progress">My Progress</TabsTrigger>
-            <TabsTrigger value="courses">Courses</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
+            <TabsTrigger value="overview">
+              <TranslatedText text="Overview" />
+            </TabsTrigger>
+            <TabsTrigger value="progress">
+              <TranslatedText text="My Progress" />
+            </TabsTrigger>
+            <TabsTrigger value="courses">
+              <TranslatedText text="Courses" />
+            </TabsTrigger>
+            <TabsTrigger value="achievements">
+              <TranslatedText text="Achievements" />
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -74,7 +82,9 @@ const StudentDashboard = () => {
                     <BookOpen className="h-8 w-8 text-blue-600" />
                     <div>
                       <p className="text-2xl font-bold">{stats.coursesEnrolled}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Courses Enrolled</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        <TranslatedText text="Courses Enrolled" />
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -86,7 +96,9 @@ const StudentDashboard = () => {
                     <Target className="h-8 w-8 text-green-600" />
                     <div>
                       <p className="text-2xl font-bold">{stats.lessonsCompleted}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Lessons Completed</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        <TranslatedText text="Lessons Completed" />
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -98,7 +110,9 @@ const StudentDashboard = () => {
                     <Clock className="h-8 w-8 text-purple-600" />
                     <div>
                       <p className="text-2xl font-bold">{stats.totalHours}h</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Learning Time</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        <TranslatedText text="Learning Time" />
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -110,7 +124,9 @@ const StudentDashboard = () => {
                     <TrendingUp className="h-8 w-8 text-orange-600" />
                     <div>
                       <p className="text-2xl font-bold">{stats.currentStreak}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Day Streak</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        <TranslatedText text="Day Streak" />
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -120,30 +136,36 @@ const StudentDashboard = () => {
             {/* Upcoming Lessons */}
             <Card>
               <CardHeader>
-                <CardTitle>Continue Learning</CardTitle>
-                <CardDescription>Pick up where you left off</CardDescription>
+                <CardTitle>
+                  <TranslatedText text="Continue Learning" />
+                </CardTitle>
+                <CardDescription>
+                  <TranslatedText text="Pick up where you left off" />
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {upcomingLessons.map((lesson) => (
                     <div key={lesson.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                       <div className="flex-1">
-                        <h3 className="font-semibold">{lesson.title}</h3>
+                        <h3 className="font-semibold">
+                          <TranslatedText text={lesson.title} />
+                        </h3>
                         <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300 mt-1">
-                          <span>{lesson.course}</span>
+                          <span><TranslatedText text={lesson.course} /></span>
                           <span className="flex items-center">
                             <Clock className="w-4 h-4 mr-1" />
                             {lesson.duration}
                           </span>
                           <span className="flex items-center">
                             <Calendar className="w-4 h-4 mr-1" />
-                            {lesson.dueDate}
+                            <TranslatedText text={lesson.dueDate} />
                           </span>
                         </div>
                       </div>
                       <Button size="sm" className="ml-4">
                         <Play className="w-4 h-4 mr-1" />
-                        Continue
+                        <TranslatedText text="Continue" />
                       </Button>
                     </div>
                   ))}

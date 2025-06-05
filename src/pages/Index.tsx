@@ -1,4 +1,3 @@
-
 import { isMobile, isTablet } from 'react-device-detect';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BookOpen, Users, Brain, Trophy, Moon, Sun, Accessibility } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { TranslatedText } from '@/components/TranslatedText';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 const Index = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -80,6 +81,7 @@ const Index = () => {
           </div>
           
           <div className="flex items-center space-x-4">
+            <LanguageSelector />
             <Button
               variant="ghost"
               size="icon"
@@ -111,16 +113,16 @@ const Index = () => {
             <div className="text-center space-y-8">
               <div className="space-y-4">
                 <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                  📱 Mobile-Optimized Learning
+                  📱 <TranslatedText text="Mobile-Optimized Learning" />
                 </Badge>
                 <h2 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
-                  Learn & Teach
+                  <TranslatedText text="Learn & Teach" />
                   <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                    On the Go
+                    <TranslatedText text="On the Go" />
                   </span>
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                  Access powerful educational tools from your mobile device. Create courses, learn with AI assistance, and connect with a global community of learners.
+                  <TranslatedText text="Access powerful educational tools from your mobile device. Create courses, learn with AI assistance, and connect with a global community of learners." />
                 </p>
               </div>
               
@@ -130,10 +132,10 @@ const Index = () => {
                   size="lg" 
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 text-lg"
                 >
-                  Start Learning Today
+                  <TranslatedText text="Start Learning Today" />
                 </Button>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Free to start • No credit card required
+                  <TranslatedText text="Free to start • No credit card required" />
                 </p>
               </div>
             </div>
@@ -143,16 +145,16 @@ const Index = () => {
               <div className="space-y-8">
                 <div className="space-y-4">
                   <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                    🚀 Democratizing Education Worldwide
+                    🚀 <TranslatedText text="Democratizing Education Worldwide" />
                   </Badge>
                   <h2 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-white lg:text-6xl">
-                    Empower Your
+                    <TranslatedText text="Empower Your" />
                     <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                      Teaching Journey
+                      <TranslatedText text="Teaching Journey" />
                     </span>
                   </h2>
                   <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl">
-                    Create immersive educational experiences with AI-powered tools. Build, deliver, and monetize courses while connecting with learners globally.
+                    <TranslatedText text="Create immersive educational experiences with AI-powered tools. Build, deliver, and monetize courses while connecting with learners globally." />
                   </p>
                 </div>
                 
@@ -162,7 +164,7 @@ const Index = () => {
                     size="lg" 
                     className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4"
                   >
-                    Get Started Free
+                    <TranslatedText text="Get Started Free" />
                   </Button>
                   <Button 
                     variant="outline" 
@@ -170,7 +172,7 @@ const Index = () => {
                     className="border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/20 px-8 py-4"
                     onClick={() => toast.success('Demo coming soon!')}
                   >
-                    Watch Demo
+                    <TranslatedText text="Watch Demo" />
                   </Button>
                 </div>
                 

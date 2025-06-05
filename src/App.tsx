@@ -1,135 +1,93 @@
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-react';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
-import { SessionTimeoutWarning } from "./components/SessionTimeoutWarning";
-import { usePerformanceTracking } from "./hooks/usePerformanceTracking";
-import { useEngagementTracking } from "./hooks/useEngagementTracking";
-import { useEffect } from "react";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import StudentDashboard from "./pages/StudentDashboard";
-import EducatorDashboard from "./pages/EducatorDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import NotFound from "./pages/NotFound";
+import Index from './pages/Index';
+import Auth from './pages/Auth';
+import Dashboard from './pages/Dashboard';
+import StudentDashboard from './pages/StudentDashboard';
+import { useAuth } from './hooks/useAuth';
+import { TranslationProvider } from '@/contexts/TranslationContext';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
-const queryClient = new QueryClient();
-
-// Performance tracking wrapper for route components
-const RouteWithTracking = ({ children, routeName }: { children: React.ReactNode; routeName: string }) => {
-  const { trackPerformance } = usePerformanceTracking();
-  const { trackEngagement } = useEngagementTracking();
+function App() {
+  const { user, logout, loading } = useAuth();
+  const [queryClient] = useState(() => new QueryClient());
 
   useEffect(() => {
-    const startTime = Date.now();
-    trackEngagement('page_view', undefined, { page: routeName });
-    
-    return () => {
-      trackPerformance(routeName, startTime);
-    };
-  }, [routeName, trackPerformance, trackEngagement]);
+    document.documentElement.classList.toggle('dark', localStorage.theme === 'dark');
+  }, []);
 
-  return <>{children}</>;
-};
+  const handleLogout = async () => {
+    await logout();
+  };
 
-// Protected Route Component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
-  
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-  
-  return <>{children}</>;
-};
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TranslationProvider>
+        <Router>
+          <div className="min-h-screen bg-background">
+            <Toaster />
+            
+            {/* Navigation Header with Language Selector */}
+            {user && (
+              <header className="border-b bg-white dark:bg-gray-900 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="flex justify-between items-center h-16">
+                    <div className="flex items-center space-x-4">
+                      <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        SimoneLabs
+                      </h1>
+                    </div>
+                    
+                    <div className="flex items-center space-x-4">
+                      <LanguageSelector />
+                      <Button
+                        variant="outline"
+                        onClick={handleLogout}
+                        className="text-gray-600 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Logout
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </header>
+            )}
 
-// Public Route Component (redirects to dashboard if authenticated)
-const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
-  
-  if (user) {
-    return <Navigate to="/student-dashboard" replace />;
-  }
-  
-  return <>{children}</>;
-};
-
-const AppRoutes = () => (
-  <>
-    <SessionTimeoutWarning />
-    <Routes>
-      <Route path="/" element={
-        <PublicRoute>
-          <RouteWithTracking routeName="/">
-            <Index />
-          </RouteWithTracking>
-        </PublicRoute>
-      } />
-      <Route path="/auth" element={
-        <PublicRoute>
-          <RouteWithTracking routeName="/auth">
-            <Auth />
-          </RouteWithTracking>
-        </PublicRoute>
-      } />
-      <Route path="/student-dashboard" element={
-        <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
-          <RouteWithTracking routeName="/student-dashboard">
-            <StudentDashboard />
-          </RouteWithTracking>
-        </RoleProtectedRoute>
-      } />
-      <Route path="/educator-dashboard" element={
-        <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
-          <RouteWithTracking routeName="/educator-dashboard">
-            <EducatorDashboard />
-          </RouteWithTracking>
-        </RoleProtectedRoute>
-      } />
-      <Route path="/admin-dashboard" element={
-        <RoleProtectedRoute allowedRoles={['admin']}>
-          <RouteWithTracking routeName="/admin-dashboard">
-            <AdminDashboard />
-          </RouteWithTracking>
-        </RoleProtectedRoute>
-      } />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  </>
-);
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
+              <Route
+                path="/dashboard"
+                element={
+                  user ? (
+                    <Dashboard />
+                  ) : (
+                    <Navigate to="/auth" />
+                  )
+                }
+              />
+              <Route
+                path="/student-dashboard"
+                element={
+                  user ? (
+                    <StudentDashboard />
+                  ) : (
+                    <Navigate to="/auth" />
+                  )
+                }
+              />
+            </Routes>
+          </div>
+        </Router>
+      </TranslationProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
