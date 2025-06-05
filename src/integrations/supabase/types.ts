@@ -46,6 +46,7 @@ export type Database = {
           ended_at: string | null
           id: string
           is_active: boolean
+          max_duration_minutes: number | null
           started_at: string
           target_role: string
           target_user_id: string
@@ -56,6 +57,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           is_active?: boolean
+          max_duration_minutes?: number | null
           started_at?: string
           target_role: string
           target_user_id: string
@@ -66,6 +68,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           is_active?: boolean
+          max_duration_minutes?: number | null
           started_at?: string
           target_role?: string
           target_user_id?: string
@@ -309,6 +312,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_impersonation_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       end_impersonation: {
         Args: { session_id: string }
         Returns: boolean
@@ -328,6 +335,10 @@ export type Database = {
       get_educator_creation_rate: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      get_effective_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_impersonation_context: {
         Args: Record<PropertyKey, never>
@@ -356,6 +367,10 @@ export type Database = {
       start_impersonation: {
         Args: { target_user_id: string; target_role: string }
         Returns: string
+      }
+      validate_impersonation_session: {
+        Args: { session_id: string }
+        Returns: boolean
       }
     }
     Enums: {

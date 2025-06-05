@@ -1,129 +1,75 @@
 
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'react-hot-toast';
-import { Button } from '@/components/ui/button';
-import { TranslatedText } from '@/components/TranslatedText';
-import { LogOut } from 'lucide-react';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { TranslationProvider } from "@/contexts/TranslationContext";
+import { SecurityProvider } from "@/components/SecurityProvider";
+import { RoleProtectedRoute } from "@/components/RoleProtectedRoute";
+import { ImpersonationBanner } from "@/components/ImpersonationBanner";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import StudentDashboard from "./pages/StudentDashboard";
+import EducatorDashboard from "./pages/EducatorDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import NotFound from "./pages/NotFound";
 
-import Index from './pages/Index';
-import Auth from './pages/Auth';
-import AdminDashboard from './pages/AdminDashboard';
-import StudentDashboard from './pages/StudentDashboard';
-import EducatorDashboard from './pages/EducatorDashboard';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { TranslationProvider } from '@/contexts/TranslationContext';
-import { LanguageSelector } from '@/components/LanguageSelector';
-import { RoleProtectedRoute } from '@/components/RoleProtectedRoute';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
-import { useUserRole } from '@/hooks/useUserRole';
+const queryClient = new QueryClient();
 
-// Separate component that uses useAuth
-const AppContent = () => {
-  const { user, signOut, loading } = useAuth();
-  const { role, loading: roleLoading } = useUserRole();
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', localStorage.theme === 'dark');
-  }, []);
-
-  const handleLogout = async () => {
-    await signOut();
-  };
-
-  if (loading || roleLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
-
-  return (
-    <Router>
-      <div className="min-h-screen bg-background">
-        <Toaster />
-        
-        {/* Navigation Header with Language Selector */}
-        {user && (
-          <header className="border-b bg-white dark:bg-gray-900 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center h-16">
-                <div className="flex items-center space-x-4">
-                  <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    SimoneLabs
-                  </h1>
-                </div>
-                
-                <div className="flex items-center space-x-4">
-                  <LanguageSelector />
-                  <Button
-                    variant="outline"
-                    onClick={handleLogout}
-                    className="text-gray-600 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    <TranslatedText text="Logout" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </header>
-        )}
-
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={user ? <Navigate to={getRoleBasedRoute(role)} /> : <Auth />} />
-          
-          {/* Admin Dashboard - Only accessible by admins */}
-          <Route
-            path="/admin-dashboard"
-            element={
-              <RoleProtectedRoute allowedRoles={['admin']} fallbackPath={getRoleBasedRoute(role)}>
-                <AdminDashboard />
-              </RoleProtectedRoute>
-            }
-          />
-          
-          {/* Educator Dashboard - Accessible by educators and admins */}
-          <Route
-            path="/educator-dashboard"
-            element={
-              <RoleProtectedRoute allowedRoles={['educator', 'admin']} fallbackPath={getRoleBasedRoute(role)}>
-                <EducatorDashboard />
-              </RoleProtectedRoute>
-            }
-          />
-          
-          {/* Student Dashboard - Accessible by all authenticated users */}
-          <Route
-            path="/student-dashboard"
-            element={
-              user ? (
-                <StudentDashboard />
-              ) : (
-                <Navigate to="/auth" />
-              )
-            }
-          />
-        </Routes>
-      </div>
-    </Router>
-  );
-};
-
-// Main App component that provides the context
 function App() {
-  const [queryClient] = useState(() => new QueryClient());
-
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TranslationProvider>
-          <AppContent />
-        </TranslationProvider>
-      </AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <TranslationProvider>
+              <SecurityProvider>
+                <div className="min-h-screen bg-background">
+                  <ImpersonationBanner />
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    
+                    <Route
+                      path="/student-dashboard"
+                      element={
+                        <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
+                          <StudentDashboard />
+                        </RoleProtectedRoute>
+                      }
+                    />
+                    
+                    <Route
+                      path="/educator-dashboard"
+                      element={
+                        <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
+                          <EducatorDashboard />
+                        </RoleProtectedRoute>
+                      }
+                    />
+                    
+                    <Route
+                      path="/admin-dashboard"
+                      element={
+                        <RoleProtectedRoute allowedRoles={['admin']}>
+                          <AdminDashboard />
+                        </RoleProtectedRoute>
+                      }
+                    />
+                    
+                    <Route path="/404" element={<NotFound />} />
+                    <Route path="*" element={<Navigate to="/404" replace />} />
+                  </Routes>
+                </div>
+              </SecurityProvider>
+            </TranslationProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }
