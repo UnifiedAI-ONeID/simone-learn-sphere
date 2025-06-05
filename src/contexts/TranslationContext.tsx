@@ -11,6 +11,7 @@ export type SupportedLanguage = {
 
 export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
+  { code: 'zh-CN', name: 'Simplified Chinese', nativeName: '简体中文', flag: '🇨🇳' },
   { code: 'zh-TW', name: 'Traditional Chinese', nativeName: '繁體中文', flag: '🇹🇼' },
   { code: 'tl', name: 'Tagalog', nativeName: 'Tagalog', flag: '🇵🇭' },
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
