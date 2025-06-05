@@ -39,6 +39,39 @@ export type Database = {
         }
         Relationships: []
       }
+      impersonation_sessions: {
+        Row: {
+          admin_id: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          is_active: boolean
+          started_at: string
+          target_role: string
+          target_user_id: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean
+          started_at?: string
+          target_role: string
+          target_user_id: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean
+          started_at?: string
+          target_role?: string
+          target_user_id?: string
+        }
+        Relationships: []
+      }
       lesson_completions: {
         Row: {
           completed_at: string
@@ -276,6 +309,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      end_impersonation: {
+        Args: { session_id: string }
+        Returns: boolean
+      }
       get_average_response_time: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -292,6 +329,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      get_impersonation_context: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          session_id: string
+          target_user_id: string
+          target_role: string
+          target_first_name: string
+          target_last_name: string
+          target_email: string
+        }[]
+      }
       get_weekly_completion_rate: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -304,6 +352,10 @@ export type Database = {
           user_agent?: string
         }
         Returns: undefined
+      }
+      start_impersonation: {
+        Args: { target_user_id: string; target_role: string }
+        Returns: string
       }
     }
     Enums: {
