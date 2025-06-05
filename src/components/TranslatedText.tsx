@@ -60,4 +60,4 @@ export const TranslatedText: React.FC<TranslatedTextProps> = ({
   }
 
   return <Component className={className}>{translatedText}</Component>;
-};
+}
