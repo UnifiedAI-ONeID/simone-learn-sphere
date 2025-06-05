@@ -80,8 +80,8 @@ const Auth = () => {
     if (authRateLimiter.isBlocked(identifier)) {
       const timeRemaining = Math.ceil(authRateLimiter.getBlockTimeRemaining(identifier) / 1000 / 60);
       toast({
-        title: <TranslatedText text="Too many attempts" />,
-        description: <TranslatedText text={`Please wait ${timeRemaining} minutes before trying again.`} />,
+        title: "Too many attempts",
+        description: `Please wait ${timeRemaining} minutes before trying again.`,
         variant: "destructive",
       });
       return;
@@ -136,8 +136,8 @@ const Auth = () => {
         const redirectRoute = getRoleBasedRoute(userRole);
         
         toast({
-          title: <TranslatedText text="Success" />,
-          description: <TranslatedText text="Welcome back!" />,
+          title: "Success",
+          description: "Welcome back!",
         });
         
         navigate(redirectRoute);
@@ -151,8 +151,8 @@ const Auth = () => {
       }
       
       toast({
-        title: <TranslatedText text="Sign in failed" />,
-        description: <TranslatedText text={errorMessage} />,
+        title: "Sign in failed",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -169,8 +169,8 @@ const Auth = () => {
     if (authRateLimiter.isBlocked(identifier)) {
       const timeRemaining = Math.ceil(authRateLimiter.getBlockTimeRemaining(identifier) / 1000 / 60);
       toast({
-        title: <TranslatedText text="Too many attempts" />,
-        description: <TranslatedText text={`Please wait ${timeRemaining} minutes before trying again.`} />,
+        title: "Too many attempts",
+        description: `Please wait ${timeRemaining} minutes before trying again.`,
         variant: "destructive",
       });
       return;
@@ -228,8 +228,8 @@ const Auth = () => {
         // Check if email confirmation is required
         if (!data.session) {
           toast({
-            title: <TranslatedText text="Account created!" />,
-            description: <TranslatedText text="Please check your email for a confirmation link before signing in." />,
+            title: "Account created!",
+            description: "Please check your email for a confirmation link before signing in.",
           });
           return;
         }
@@ -238,16 +238,16 @@ const Auth = () => {
         const redirectRoute = getRoleBasedRoute(validated.role);
         
         toast({
-          title: <TranslatedText text="Success" />,
-          description: <TranslatedText text="Account created successfully!" />,
+          title: "Success",
+          description: "Account created successfully!",
         });
         
         navigate(redirectRoute);
       }
     } catch (error: any) {
       toast({
-        title: <TranslatedText text="Sign up failed" />,
-        description: <TranslatedText text={getAuthErrorMessage(error)} />,
+        title: "Sign up failed",
+        description: getAuthErrorMessage(error),
         variant: "destructive",
       });
     } finally {

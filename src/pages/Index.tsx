@@ -112,7 +112,7 @@ const Index = () => {
             // Mobile-First Landing
             <div className="text-center space-y-8">
               <div className="space-y-4">
-                <Badge variant="secondary\" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                   📱 <TranslatedText text="Mobile-Optimized Learning" />
                 </Badge>
                 <h2 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">

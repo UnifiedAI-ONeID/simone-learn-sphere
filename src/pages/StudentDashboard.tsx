@@ -1,3 +1,4 @@
+
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { ImpersonationBanner } from '@/components/ImpersonationBanner';
 import { TranslatedText } from '@/components/TranslatedText';
@@ -72,9 +73,9 @@ const StudentDashboard = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DashboardHeader 
-          title={<TranslatedText text="Student Dashboard" />}
-          subtitle={<TranslatedText text="Continue your learning journey" />}
-          badgeText={<TranslatedText text="Student" />}
+          title="Student Dashboard"
+          subtitle="Continue your learning journey"
+          badgeText="Student"
           badgeIcon={GraduationCap}
         />
         
