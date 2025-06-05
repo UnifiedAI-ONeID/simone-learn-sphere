@@ -11,13 +11,13 @@ import Auth from './pages/Auth';
 import AdminDashboard from './pages/AdminDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import EducatorDashboard from './pages/EducatorDashboard';
-import { useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TranslationProvider } from '@/contexts/TranslationContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
-function App() {
+// Separate component that uses useAuth
+const AppContent = () => {
   const { user, signOut, loading } = useAuth();
-  const [queryClient] = useState(() => new QueryClient());
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', localStorage.theme === 'dark');
@@ -27,77 +27,96 @@ function App() {
     await signOut();
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-background">
+        <Toaster />
+        
+        {/* Navigation Header with Language Selector */}
+        {user && (
+          <header className="border-b bg-white dark:bg-gray-900 shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center h-16">
+                <div className="flex items-center space-x-4">
+                  <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    SimoneLabs
+                  </h1>
+                </div>
+                
+                <div className="flex items-center space-x-4">
+                  <LanguageSelector />
+                  <Button
+                    variant="outline"
+                    onClick={handleLogout}
+                    className="text-gray-600 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </header>
+        )}
+
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={user ? <Navigate to="/admin-dashboard" /> : <Auth />} />
+          <Route
+            path="/admin-dashboard"
+            element={
+              user ? (
+                <AdminDashboard />
+              ) : (
+                <Navigate to="/auth" />
+              )
+            }
+          />
+          <Route
+            path="/educator-dashboard"
+            element={
+              user ? (
+                <EducatorDashboard />
+              ) : (
+                <Navigate to="/auth" />
+              )
+            }
+          />
+          <Route
+            path="/student-dashboard"
+            element={
+              user ? (
+                <StudentDashboard />
+              ) : (
+                <Navigate to="/auth" />
+              )
+            }
+          />
+        </Routes>
+      </div>
+    </Router>
+  );
+};
+
+// Main App component that provides the context
+function App() {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
     <QueryClientProvider client={queryClient}>
-      <TranslationProvider>
-        <Router>
-          <div className="min-h-screen bg-background">
-            <Toaster />
-            
-            {/* Navigation Header with Language Selector */}
-            {user && (
-              <header className="border-b bg-white dark:bg-gray-900 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center space-x-4">
-                      <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        SimoneLabs
-                      </h1>
-                    </div>
-                    
-                    <div className="flex items-center space-x-4">
-                      <LanguageSelector />
-                      <Button
-                        variant="outline"
-                        onClick={handleLogout}
-                        className="text-gray-600 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400"
-                      >
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Logout
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </header>
-            )}
-
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={user ? <Navigate to="/admin-dashboard" /> : <Auth />} />
-              <Route
-                path="/admin-dashboard"
-                element={
-                  user ? (
-                    <AdminDashboard />
-                  ) : (
-                    <Navigate to="/auth" />
-                  )
-                }
-              />
-              <Route
-                path="/educator-dashboard"
-                element={
-                  user ? (
-                    <EducatorDashboard />
-                  ) : (
-                    <Navigate to="/auth" />
-                  )
-                }
-              />
-              <Route
-                path="/student-dashboard"
-                element={
-                  user ? (
-                    <StudentDashboard />
-                  ) : (
-                    <Navigate to="/auth" />
-                  )
-                }
-              />
-            </Routes>
-          </div>
-        </Router>
-      </TranslationProvider>
+      <AuthProvider>
+        <TranslationProvider>
+          <AppContent />
+        </TranslationProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
