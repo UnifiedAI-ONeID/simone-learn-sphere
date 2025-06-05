@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { Loader2 } from 'lucide-react';
@@ -18,7 +17,7 @@ export const TranslatedText: React.FC<TranslatedTextProps> = ({
   fallback,
   as: Component = 'span',
 }) => {
-  const { translateText, currentLanguage, isTranslating } = useTranslation();
+  const { translateText, currentLanguage } = useTranslation();
   const [translatedText, setTranslatedText] = useState(text);
   const [isLoading, setIsLoading] = useState(false);
 
