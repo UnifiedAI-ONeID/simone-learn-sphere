@@ -32,7 +32,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
           />
           <div className="absolute top-4 right-4">
             <Badge variant="secondary" className="bg-white/90 text-gray-800">
-              {course.difficulty_level}
+              {course.difficulty_level || 'beginner'}
             </Badge>
           </div>
           {course.pricing?.is_free && (
@@ -51,7 +51,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
             </div>
           )}
           <span className="text-sm text-blue-600 font-medium">
-            {course.category?.name}
+            {course.category?.name || 'Uncategorized'}
           </span>
         </div>
 
@@ -60,13 +60,13 @@ export const CourseCard: React.FC<CourseCardProps> = ({
         </h3>
         
         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-          {course.description}
+          {course.description || 'No description available'}
         </p>
 
         <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
           <div className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
-            <span>{course.estimated_duration}h</span>
+            <span>{course.estimated_duration || 1}h</span>
           </div>
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4" />
@@ -80,7 +80,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
 
         {course.educator && (
           <p className="text-sm text-gray-600">
-            by {course.educator.first_name} {course.educator.last_name}
+            by {course.educator.first_name || ''} {course.educator.last_name || ''}
           </p>
         )}
       </CardContent>
@@ -97,7 +97,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                 onClick={() => onEnroll?.(course.id)}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
-                {course.pricing?.is_free ? 'Enroll Free' : `Enroll $${course.pricing?.price}`}
+                {course.pricing?.is_free ? 'Enroll Free' : `Enroll $${course.pricing?.price || 0}`}
               </Button>
             )}
             {onEdit && (

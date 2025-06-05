@@ -7,31 +7,31 @@ import { useToast } from '@/hooks/use-toast';
 export interface Course {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   educator_id: string;
-  category_id: string;
-  difficulty_level: string;
-  estimated_duration: number;
-  thumbnail_url: string;
-  tags: string[];
-  is_published: boolean;
+  category_id: string | null;
+  difficulty_level: string | null;
+  estimated_duration: number | null;
+  thumbnail_url: string | null;
+  tags: string[] | null;
+  is_published: boolean | null;
   created_at: string;
   updated_at: string;
   category?: {
     name: string;
     icon: string;
-  };
+  } | null;
   pricing?: {
     price: number;
     currency: string;
     is_free: boolean;
     discount_percentage: number;
-  };
+  } | null;
   enrollment_count?: number;
   educator?: {
-    first_name: string;
-    last_name: string;
-  };
+    first_name: string | null;
+    last_name: string | null;
+  } | null;
 }
 
 export const useCourses = () => {
@@ -70,7 +70,10 @@ export const useCourses = () => {
             enrollment_count: count || 0,
             pricing: Array.isArray(course.pricing) && course.pricing.length > 0 
               ? course.pricing[0] 
-              : { price: 0, currency: 'USD', is_free: true, discount_percentage: 0 }
+              : { price: 0, currency: 'USD', is_free: true, discount_percentage: 0 },
+            educator: Array.isArray(course.educator) && course.educator.length > 0
+              ? course.educator[0]
+              : null
           };
         })
       );
