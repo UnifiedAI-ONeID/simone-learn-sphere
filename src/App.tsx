@@ -14,6 +14,7 @@ import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/StudentDashboard";
 import EducatorDashboard from "./pages/EducatorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import ProfileSettings from "./pages/ProfileSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,15 @@ function App() {
                       element={
                         <RoleProtectedRoute allowedRoles={['admin']}>
                           <AdminDashboard />
+                        </RoleProtectedRoute>
+                      }
+                    />
+                    
+                    <Route
+                      path="/profile-settings"
+                      element={
+                        <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
+                          <ProfileSettings />
                         </RoleProtectedRoute>
                       }
                     />

@@ -2,11 +2,14 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TranslatedText } from '@/components/TranslatedText';
-import { LogOut, Brain } from 'lucide-react';
+import { LogOut, Brain, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { UserAvatar } from './UserAvatar';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 interface DashboardHeaderProps {
   title: string;
@@ -16,10 +19,32 @@ interface DashboardHeaderProps {
 }
 
 export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIcon }: DashboardHeaderProps) => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const { role } = useUserRole();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [userProfile, setUserProfile] = useState<{ first_name: string; last_name: string } | null>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', user.id)
+          .single();
+
+        setUserProfile(data);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   const handleSignOut = async () => {
     if (isSigningOut) return;
@@ -41,6 +66,10 @@ export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIc
     } finally {
       setIsSigningOut(false);
     }
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile-settings');
   };
 
   // Use provided badge info or fall back to role-based defaults
@@ -68,6 +97,36 @@ export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIc
             <DisplayBadgeIcon className="w-4 h-4 mr-1" />
             <TranslatedText text={displayBadgeText} />
           </Badge>
+          
+          {/* User Profile Section */}
+          <div className="flex items-center space-x-3">
+            <div className="hidden md:block text-right">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {userProfile?.first_name} {userProfile?.last_name}
+              </p>
+              <p className="text-xs text-gray-500">
+                {role?.charAt(0).toUpperCase()}{role?.slice(1)}
+              </p>
+            </div>
+            
+            <button
+              onClick={handleProfileClick}
+              className="relative group"
+              title="Profile Settings"
+            >
+              <UserAvatar
+                userId={user?.id}
+                firstName={userProfile?.first_name}
+                lastName={userProfile?.last_name}
+                size="md"
+                className="ring-2 ring-transparent group-hover:ring-blue-300 transition-all cursor-pointer"
+              />
+              <div className="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center">
+                <Settings className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </button>
+          </div>
+          
           <Button 
             variant="outline" 
             size="sm"
