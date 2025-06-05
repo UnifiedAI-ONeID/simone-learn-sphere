@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -79,9 +80,9 @@ const Auth = () => {
   const handleOAuthSignIn = async (provider: 'google' | 'github') => {
     setIsLoading(true);
     try {
-      // Clean up existing state
       cleanupAuthState();
       
+      // Clean sign out before OAuth
       try {
         await supabase.auth.signOut({ scope: 'global' });
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -89,16 +90,31 @@ const Auth = () => {
         console.warn('Pre-OAuth cleanup failed, continuing');
       }
 
-      const redirectUrl = `${window.location.origin}/`;
+      // Use current origin for redirect
+      const redirectUrl = window.location.origin;
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         },
       });
 
       if (error) {
+        // Handle specific OAuth errors
+        if (error.message?.includes('Provider not enabled')) {
+          toast({
+            title: `${provider === 'google' ? 'Google' : 'GitHub'} authentication not configured`,
+            description: 'Please contact support to enable social login.',
+            variant: "destructive",
+          });
+          return;
+        }
+        
         const clientIP = await getClientIP();
         await logSecurityEvent('failed_oauth_login', {
           provider,
@@ -109,8 +125,7 @@ const Auth = () => {
         throw error;
       }
 
-      // OAuth redirects automatically, so we don't need to handle success here
-      // The auth state change will be handled by the auth context
+      // OAuth redirects automatically, no need to handle success here
       
     } catch (error: any) {
       let errorMessage = getAuthErrorMessage(error);
@@ -121,6 +136,10 @@ const Auth = () => {
       
       if (error.message?.includes('access_denied')) {
         errorMessage = 'Access denied. Please check your permissions and try again.';
+      }
+      
+      if (error.message?.includes('Provider not enabled')) {
+        errorMessage = `${provider === 'google' ? 'Google' : 'GitHub'} authentication is not configured. Please use email/password or contact support.`;
       }
       
       toast({
@@ -151,7 +170,6 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
-      // Clean up existing state thoroughly
       cleanupAuthState();
       
       try {
@@ -161,7 +179,6 @@ const Auth = () => {
         console.warn('Pre-signin cleanup failed, continuing');
       }
 
-      // Sign in with email/password
       const { data, error } = await supabase.auth.signInWithPassword({
         email: validated.email,
         password: validated.password,
@@ -246,7 +263,6 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
-      // Clean up existing state
       cleanupAuthState();
       
       try {
@@ -256,7 +272,7 @@ const Auth = () => {
         console.warn('Pre-signup cleanup failed, continuing');
       }
 
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = window.location.origin;
       
       const { data, error } = await supabase.auth.signUp({
         email: validated.email,
@@ -273,6 +289,16 @@ const Auth = () => {
 
       if (error) {
         authRateLimiter.recordAttempt(identifier, true);
+        
+        // Handle specific signup errors
+        if (error.message?.includes('email rate limit exceeded')) {
+          toast({
+            title: "Email rate limit exceeded",
+            description: "Too many email attempts. Please try again in a few minutes or contact support.",
+            variant: "destructive",
+          });
+          return;
+        }
         
         const clientIP = await getClientIP();
         await logSecurityEvent('failed_signup', {
@@ -319,13 +345,16 @@ const Auth = () => {
     } catch (error: any) {
       let errorMessage = getAuthErrorMessage(error);
       
-      // Handle specific signup errors
       if (error.message?.includes('User already registered')) {
         errorMessage = 'An account with this email already exists. Please sign in instead.';
       }
       
       if (error.message?.includes('Password should be at least')) {
         errorMessage = 'Password must be at least 6 characters long.';
+      }
+      
+      if (error.message?.includes('email rate limit exceeded')) {
+        errorMessage = 'Too many email attempts. Please try again in a few minutes.';
       }
       
       toast({
@@ -658,6 +687,17 @@ const Auth = () => {
               </CardContent>
             </TabsContent>
           </Tabs>
+        </Card>
+
+        {/* Instructions Card */}
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="text-center text-sm text-amber-800">
+              <p className="font-medium">🔧 Setup Required</p>
+              <p>OAuth providers need configuration in Supabase Dashboard → Authentication → Providers</p>
+              <p className="mt-2 text-xs">For email signup: Configure SMTP or disable email confirmation in settings</p>
+            </div>
+          </CardContent>
         </Card>
 
         {/* Accessibility Note */}
