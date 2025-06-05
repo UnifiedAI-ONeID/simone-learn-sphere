@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Brain, User, GraduationCap, Shield } from 'lucide-react';
+import { Brain, User, GraduationCap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,7 +20,7 @@ import { getRoleBasedRoute } from '@/utils/roleRouting';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [userRole, setUserRole] = useState<'student' | 'educator' | 'admin'>('student');
+  const [userRole, setUserRole] = useState<'student' | 'educator'>('student');
   const [signInData, setSignInData] = useState<Partial<SignInFormData>>({});
   const [signUpData, setSignUpData] = useState<Partial<SignUpFormData>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -296,13 +295,6 @@ const Auth = () => {
       description: <TranslatedText text="Create and monetize educational content" />,
       icon: User,
       color: 'bg-purple-100 text-purple-800 border-purple-200'
-    },
-    {
-      id: 'admin' as const,
-      title: <TranslatedText text="Admin" />,
-      description: <TranslatedText text="Manage platform and user analytics" />,
-      icon: Shield,
-      color: 'bg-green-100 text-green-800 border-green-200'
     }
   ];
 
