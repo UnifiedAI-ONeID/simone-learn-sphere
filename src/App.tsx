@@ -10,6 +10,7 @@ import Index from './pages/Index';
 import Auth from './pages/Auth';
 import AdminDashboard from './pages/AdminDashboard';
 import StudentDashboard from './pages/StudentDashboard';
+import EducatorDashboard from './pages/EducatorDashboard';
 import { useAuth } from './contexts/AuthContext';
 import { TranslationProvider } from '@/contexts/TranslationContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -68,6 +69,16 @@ function App() {
                 element={
                   user ? (
                     <AdminDashboard />
+                  ) : (
+                    <Navigate to="/auth" />
+                  )
+                }
+              />
+              <Route
+                path="/educator-dashboard"
+                element={
+                  user ? (
+                    <EducatorDashboard />
                   ) : (
                     <Navigate to="/auth" />
                   )
