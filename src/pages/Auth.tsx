@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +17,7 @@ import { useSecurityAudit } from '@/hooks/useSecurityAudit';
 import { getClientIP, sanitizeUserAgent } from '@/utils/securityUtils';
 import { TranslatedText } from '@/components/TranslatedText';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { TwoFactorLogin } from '@/components/TwoFactorLogin';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +25,8 @@ const Auth = () => {
   const [signInData, setSignInData] = useState<Partial<SignInFormData>>({});
   const [signUpData, setSignUpData] = useState<Partial<SignUpFormData>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string>('');
   const { toast } = useToast();
   const navigate = useNavigate();
   const { logSecurityEvent } = useSecurityAudit();
@@ -77,6 +79,27 @@ const Auth = () => {
     }
   };
 
+  const checkUserHas2FA = async (email: string): Promise<boolean> => {
+    try {
+      // Check if user has 2FA enabled by attempting to get their profile
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .single();
+      
+      if (error || !data) return false;
+      
+      // Check user metadata for 2FA status
+      const { data: userData, error: userError } = await supabase.auth.admin.getUserById(data.id);
+      
+      return userData?.user?.user_metadata?.two_factor_enabled === true;
+    } catch (error) {
+      console.error('Error checking 2FA status:', error);
+      return false;
+    }
+  };
+
   const handleSignIn = async () => {
     const validated = validateAndSanitizeSignIn(signInData);
     if (!validated) return;
@@ -98,15 +121,25 @@ const Auth = () => {
       // Clean up existing state thoroughly
       cleanupAuthState();
       
-      // Multiple sign out attempts to ensure clean state
       try {
         await supabase.auth.signOut({ scope: 'global' });
-        // Wait a moment for cleanup
         await new Promise(resolve => setTimeout(resolve, 500));
       } catch (err) {
         console.warn('Pre-signin cleanup failed, continuing');
       }
 
+      // First, check if user has 2FA enabled
+      const has2FA = await checkUserHas2FA(validated.email);
+      
+      if (has2FA) {
+        // Don't actually sign in yet, show 2FA verification
+        setPendingEmail(validated.email);
+        setShowTwoFactor(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // Proceed with normal sign in for users without 2FA
       const { data, error } = await supabase.auth.signInWithPassword({
         email: validated.email,
         password: validated.password,
@@ -135,7 +168,6 @@ const Auth = () => {
           login_time: new Date().toISOString()
         }, clientIP, sanitizeUserAgent(navigator.userAgent));
         
-        // Ensure profile exists before redirecting
         const profile = await ensureProfileExists(supabase, data.user);
         const userRole = profile?.role || 'student';
         const redirectRoute = getRoleBasedRoute(userRole);
@@ -145,13 +177,11 @@ const Auth = () => {
           description: "Welcome back!",
         });
         
-        // Use replace to prevent back button issues
         navigate(redirectRoute, { replace: true });
       }
     } catch (error: any) {
       let errorMessage = getAuthErrorMessage(error);
       
-      // Handle specific error cases
       if (error.message?.includes('Email not confirmed')) {
         errorMessage = 'Please check your email and click the confirmation link before signing in.';
         toast({
@@ -174,6 +204,49 @@ const Auth = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handle2FASuccess = async (sessionToken?: string) => {
+    try {
+      setIsLoading(true);
+      
+      // Now complete the sign in process
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: pendingEmail,
+        password: signInData.password || '',
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        const profile = await ensureProfileExists(supabase, data.user);
+        const userRole = profile?.role || 'student';
+        const redirectRoute = getRoleBasedRoute(userRole);
+        
+        toast({
+          title: "Success",
+          description: "Welcome back!",
+        });
+        
+        navigate(redirectRoute, { replace: true });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Sign in failed",
+        description: getAuthErrorMessage(error),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setShowTwoFactor(false);
+      setPendingEmail('');
+    }
+  };
+
+  const handleBack2FA = () => {
+    setShowTwoFactor(false);
+    setPendingEmail('');
+    setIsLoading(false);
   };
 
   const handleSignUp = async () => {
@@ -309,6 +382,18 @@ const Auth = () => {
       color: 'bg-green-100 text-green-800 border-green-200'
     }
   ];
+
+  if (showTwoFactor) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center px-4">
+        <TwoFactorLogin
+          email={pendingEmail}
+          onVerificationSuccess={handle2FASuccess}
+          onBack={handleBack2FA}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center px-4">
