@@ -15,6 +15,7 @@ import { getAuthErrorMessage, sanitizeInput } from '@/utils/errorHandling';
 import { cleanupAuthState } from '@/utils/authCleanup';
 import { useSecurityAudit } from '@/hooks/useSecurityAudit';
 import { getClientIP, sanitizeUserAgent } from '@/utils/securityUtils';
+import { TranslatedText } from '@/components/TranslatedText';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +54,7 @@ const Auth = () => {
         password: data.password || '',
         firstName: sanitizeInput(data.firstName || ''),
         lastName: sanitizeInput(data.lastName || ''),
-        role: userRole // Use the userRole state directly which is already typed correctly
+        role: userRole
       };
       
       const validated = signUpSchema.parse(sanitized);
@@ -78,8 +79,8 @@ const Auth = () => {
     if (authRateLimiter.isBlocked(identifier)) {
       const timeRemaining = Math.ceil(authRateLimiter.getBlockTimeRemaining(identifier) / 1000 / 60);
       toast({
-        title: "Too many attempts",
-        description: `Please wait ${timeRemaining} minutes before trying again.`,
+        title: <TranslatedText text="Too many attempts" />,
+        description: <TranslatedText text={`Please wait ${timeRemaining} minutes before trying again.`} />,
         variant: "destructive",
       });
       return;
@@ -103,7 +104,6 @@ const Auth = () => {
       if (error) {
         authRateLimiter.recordAttempt(identifier, true);
         
-        // Log failed login attempt
         const clientIP = await getClientIP();
         await logSecurityEvent('failed_login', {
           email: validated.email,
@@ -117,7 +117,6 @@ const Auth = () => {
       if (data.user) {
         authRateLimiter.recordAttempt(identifier, false);
         
-        // Log successful login
         const clientIP = await getClientIP();
         await logSecurityEvent('successful_login', {
           user_id: data.user.id,
@@ -126,17 +125,16 @@ const Auth = () => {
         }, clientIP, sanitizeUserAgent(navigator.userAgent));
         
         toast({
-          title: "Success",
-          description: "Welcome back!",
+          title: <TranslatedText text="Success" />,
+          description: <TranslatedText text="Welcome back!" />,
         });
         
-        // Navigate to student dashboard by default - RoleProtectedRoute will handle role-based access
         window.location.href = '/student-dashboard';
       }
     } catch (error: any) {
       toast({
-        title: "Sign in failed",
-        description: getAuthErrorMessage(error),
+        title: <TranslatedText text="Sign in failed" />,
+        description: <TranslatedText text={getAuthErrorMessage(error)} />,
         variant: "destructive",
       });
     } finally {
@@ -153,8 +151,8 @@ const Auth = () => {
     if (authRateLimiter.isBlocked(identifier)) {
       const timeRemaining = Math.ceil(authRateLimiter.getBlockTimeRemaining(identifier) / 1000 / 60);
       toast({
-        title: "Too many attempts",
-        description: `Please wait ${timeRemaining} minutes before trying again.`,
+        title: <TranslatedText text="Too many attempts" />,
+        description: <TranslatedText text={`Please wait ${timeRemaining} minutes before trying again.`} />,
         variant: "destructive",
       });
       return;
@@ -188,7 +186,6 @@ const Auth = () => {
       if (error) {
         authRateLimiter.recordAttempt(identifier, true);
         
-        // Log failed signup attempt
         const clientIP = await getClientIP();
         await logSecurityEvent('failed_signup', {
           email: validated.email,
@@ -202,7 +199,6 @@ const Auth = () => {
       if (data.user) {
         authRateLimiter.recordAttempt(identifier, false);
         
-        // Log successful signup
         const clientIP = await getClientIP();
         await logSecurityEvent('successful_signup', {
           user_id: data.user.id,
@@ -212,17 +208,16 @@ const Auth = () => {
         }, clientIP, sanitizeUserAgent(navigator.userAgent));
         
         toast({
-          title: "Success",
-          description: "Account created successfully! Please check your email for verification.",
+          title: <TranslatedText text="Success" />,
+          description: <TranslatedText text="Account created successfully! Please check your email for verification." />,
         });
         
-        // Navigate to student dashboard by default - RoleProtectedRoute will handle role-based access
         window.location.href = '/student-dashboard';
       }
     } catch (error: any) {
       toast({
-        title: "Sign up failed",
-        description: getAuthErrorMessage(error),
+        title: <TranslatedText text="Sign up failed" />,
+        description: <TranslatedText text={getAuthErrorMessage(error)} />,
         variant: "destructive",
       });
     } finally {
@@ -233,22 +228,22 @@ const Auth = () => {
   const roles = [
     {
       id: 'student' as const,
-      title: 'Student',
-      description: 'Learn with personalized AI-powered experiences',
+      title: <TranslatedText text="Student" />,
+      description: <TranslatedText text="Learn with personalized AI-powered experiences" />,
       icon: GraduationCap,
       color: 'bg-blue-100 text-blue-800 border-blue-200'
     },
     {
       id: 'educator' as const,
-      title: 'Educator',
-      description: 'Create and monetize educational content',
+      title: <TranslatedText text="Educator" />,
+      description: <TranslatedText text="Create and monetize educational content" />,
       icon: User,
       color: 'bg-purple-100 text-purple-800 border-purple-200'
     },
     {
       id: 'admin' as const,
-      title: 'Admin',
-      description: 'Manage platform and user analytics',
+      title: <TranslatedText text="Admin" />,
+      description: <TranslatedText text="Manage platform and user analytics" />,
       icon: Shield,
       color: 'bg-green-100 text-green-800 border-green-200'
     }
@@ -265,19 +260,21 @@ const Auth = () => {
             </div>
           </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Welcome to SimoneLabs
+            <TranslatedText text="Welcome to SimoneLabs" />
           </h1>
           <p className="text-gray-600">
-            Choose your role and start your educational journey
+            <TranslatedText text="Choose your role and start your educational journey" />
           </p>
         </div>
 
         {/* Role Selection */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-center text-lg">Select Your Role</CardTitle>
+            <CardTitle className="text-center text-lg">
+              <TranslatedText text="Select Your Role" />
+            </CardTitle>
             <CardDescription className="text-center">
-              This will customize your experience
+              <TranslatedText text="This will customize your experience" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -299,7 +296,7 @@ const Auth = () => {
                   </div>
                   {userRole === role.id && (
                     <Badge variant="secondary" className="bg-white text-current">
-                      Selected
+                      <TranslatedText text="Selected" />
                     </Badge>
                   )}
                 </div>
@@ -312,20 +309,28 @@ const Auth = () => {
         <Card>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="login">
+                <TranslatedText text="Sign In" />
+              </TabsTrigger>
+              <TabsTrigger value="signup">
+                <TranslatedText text="Sign Up" />
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
               <CardHeader>
-                <CardTitle>Sign In</CardTitle>
+                <CardTitle>
+                  <TranslatedText text="Sign In" />
+                </CardTitle>
                 <CardDescription>
-                  Welcome back! Enter your credentials to continue.
+                  <TranslatedText text="Welcome back! Enter your credentials to continue." />
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email">
+                    <TranslatedText text="Email" />
+                  </Label>
                   <Input 
                     id="login-email" 
                     type="email" 
@@ -336,11 +341,15 @@ const Auth = () => {
                     className={validationErrors.email ? 'border-red-500' : ''}
                   />
                   {validationErrors.email && (
-                    <p className="text-sm text-red-600">{validationErrors.email}</p>
+                    <p className="text-sm text-red-600">
+                      <TranslatedText text={validationErrors.email} />
+                    </p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password">
+                    <TranslatedText text="Password" />
+                  </Label>
                   <Input 
                     id="login-password" 
                     type="password" 
@@ -351,7 +360,9 @@ const Auth = () => {
                     className={validationErrors.password ? 'border-red-500' : ''}
                   />
                   {validationErrors.password && (
-                    <p className="text-sm text-red-600">{validationErrors.password}</p>
+                    <p className="text-sm text-red-600">
+                      <TranslatedText text={validationErrors.password} />
+                    </p>
                   )}
                 </div>
                 <Button 
@@ -359,22 +370,26 @@ const Auth = () => {
                   disabled={isLoading}
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                 >
-                  {isLoading ? 'Signing In...' : 'Sign In'}
+                  <TranslatedText text={isLoading ? 'Signing In...' : 'Sign In'} />
                 </Button>
               </CardContent>
             </TabsContent>
             
             <TabsContent value="signup">
               <CardHeader>
-                <CardTitle>Create Account</CardTitle>
+                <CardTitle>
+                  <TranslatedText text="Create Account" />
+                </CardTitle>
                 <CardDescription>
-                  Join SimoneLabs and start your learning journey.
+                  <TranslatedText text="Join SimoneLabs and start your learning journey." />
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstname">First Name</Label>
+                    <Label htmlFor="firstname">
+                      <TranslatedText text="First Name" />
+                    </Label>
                     <Input 
                       id="firstname" 
                       placeholder="First name"
@@ -384,11 +399,15 @@ const Auth = () => {
                       className={validationErrors.firstName ? 'border-red-500' : ''}
                     />
                     {validationErrors.firstName && (
-                      <p className="text-xs text-red-600">{validationErrors.firstName}</p>
+                      <p className="text-xs text-red-600">
+                        <TranslatedText text={validationErrors.firstName} />
+                      </p>
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastname">Last Name</Label>
+                    <Label htmlFor="lastname">
+                      <TranslatedText text="Last Name" />
+                    </Label>
                     <Input 
                       id="lastname" 
                       placeholder="Last name"
@@ -398,12 +417,16 @@ const Auth = () => {
                       className={validationErrors.lastName ? 'border-red-500' : ''}
                     />
                     {validationErrors.lastName && (
-                      <p className="text-xs text-red-600">{validationErrors.lastName}</p>
+                      <p className="text-xs text-red-600">
+                        <TranslatedText text={validationErrors.lastName} />
+                      </p>
                     )}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">
+                    <TranslatedText text="Email" />
+                  </Label>
                   <Input 
                     id="signup-email" 
                     type="email" 
@@ -414,11 +437,15 @@ const Auth = () => {
                     className={validationErrors.email ? 'border-red-500' : ''}
                   />
                   {validationErrors.email && (
-                    <p className="text-sm text-red-600">{validationErrors.email}</p>
+                    <p className="text-sm text-red-600">
+                      <TranslatedText text={validationErrors.email} />
+                    </p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">
+                    <TranslatedText text="Password" />
+                  </Label>
                   <Input 
                     id="signup-password" 
                     type="password" 
@@ -429,10 +456,12 @@ const Auth = () => {
                     className={validationErrors.password ? 'border-red-500' : ''}
                   />
                   {validationErrors.password && (
-                    <p className="text-sm text-red-600">{validationErrors.password}</p>
+                    <p className="text-sm text-red-600">
+                      <TranslatedText text={validationErrors.password} />
+                    </p>
                   )}
                   <p className="text-xs text-gray-600">
-                    Must be 8+ characters with uppercase, lowercase, and number
+                    <TranslatedText text="Must be 8+ characters with uppercase, lowercase, and number" />
                   </p>
                 </div>
                 <Button 
@@ -440,7 +469,7 @@ const Auth = () => {
                   disabled={isLoading}
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                 >
-                  {isLoading ? 'Creating Account...' : 'Create Account'}
+                  <TranslatedText text={isLoading ? 'Creating Account...' : 'Create Account'} />
                 </Button>
               </CardContent>
             </TabsContent>
@@ -451,8 +480,8 @@ const Auth = () => {
         <Card className="border-blue-200 bg-blue-50">
           <CardContent className="pt-6">
             <div className="text-center text-sm text-blue-800">
-              <p className="font-medium">♿ Fully Accessible Platform</p>
-              <p>Screen reader compatible • Keyboard navigation • High contrast support</p>
+              <p className="font-medium">♿ <TranslatedText text="Fully Accessible Platform" /></p>
+              <p><TranslatedText text="Screen reader compatible • Keyboard navigation • High contrast support" /></p>
             </div>
           </CardContent>
         </Card>
