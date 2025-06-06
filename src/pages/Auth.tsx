@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,8 +11,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, SignUpFormData, SignInFormData } from '@/schemas/authSchemas';
-import { getAuthErrorMessage, sanitizeInput } from '@/utils/errorHandling';
-import { ensureProfileExists } from '@/utils/authCleanup';
 import { TranslatedText } from '@/components/TranslatedText';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 
@@ -25,14 +23,12 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const validateAndSanitizeSignIn = (data: Partial<SignInFormData>): SignInFormData | null => {
+  const validateSignIn = (data: Partial<SignInFormData>): SignInFormData | null => {
     try {
-      const sanitized = {
-        email: sanitizeInput(data.email || ''),
+      const validated = signInSchema.parse({
+        email: data.email?.trim() || '',
         password: data.password || ''
-      };
-      
-      const validated = signInSchema.parse(sanitized);
+      });
       setValidationErrors({});
       return validated;
     } catch (error: any) {
@@ -45,17 +41,15 @@ const Auth = () => {
     }
   };
 
-  const validateAndSanitizeSignUp = (data: Partial<SignUpFormData>): SignUpFormData | null => {
+  const validateSignUp = (data: Partial<SignUpFormData>): SignUpFormData | null => {
     try {
-      const sanitized = {
-        email: sanitizeInput(data.email || ''),
+      const validated = signUpSchema.parse({
+        email: data.email?.trim() || '',
         password: data.password || '',
-        firstName: sanitizeInput(data.firstName || ''),
-        lastName: sanitizeInput(data.lastName || ''),
+        firstName: data.firstName?.trim() || '',
+        lastName: data.lastName?.trim() || '',
         role: userRole
-      };
-      
-      const validated = signUpSchema.parse(sanitized);
+      });
       setValidationErrors({});
       return validated;
     } catch (error: any) {
@@ -70,13 +64,13 @@ const Auth = () => {
 
   const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
     setIsLoading(true);
-    console.log(`Starting ${provider} OAuth signin`);
+    console.log(`Starting ${provider} OAuth signin with role:`, userRole);
     
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: `${window.location.origin}/`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -89,36 +83,25 @@ const Auth = () => {
       if (error) {
         console.error('OAuth error:', error);
         
+        let errorMessage = 'Authentication failed. Please try again.';
+        
         if (error.message?.includes('Provider not enabled')) {
-          toast({
-            title: `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication not configured`,
-            description: 'Please contact support to enable social login.',
-            variant: "destructive",
-          });
-          return;
+          errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication is not configured. Please contact support.`;
         }
         
-        throw error;
+        toast({
+          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
+          description: errorMessage,
+          variant: "destructive",
+        });
       }
-
-      // OAuth redirects automatically
       
     } catch (error: any) {
       console.error('OAuth signin error:', error);
       
-      let errorMessage = getAuthErrorMessage(error);
-      
-      if (error.message?.includes('popup_closed_by_user')) {
-        errorMessage = 'Sign-in was cancelled. Please try again.';
-      }
-      
-      if (error.message?.includes('access_denied')) {
-        errorMessage = 'Access denied. Please check your permissions and try again.';
-      }
-      
       toast({
         title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
-        description: errorMessage,
+        description: 'Authentication failed. Please try again.',
         variant: "destructive",
       });
     } finally {
@@ -127,7 +110,7 @@ const Auth = () => {
   };
 
   const handleSignIn = async () => {
-    const validated = validateAndSanitizeSignIn(signInData);
+    const validated = validateSignIn(signInData);
     if (!validated) return;
 
     setIsLoading(true);
@@ -143,39 +126,55 @@ const Auth = () => {
 
       if (error) {
         console.error('Email signin error:', error);
-        throw error;
+        
+        let errorMessage = 'Sign in failed. Please check your credentials.';
+        
+        if (error.message?.includes('Email not confirmed')) {
+          errorMessage = 'Please check your email and confirm your account before signing in.';
+        } else if (error.message?.includes('Invalid login credentials')) {
+          errorMessage = 'Invalid email or password. Please try again.';
+        }
+        
+        toast({
+          title: "Sign in failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return;
       }
 
       if (data.user) {
         console.log('User signed in successfully:', data.user.id);
-        
-        const profile = await ensureProfileExists(supabase, data.user);
-        const userRole = profile?.role || 'student';
-        const redirectRoute = getRoleBasedRoute(userRole);
         
         toast({
           title: "Success",
           description: "Welcome back!",
         });
         
-        navigate(redirectRoute, { replace: true });
+        // Get user role and redirect
+        setTimeout(async () => {
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', data.user.id)
+              .single();
+            
+            const userRole = profile?.role || 'student';
+            const redirectRoute = getRoleBasedRoute(userRole);
+            navigate(redirectRoute, { replace: true });
+          } catch (error) {
+            console.error('Error getting user role:', error);
+            navigate('/student-dashboard', { replace: true });
+          }
+        }, 500);
       }
     } catch (error: any) {
       console.error('Signin error:', error);
       
-      let errorMessage = getAuthErrorMessage(error);
-      
-      if (error.message?.includes('Email not confirmed')) {
-        errorMessage = 'Please check your email and click the confirmation link before signing in.';
-      }
-      
-      if (error.message?.includes('Invalid login credentials')) {
-        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
-      }
-      
       toast({
         title: "Sign in failed",
-        description: errorMessage,
+        description: 'An unexpected error occurred. Please try again.',
         variant: "destructive",
       });
     } finally {
@@ -184,18 +183,18 @@ const Auth = () => {
   };
 
   const handleSignUp = async () => {
-    const validated = validateAndSanitizeSignUp(signUpData);
+    const validated = validateSignUp(signUpData);
     if (!validated) return;
 
     setIsLoading(true);
-    console.log('Starting email signup for:', validated.email);
+    console.log('Starting email signup for:', validated.email, 'with role:', validated.role);
     
     try {
       const { data, error } = await supabase.auth.signUp({
         email: validated.email,
         password: validated.password,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             first_name: validated.firstName,
             last_name: validated.lastName,
@@ -209,16 +208,22 @@ const Auth = () => {
       if (error) {
         console.error('Email signup error:', error);
         
-        if (error.message?.includes('email rate limit exceeded')) {
-          toast({
-            title: "Email rate limit exceeded",
-            description: "Too many email attempts. Please try again in a few minutes or contact support.",
-            variant: "destructive",
-          });
-          return;
+        let errorMessage = 'Sign up failed. Please try again.';
+        
+        if (error.message?.includes('User already registered')) {
+          errorMessage = 'An account with this email already exists. Please sign in instead.';
+        } else if (error.message?.includes('Password should be at least')) {
+          errorMessage = 'Password must be at least 6 characters long.';
+        } else if (error.message?.includes('rate limit')) {
+          errorMessage = 'Too many attempts. Please wait a few minutes and try again.';
         }
         
-        throw error;
+        toast({
+          title: "Sign up failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return;
       }
 
       if (data.user) {
@@ -233,34 +238,23 @@ const Auth = () => {
           return;
         }
         
-        // If logged in immediately, ensure profile exists and redirect
-        const profile = await ensureProfileExists(supabase, data.user);
-        const userRole = profile?.role || validated.role;
-        const redirectRoute = getRoleBasedRoute(userRole);
-        
+        // If logged in immediately, redirect
         toast({
           title: "Success",
           description: "Account created successfully!",
         });
         
-        navigate(redirectRoute, { replace: true });
+        setTimeout(() => {
+          const redirectRoute = getRoleBasedRoute(validated.role);
+          navigate(redirectRoute, { replace: true });
+        }, 500);
       }
     } catch (error: any) {
       console.error('Signup error:', error);
       
-      let errorMessage = getAuthErrorMessage(error);
-      
-      if (error.message?.includes('User already registered')) {
-        errorMessage = 'An account with this email already exists. Please sign in instead.';
-      }
-      
-      if (error.message?.includes('Password should be at least')) {
-        errorMessage = 'Password must be at least 6 characters long.';
-      }
-      
       toast({
         title: "Sign up failed",
-        description: errorMessage,
+        description: 'An unexpected error occurred. Please try again.',
         variant: "destructive",
       });
     } finally {
@@ -590,23 +584,16 @@ const Auth = () => {
           </Tabs>
         </Card>
 
-        {/* Instructions Card */}
+        {/* Configuration Instructions */}
         <Card className="border-amber-200 bg-amber-50">
           <CardContent className="pt-6">
             <div className="text-center text-sm text-amber-800">
-              <p className="font-medium">🔧 Setup Required</p>
-              <p>OAuth providers need configuration in Supabase Dashboard → Authentication → Providers</p>
-              <p className="mt-2 text-xs">For email signup: Configure SMTP or disable email confirmation in settings</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Accessibility Note */}
-        <Card className="border-blue-200 bg-blue-50">
-          <CardContent className="pt-6">
-            <div className="text-center text-sm text-blue-800">
-              <p className="font-medium">♿ <TranslatedText text="Fully Accessible Platform" /></p>
-              <p><TranslatedText text="Screen reader compatible • Keyboard navigation • High contrast support" /></p>
+              <p className="font-medium mb-2">⚙️ Configuration Status</p>
+              <div className="space-y-1 text-xs">
+                <p>• OAuth: Check Supabase Dashboard → Authentication → Providers</p>
+                <p>• SMTP: Configure email delivery in Authentication → Settings</p>
+                <p>• Site URL: Must match your application domain</p>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -1,44 +1,19 @@
 
 export const cleanupAuthState = () => {
-  // Remove standard auth tokens
-  localStorage.removeItem('supabase.auth.token');
-  
-  // Remove all Supabase auth keys from localStorage
+  // Remove auth tokens from localStorage
   Object.keys(localStorage).forEach((key) => {
     if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
       localStorage.removeItem(key);
     }
   });
   
-  // Remove from sessionStorage if in use
+  // Remove from sessionStorage if available
   if (typeof sessionStorage !== 'undefined') {
     Object.keys(sessionStorage).forEach((key) => {
       if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
         sessionStorage.removeItem(key);
       }
     });
-  }
-  
-  // Clear any cached user data
-  localStorage.removeItem('user_role');
-  localStorage.removeItem('user_profile');
-};
-
-export const secureSignOut = async (supabase: any) => {
-  try {
-    // Attempt global sign out
-    await supabase.auth.signOut({ scope: 'global' });
-    
-    // Clean up auth state after successful sign out
-    cleanupAuthState();
-    
-    // Redirect to auth page
-    window.location.href = '/auth';
-  } catch (error) {
-    console.error('Sign out error:', error);
-    // Even if sign out fails, clean up and redirect
-    cleanupAuthState();
-    window.location.href = '/auth';
   }
 };
 
@@ -54,10 +29,12 @@ export const ensureProfileExists = async (supabase: any, user: any) => {
       .single();
     
     if (existingProfile && !fetchError) {
+      console.log('Profile exists:', existingProfile);
       return existingProfile;
     }
     
     // If profile doesn't exist, create it
+    console.log('Creating new profile for user:', user.id);
     const profileData = {
       id: user.id,
       email: user.email,
@@ -84,6 +61,7 @@ export const ensureProfileExists = async (supabase: any, user: any) => {
       };
     }
     
+    console.log('Profile created successfully:', newProfile);
     return newProfile;
   } catch (error) {
     console.error('Error ensuring profile exists:', error);

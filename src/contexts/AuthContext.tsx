@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { secureSignOut, cleanupAuthState, ensureProfileExists } from '@/utils/authCleanup';
 
 interface AuthContextType {
   user: User | null;
@@ -29,93 +28,103 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshProfile = async () => {
     if (user) {
-      await ensureProfileExists(supabase, user);
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        if (error && error.code === 'PGRST116') {
+          // Profile doesn't exist, create it
+          console.log('Creating profile for user:', user.id);
+          const profileData = {
+            id: user.id,
+            email: user.email,
+            first_name: user.user_metadata?.first_name || '',
+            last_name: user.user_metadata?.last_name || '',
+            role: user.user_metadata?.role || 'student'
+          };
+          
+          await supabase.from('profiles').insert(profileData);
+          console.log('Profile created successfully');
+        }
+      } catch (error) {
+        console.error('Error refreshing profile:', error);
+      }
     }
   };
 
   useEffect(() => {
-    let mounted = true;
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session);
-        
-        if (!mounted) return;
-
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        // Handle profile creation/validation on sign in
-        if (event === 'SIGNED_IN' && session?.user) {
-          try {
-            await ensureProfileExists(supabase, session.user);
-          } catch (error) {
-            console.error('Error ensuring profile exists:', error);
-          }
-        }
-
-        // Clear any stale data on sign out
-        if (event === 'SIGNED_OUT') {
-          cleanupAuthState();
-        }
-
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    );
-
+    console.log('AuthProvider: Initializing auth state');
+    
     // Get initial session
-    const initializeAuth = async () => {
+    const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Error getting session:', error);
-          cleanupAuthState();
-        }
-        
-        if (mounted) {
+          console.error('AuthProvider: Error getting session:', error);
+        } else {
+          console.log('AuthProvider: Initial session:', session ? 'exists' : 'none');
           setSession(session);
           setUser(session?.user ?? null);
           
-          // Ensure profile exists for existing session
           if (session?.user) {
-            try {
-              await ensureProfileExists(supabase, session.user);
-            } catch (error) {
-              console.error('Error ensuring profile exists on init:', error);
-            }
+            // Defer profile creation to avoid blocking
+            setTimeout(() => refreshProfile(), 100);
           }
-          
-          setLoading(false);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
-        if (mounted) {
-          setLoading(false);
-        }
+        console.error('AuthProvider: Error in getInitialSession:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    initializeAuth();
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('AuthProvider: Auth state changed:', event, session ? 'session exists' : 'no session');
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        // Handle profile creation on sign in
+        if (event === 'SIGNED_IN' && session?.user) {
+          console.log('AuthProvider: User signed in, ensuring profile exists');
+          setTimeout(() => refreshProfile(), 100);
+        }
+
+        setLoading(false);
+      }
+    );
+
+    getInitialSession();
 
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
 
   const signOut = async () => {
     try {
+      console.log('AuthProvider: Signing out');
       setLoading(true);
-      await secureSignOut(supabase);
-    } catch (error) {
-      console.error('Error signing out:', error);
-      // Force cleanup and redirect even if sign out fails
-      cleanupAuthState();
+      
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('AuthProvider: Sign out error:', error);
+      }
+      
+      // Clear state
+      setSession(null);
+      setUser(null);
+      
+      // Redirect to auth page
       window.location.href = '/auth';
+    } catch (error) {
+      console.error('AuthProvider: Unexpected sign out error:', error);
     } finally {
       setLoading(false);
     }
