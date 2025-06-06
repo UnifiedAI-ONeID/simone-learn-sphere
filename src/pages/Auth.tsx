@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,6 +69,7 @@ const Auth = () => {
     try {
       // Store the selected role in localStorage to use after OAuth callback
       localStorage.setItem('pendingUserRole', userRole);
+      console.log('Stored pendingUserRole in localStorage:', userRole);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -89,6 +91,10 @@ const Auth = () => {
         
         if (error.message?.includes('Provider not enabled')) {
           errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication is not configured. Please contact support.`;
+        } else if (error.message?.includes('Invalid redirect URL')) {
+          errorMessage = 'OAuth configuration error. The redirect URL may not be properly configured in Supabase.';
+        } else if (error.message?.includes('unauthorized_client')) {
+          errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} OAuth client is not properly configured. Please check the OAuth settings.`;
         }
         
         toast({
@@ -96,10 +102,16 @@ const Auth = () => {
           description: errorMessage,
           variant: "destructive",
         });
+        
+        // Clean up pending role on error
+        localStorage.removeItem('pendingUserRole');
       }
       
     } catch (error: any) {
       console.error('OAuth signin error:', error);
+      
+      // Clean up pending role on error
+      localStorage.removeItem('pendingUserRole');
       
       toast({
         title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
