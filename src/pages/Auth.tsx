@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Brain, User, GraduationCap, Github } from 'lucide-react';
+import { Brain, User, GraduationCap, Linkedin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,7 +76,7 @@ const Auth = () => {
     }
   };
 
-  const handleOAuthSignIn = async (provider: 'google' | 'github') => {
+  const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
     setIsLoading(true);
     try {
       cleanupAuthState();
@@ -108,7 +107,7 @@ const Auth = () => {
         // Handle specific OAuth errors
         if (error.message?.includes('Provider not enabled')) {
           toast({
-            title: `${provider === 'google' ? 'Google' : 'GitHub'} authentication not configured`,
+            title: `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication not configured`,
             description: 'Please contact support to enable social login.',
             variant: "destructive",
           });
@@ -139,11 +138,11 @@ const Auth = () => {
       }
       
       if (error.message?.includes('Provider not enabled')) {
-        errorMessage = `${provider === 'google' ? 'Google' : 'GitHub'} authentication is not configured. Please use email/password or contact support.`;
+        errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication is not configured. Please use email/password or contact support.`;
       }
       
       toast({
-        title: `${provider === 'google' ? 'Google' : 'GitHub'} sign in failed`,
+        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
         description: errorMessage,
         variant: "destructive",
       });
@@ -482,11 +481,11 @@ const Auth = () => {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => handleOAuthSignIn('github')}
+                    onClick={() => handleOAuthSignIn('linkedin_oidc')}
                     disabled={isLoading}
                   >
-                    <Github className="w-5 h-5 mr-2" />
-                    <TranslatedText text="Continue with GitHub" />
+                    <Linkedin className="w-5 h-5 mr-2" />
+                    <TranslatedText text="Continue with LinkedIn" />
                   </Button>
                   
                   <div className="relative">
@@ -580,11 +579,11 @@ const Auth = () => {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => handleOAuthSignIn('github')}
+                    onClick={() => handleOAuthSignIn('linkedin_oidc')}
                     disabled={isLoading}
                   >
-                    <Github className="w-5 h-5 mr-2" />
-                    <TranslatedText text="Sign up with GitHub" />
+                    <Linkedin className="w-5 h-5 mr-2" />
+                    <TranslatedText text="Sign up with LinkedIn" />
                   </Button>
                   
                   <div className="relative">
