@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,10 +69,13 @@ const Auth = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
+          },
+          data: {
+            role: userRole
           }
         },
       });
@@ -151,23 +153,22 @@ const Auth = () => {
           description: "Welcome back!",
         });
         
-        // Get user role and redirect
-        setTimeout(async () => {
-          try {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('role')
-              .eq('id', data.user.id)
-              .single();
-            
-            const userRole = profile?.role || 'student';
-            const redirectRoute = getRoleBasedRoute(userRole);
-            navigate(redirectRoute, { replace: true });
-          } catch (error) {
-            console.error('Error getting user role:', error);
-            navigate('/student-dashboard', { replace: true });
-          }
-        }, 500);
+        // Get user role and redirect immediately
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
+          
+          const userRole = profile?.role || 'student';
+          const redirectRoute = getRoleBasedRoute(userRole);
+          console.log('Redirecting to:', redirectRoute);
+          navigate(redirectRoute, { replace: true });
+        } catch (error) {
+          console.error('Error getting user role:', error);
+          navigate('/student-dashboard', { replace: true });
+        }
       }
     } catch (error: any) {
       console.error('Signin error:', error);
@@ -194,7 +195,7 @@ const Auth = () => {
         email: validated.email,
         password: validated.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             first_name: validated.firstName,
             last_name: validated.lastName,
@@ -244,10 +245,8 @@ const Auth = () => {
           description: "Account created successfully!",
         });
         
-        setTimeout(() => {
-          const redirectRoute = getRoleBasedRoute(validated.role);
-          navigate(redirectRoute, { replace: true });
-        }, 500);
+        const redirectRoute = getRoleBasedRoute(validated.role);
+        navigate(redirectRoute, { replace: true });
       }
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -593,6 +592,7 @@ const Auth = () => {
                 <p>• OAuth: Check Supabase Dashboard → Authentication → Providers</p>
                 <p>• SMTP: Configure email delivery in Authentication → Settings</p>
                 <p>• Site URL: Must match your application domain</p>
+                <p>• Redirect URLs: Should include /auth/callback</p>
               </div>
             </div>
           </CardContent>

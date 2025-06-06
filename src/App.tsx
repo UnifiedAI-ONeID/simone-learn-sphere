@@ -11,6 +11,7 @@ import { RoleProtectedRoute } from "@/components/RoleProtectedRoute";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import StudentDashboard from "./pages/StudentDashboard";
 import EducatorDashboard from "./pages/EducatorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -34,6 +35,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/auth/callback" element={<AuthCallback />} />
                     
                     <Route
                       path="/student-dashboard"

@@ -1,5 +1,5 @@
 import { isMobile, isTablet } from 'react-device-detect';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,11 +9,46 @@ import { BookOpen, Users, Brain, Trophy, Moon, Sun, Accessibility } from 'lucide
 import toast from 'react-hot-toast';
 import { TranslatedText } from '@/components/TranslatedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
+import { getRoleBasedRoute } from '@/utils/roleRouting';
 
 const Index = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const navigate = useNavigate();
   const isMobileDevice = isMobile || isTablet;
+  const { user, loading: authLoading } = useAuth();
+  const { role, loading: roleLoading } = useUserRole();
+
+  // Redirect authenticated users to their dashboard
+  useEffect(() => {
+    if (!authLoading && !roleLoading && user && role) {
+      console.log('Index: Authenticated user detected, redirecting to dashboard');
+      const redirectRoute = getRoleBasedRoute(role);
+      navigate(redirectRoute, { replace: true });
+    }
+  }, [user, role, authLoading, roleLoading, navigate]);
+
+  // Show loading state while checking authentication
+  if (authLoading || roleLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  // Don't render the landing page if user is authenticated (they'll be redirected)
+  if (user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="text-gray-600">Redirecting to your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
