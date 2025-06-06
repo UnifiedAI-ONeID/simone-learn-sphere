@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,11 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, SignUpFormData, SignInFormData } from '@/schemas/authSchemas';
-import { authRateLimiter } from '@/utils/rateLimiter';
 import { getAuthErrorMessage, sanitizeInput } from '@/utils/errorHandling';
-import { cleanupAuthState, ensureProfileExists } from '@/utils/authCleanup';
-import { useSecurityAudit } from '@/hooks/useSecurityAudit';
-import { getClientIP, sanitizeUserAgent } from '@/utils/securityUtils';
+import { ensureProfileExists } from '@/utils/authCleanup';
 import { TranslatedText } from '@/components/TranslatedText';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 
@@ -26,12 +24,6 @@ const Auth = () => {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { logSecurityEvent } = useSecurityAudit();
-
-  // Clear any existing auth state on component mount
-  useEffect(() => {
-    cleanupAuthState();
-  }, []);
 
   const validateAndSanitizeSignIn = (data: Partial<SignInFormData>): SignInFormData | null => {
     try {
@@ -78,24 +70,13 @@ const Auth = () => {
 
   const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
     setIsLoading(true);
+    console.log(`Starting ${provider} OAuth signin`);
+    
     try {
-      cleanupAuthState();
-      
-      // Clean sign out before OAuth
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (err) {
-        console.warn('Pre-OAuth cleanup failed, continuing');
-      }
-
-      // Use current origin for redirect
-      const redirectUrl = window.location.origin;
-      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: window.location.origin,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -103,8 +84,11 @@ const Auth = () => {
         },
       });
 
+      console.log('OAuth response:', { data, error });
+
       if (error) {
-        // Handle specific OAuth errors
+        console.error('OAuth error:', error);
+        
         if (error.message?.includes('Provider not enabled')) {
           toast({
             title: `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication not configured`,
@@ -114,19 +98,14 @@ const Auth = () => {
           return;
         }
         
-        const clientIP = await getClientIP();
-        await logSecurityEvent('failed_oauth_login', {
-          provider,
-          error_message: error.message,
-          attempt_time: new Date().toISOString()
-        }, clientIP, sanitizeUserAgent(navigator.userAgent));
-        
         throw error;
       }
 
-      // OAuth redirects automatically, no need to handle success here
+      // OAuth redirects automatically
       
     } catch (error: any) {
+      console.error('OAuth signin error:', error);
+      
       let errorMessage = getAuthErrorMessage(error);
       
       if (error.message?.includes('popup_closed_by_user')) {
@@ -135,10 +114,6 @@ const Auth = () => {
       
       if (error.message?.includes('access_denied')) {
         errorMessage = 'Access denied. Please check your permissions and try again.';
-      }
-      
-      if (error.message?.includes('Provider not enabled')) {
-        errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication is not configured. Please use email/password or contact support.`;
       }
       
       toast({
@@ -155,56 +130,24 @@ const Auth = () => {
     const validated = validateAndSanitizeSignIn(signInData);
     if (!validated) return;
 
-    const identifier = validated.email;
-    
-    if (authRateLimiter.isBlocked(identifier)) {
-      const timeRemaining = Math.ceil(authRateLimiter.getBlockTimeRemaining(identifier) / 1000 / 60);
-      toast({
-        title: "Too many attempts",
-        description: `Please wait ${timeRemaining} minutes before trying again.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
+    console.log('Starting email signin for:', validated.email);
+    
     try {
-      cleanupAuthState();
-      
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (err) {
-        console.warn('Pre-signin cleanup failed, continuing');
-      }
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email: validated.email,
         password: validated.password,
       });
 
+      console.log('Email signin response:', { data, error });
+
       if (error) {
-        authRateLimiter.recordAttempt(identifier, true);
-        
-        const clientIP = await getClientIP();
-        await logSecurityEvent('failed_login', {
-          email: validated.email,
-          error_message: error.message,
-          attempt_time: new Date().toISOString()
-        }, clientIP, sanitizeUserAgent(navigator.userAgent));
-        
+        console.error('Email signin error:', error);
         throw error;
       }
 
       if (data.user) {
-        authRateLimiter.recordAttempt(identifier, false);
-        
-        const clientIP = await getClientIP();
-        await logSecurityEvent('successful_login', {
-          user_id: data.user.id,
-          email: validated.email,
-          login_time: new Date().toISOString()
-        }, clientIP, sanitizeUserAgent(navigator.userAgent));
+        console.log('User signed in successfully:', data.user.id);
         
         const profile = await ensureProfileExists(supabase, data.user);
         const userRole = profile?.role || 'student';
@@ -218,16 +161,12 @@ const Auth = () => {
         navigate(redirectRoute, { replace: true });
       }
     } catch (error: any) {
+      console.error('Signin error:', error);
+      
       let errorMessage = getAuthErrorMessage(error);
       
       if (error.message?.includes('Email not confirmed')) {
         errorMessage = 'Please check your email and click the confirmation link before signing in.';
-        toast({
-          title: "Email confirmation required",
-          description: errorMessage,
-          variant: "destructive",
-        });
-        return;
       }
       
       if (error.message?.includes('Invalid login credentials')) {
@@ -248,36 +187,15 @@ const Auth = () => {
     const validated = validateAndSanitizeSignUp(signUpData);
     if (!validated) return;
 
-    const identifier = validated.email;
-    
-    if (authRateLimiter.isBlocked(identifier)) {
-      const timeRemaining = Math.ceil(authRateLimiter.getBlockTimeRemaining(identifier) / 1000 / 60);
-      toast({
-        title: "Too many attempts",
-        description: `Please wait ${timeRemaining} minutes before trying again.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
+    console.log('Starting email signup for:', validated.email);
+    
     try {
-      cleanupAuthState();
-      
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (err) {
-        console.warn('Pre-signup cleanup failed, continuing');
-      }
-
-      const redirectUrl = window.location.origin;
-      
       const { data, error } = await supabase.auth.signUp({
         email: validated.email,
         password: validated.password,
         options: {
-          emailRedirectTo: redirectUrl,
+          emailRedirectTo: window.location.origin,
           data: {
             first_name: validated.firstName,
             last_name: validated.lastName,
@@ -286,10 +204,11 @@ const Auth = () => {
         },
       });
 
+      console.log('Email signup response:', { data, error });
+
       if (error) {
-        authRateLimiter.recordAttempt(identifier, true);
+        console.error('Email signup error:', error);
         
-        // Handle specific signup errors
         if (error.message?.includes('email rate limit exceeded')) {
           toast({
             title: "Email rate limit exceeded",
@@ -299,26 +218,11 @@ const Auth = () => {
           return;
         }
         
-        const clientIP = await getClientIP();
-        await logSecurityEvent('failed_signup', {
-          email: validated.email,
-          error_message: error.message,
-          attempt_time: new Date().toISOString()
-        }, clientIP, sanitizeUserAgent(navigator.userAgent));
-        
         throw error;
       }
 
       if (data.user) {
-        authRateLimiter.recordAttempt(identifier, false);
-        
-        const clientIP = await getClientIP();
-        await logSecurityEvent('successful_signup', {
-          user_id: data.user.id,
-          email: validated.email,
-          role: validated.role,
-          signup_time: new Date().toISOString()
-        }, clientIP, sanitizeUserAgent(navigator.userAgent));
+        console.log('User signed up successfully:', data.user.id);
         
         // Check if email confirmation is required
         if (!data.session) {
@@ -342,6 +246,8 @@ const Auth = () => {
         navigate(redirectRoute, { replace: true });
       }
     } catch (error: any) {
+      console.error('Signup error:', error);
+      
       let errorMessage = getAuthErrorMessage(error);
       
       if (error.message?.includes('User already registered')) {
@@ -350,10 +256,6 @@ const Auth = () => {
       
       if (error.message?.includes('Password should be at least')) {
         errorMessage = 'Password must be at least 6 characters long.';
-      }
-      
-      if (error.message?.includes('email rate limit exceeded')) {
-        errorMessage = 'Too many email attempts. Please try again in a few minutes.';
       }
       
       toast({
