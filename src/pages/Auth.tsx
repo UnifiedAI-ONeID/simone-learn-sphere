@@ -66,6 +66,9 @@ const Auth = () => {
     console.log(`Starting ${provider} OAuth signin with role:`, userRole);
     
     try {
+      // Store the selected role in localStorage to use after OAuth callback
+      localStorage.setItem('pendingUserRole', userRole);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -73,9 +76,6 @@ const Auth = () => {
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-          },
-          data: {
-            role: userRole
           }
         },
       });
