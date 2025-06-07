@@ -10,6 +10,7 @@ import { PlatformThemeProvider } from "@/contexts/PlatformThemeContext";
 import { SecurityProvider } from "@/components/SecurityProvider";
 import { RoleProtectedRoute } from "@/components/RoleProtectedRoute";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
+import { ChatPopup } from "@/components/ChatPopup";
 import { MobileAppLayout } from "@/components/layout/MobileAppLayout";
 import { DesktopLayout } from "@/components/layout/DesktopLayout";
 import { Suspense, lazy, useEffect } from 'react';
@@ -193,6 +194,7 @@ function App() {
                     <Suspense fallback={<MobileLoadingSpinner />}>
                       <AppRoutes />
                     </Suspense>
+                    <ChatPopup />
                   </div>
                 </SecurityProvider>
               </PlatformThemeProvider>
