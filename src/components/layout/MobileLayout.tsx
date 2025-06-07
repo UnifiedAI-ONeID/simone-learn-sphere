@@ -2,16 +2,19 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { MobileNavigation } from './MobileNavigation';
-import { MobileHeader } from './MobileHeader';
+import { OptimizedMobileHeader } from './OptimizedMobileHeader';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const MobileLayout = () => {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <MobileHeader />
-      <main className="flex-1 overflow-auto pb-16">
-        <Outlet />
-      </main>
-      <MobileNavigation />
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background flex flex-col">
+        <OptimizedMobileHeader />
+        <main className="flex-1 overflow-auto pb-16">
+          <Outlet />
+        </main>
+        <MobileNavigation />
+      </div>
+    </ErrorBoundary>
   );
 };
