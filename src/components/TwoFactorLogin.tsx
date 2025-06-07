@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
@@ -34,11 +34,11 @@ export const TwoFactorLogin = ({ email, onVerificationSuccess, onBack }: TwoFact
   };
 
   // Auto-request code when component mounts
-  useState(() => {
+  useEffect(() => {
     if (!state.isVerifying) {
       handleRequestCode();
     }
-  });
+  }, []); // Empty dependency array to run only on mount
 
   return (
     <Card className="w-full max-w-md mx-auto">
