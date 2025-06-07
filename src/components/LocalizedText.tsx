@@ -20,7 +20,7 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
   as: Component = 'span',
   showLoadingSpinner = true,
 }) => {
-  const { localizeText, currentLanguage, translationKey } = useLocalization();
+  const { currentLanguage, translationKey, getTranslation } = useLocalization();
   const [localizedText, setLocalizedText] = useState(text);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -56,7 +56,7 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
       }
       
       try {
-        const result = await localizeText(text.trim(), target);
+        const result = await getTranslation(text.trim(), target);
         if (isMounted) {
           console.log('LocalizedText: Translation completed for:', text.substring(0, 30));
           setLocalizedText(result);
@@ -79,7 +79,7 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [text, currentLanguage.code, targetLanguage, translationKey, localizeText]);
+  }, [text, currentLanguage.code, targetLanguage, translationKey]); // Removed getTranslation from deps
 
   if (isLoading && showLoadingSpinner) {
     return (

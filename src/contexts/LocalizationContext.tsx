@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export type SupportedLanguage = {
@@ -28,13 +28,12 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
 interface LocalizationContextType {
   currentLanguage: SupportedLanguage;
   setLanguage: (language: SupportedLanguage) => void;
-  localizeText: (text: string, targetLanguage?: string) => Promise<string>;
+  getTranslation: (text: string, targetLanguage?: string) => Promise<string>;
   isLocalizing: boolean;
-  localizations: Record<string, string>;
   translationError: string | null;
   clearTranslationError: () => void;
-  translationKey: number; // Forces re-translation when incremented
-  forceRefresh: () => void; // Manual refresh trigger
+  translationKey: number;
+  forceRefresh: () => void;
 }
 
 const LocalizationContext = createContext<LocalizationContextType | undefined>(undefined);
@@ -60,59 +59,61 @@ const detectUserLanguage = (): SupportedLanguage => {
   return detectedLanguage || SUPPORTED_LANGUAGES[0];
 };
 
+const getInitialLanguage = (): SupportedLanguage => {
+  try {
+    const savedLanguage = localStorage.getItem('selectedLanguage');
+    if (savedLanguage) {
+      const language = SUPPORTED_LANGUAGES.find(lang => lang.code === savedLanguage);
+      if (language) {
+        console.log('LocalizationProvider: Loaded saved language:', language.code);
+        return language;
+      }
+    }
+  } catch (error) {
+    console.warn('LocalizationProvider: Error reading from localStorage:', error);
+  }
+  
+  const detectedLanguage = detectUserLanguage();
+  console.log('LocalizationProvider: Using detected language:', detectedLanguage.code);
+  return detectedLanguage;
+};
+
 export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(SUPPORTED_LANGUAGES[0]);
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(getInitialLanguage);
   const [isLocalizing, setIsLocalizing] = useState(false);
   const [localizations, setLocalizations] = useState<Record<string, string>>({});
   const [translationError, setTranslationError] = useState<string | null>(null);
   const [translationKey, setTranslationKey] = useState(0);
 
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('selectedLanguage');
-    if (savedLanguage) {
-      const language = SUPPORTED_LANGUAGES.find(lang => lang.code === savedLanguage);
-      if (language) {
-        setCurrentLanguage(language);
-        console.log('LocalizationProvider: Loaded saved language:', language.code);
-      } else {
-        const detectedLanguage = detectUserLanguage();
-        setCurrentLanguage(detectedLanguage);
-        localStorage.setItem('selectedLanguage', detectedLanguage.code);
-        console.log('LocalizationProvider: Using detected language:', detectedLanguage.code);
-      }
-    } else {
-      const detectedLanguage = detectUserLanguage();
-      setCurrentLanguage(detectedLanguage);
-      localStorage.setItem('selectedLanguage', detectedLanguage.code);
-      console.log('LocalizationProvider: Using detected language:', detectedLanguage.code);
-    }
-  }, []);
-
-  const setLanguage = (language: SupportedLanguage) => {
+  const setLanguage = useCallback((language: SupportedLanguage) => {
     console.log('LocalizationProvider: Setting language to:', language.code);
     setCurrentLanguage(language);
-    localStorage.setItem('selectedLanguage', language.code);
+    
+    try {
+      localStorage.setItem('selectedLanguage', language.code);
+    } catch (error) {
+      console.warn('LocalizationProvider: Error saving to localStorage:', error);
+    }
+    
     setTranslationError(null);
     
-    // Clear all caches and force re-translation with a delay to ensure state updates
-    setTimeout(() => {
-      setLocalizations({});
-      setTranslationKey(prev => prev + 1);
-      console.log('LocalizationProvider: Cache cleared, translation key incremented');
-    }, 100);
-  };
+    // Clear cache and force re-translation immediately
+    setLocalizations({});
+    setTranslationKey(prev => prev + 1);
+    console.log('LocalizationProvider: Cache cleared, translation key incremented');
+  }, []);
 
-  const forceRefresh = () => {
+  const forceRefresh = useCallback(() => {
     console.log('LocalizationProvider: Force refreshing translations');
     setLocalizations({});
     setTranslationKey(prev => prev + 1);
-  };
+  }, []);
 
-  const clearTranslationError = () => {
+  const clearTranslationError = useCallback(() => {
     setTranslationError(null);
-  };
+  }, []);
 
-  const localizeText = async (
+  const getTranslation = useCallback(async (
     text: string, 
     targetLanguage?: string
   ): Promise<string> => {
@@ -127,7 +128,7 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return text;
     }
 
-    const cacheKey = `${text.trim()}_${target}_${translationKey}`;
+    const cacheKey = `${text.trim()}_${target}`;
     
     if (localizations[cacheKey]) {
       console.log('LocalizationProvider: Using cached translation for:', text.substring(0, 30));
@@ -155,7 +156,7 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const localizedText = data?.localizedText || text;
       console.log('LocalizationProvider: Translation result:', localizedText.substring(0, 30));
       
-      // Update cache with new key including translationKey
+      // Update cache
       setLocalizations(prev => ({ ...prev, [cacheKey]: localizedText }));
       return localizedText;
     } catch (error) {
@@ -165,16 +166,15 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } finally {
       setIsLocalizing(false);
     }
-  };
+  }, [currentLanguage.code, localizations]);
 
   return (
     <LocalizationContext.Provider
       value={{
         currentLanguage,
         setLanguage,
-        localizeText,
+        getTranslation,
         isLocalizing,
-        localizations,
         translationError,
         clearTranslationError,
         translationKey,

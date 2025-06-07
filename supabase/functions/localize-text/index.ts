@@ -20,7 +20,8 @@ serve(async (req) => {
     console.log('Localize-text function called with:', { 
       textLength: text?.length, 
       targetLanguage,
-      hasOpenAIKey: !!openAIApiKey 
+      hasOpenAIKey: !!openAIApiKey,
+      timestamp: new Date().toISOString()
     });
 
     if (!text || !targetLanguage) {
@@ -33,7 +34,15 @@ serve(async (req) => {
 
     let localizedText = text;
 
-    if (openAIApiKey && targetLanguage !== 'en') {
+    if (!openAIApiKey) {
+      console.warn('OPENAI_API_KEY not found, returning original text');
+      return new Response(
+        JSON.stringify({ localizedText: text }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (targetLanguage !== 'en') {
       const languageNames = {
         'zh-CN': 'Simplified Chinese',
         'zh-TW': 'Traditional Chinese',
@@ -86,30 +95,35 @@ serve(async (req) => {
           }),
         });
 
+        console.log('OpenAI API response status:', response.status);
+
         if (response.ok) {
           const data = await response.json();
           localizedText = data.choices[0].message.content.trim();
-          console.log('OpenAI translation successful');
+          console.log('OpenAI translation successful, result length:', localizedText.length);
         } else {
+          const errorText = await response.text();
           console.error('OpenAI API error:', response.status, response.statusText);
-          const errorData = await response.text();
-          console.error('OpenAI error details:', errorData);
+          console.error('OpenAI error details:', errorText);
+          
+          // Return original text on API failure
+          localizedText = text;
         }
       } catch (openAIError) {
         console.error('OpenAI request failed:', openAIError);
+        // Return original text on request failure
+        localizedText = text;
       }
-    } else if (!openAIApiKey) {
-      console.warn('OPENAI_API_KEY not found, returning original text');
     }
 
-    console.log('Returning localized text:', localizedText.substring(0, 50));
+    console.log('Returning localized text (length):', localizedText.length);
 
     return new Response(
       JSON.stringify({ localizedText }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Localization error:', error);
+    console.error('Localization function error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
