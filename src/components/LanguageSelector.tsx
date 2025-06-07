@@ -9,14 +9,26 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { Globe, Check, Bot } from 'lucide-react';
+import { Globe, Check, Bot, RefreshCw } from 'lucide-react';
 import { useLocalization, SUPPORTED_LANGUAGES } from '@/contexts/LocalizationContext';
 import { usePlatformDetection } from '@/hooks/usePlatformDetection';
 
 export const LanguageSelector = () => {
-  const { currentLanguage, setLanguage } = useLocalization();
+  const { currentLanguage, setLanguage, forceRefresh, translationError } = useLocalization();
   const platform = usePlatformDetection();
   const isMobile = platform !== 'desktop';
+
+  const handleLanguageChange = (language: any) => {
+    console.log('Language selector: Changing language to', language.code);
+    setLanguage(language);
+  };
+
+  const handleForceRefresh = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Language selector: Force refreshing translations');
+    forceRefresh();
+  };
 
   return (
     <DropdownMenu>
@@ -38,13 +50,29 @@ export const LanguageSelector = () => {
           AI-Powered Localization
         </div>
         <div className="px-2 py-1 text-xs text-gray-400 mb-2">
-          <div className="flex items-center space-x-2">
-            <Bot className="h-3 w-3" />
-            <span>Powered by ChatGPT</span>
-            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
-              Smart
-            </Badge>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Bot className="h-3 w-3" />
+              <span>Powered by ChatGPT</span>
+              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
+                Smart
+              </Badge>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleForceRefresh}
+              className="h-6 w-6 p-0"
+              title="Refresh translations"
+            >
+              <RefreshCw className="h-3 w-3" />
+            </Button>
           </div>
+          {translationError && (
+            <div className="text-red-500 text-xs mt-1">
+              {translationError}
+            </div>
+          )}
         </div>
         
         <DropdownMenuSeparator />
@@ -56,7 +84,7 @@ export const LanguageSelector = () => {
         {SUPPORTED_LANGUAGES.map((language) => (
           <DropdownMenuItem
             key={language.code}
-            onClick={() => setLanguage(language)}
+            onClick={() => handleLanguageChange(language)}
             className="flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center space-x-3">

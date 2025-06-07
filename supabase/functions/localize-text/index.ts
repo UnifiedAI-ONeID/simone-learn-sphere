@@ -17,7 +17,14 @@ serve(async (req) => {
   try {
     const { text, targetLanguage } = await req.json();
 
+    console.log('Localize-text function called with:', { 
+      textLength: text?.length, 
+      targetLanguage,
+      hasOpenAIKey: !!openAIApiKey 
+    });
+
     if (!text || !targetLanguage) {
+      console.error('Missing required parameters:', { text: !!text, targetLanguage: !!targetLanguage });
       return new Response(
         JSON.stringify({ error: 'Missing required parameters' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -27,7 +34,6 @@ serve(async (req) => {
     let localizedText = text;
 
     if (openAIApiKey && targetLanguage !== 'en') {
-      // Use ChatGPT for localization
       const languageNames = {
         'zh-CN': 'Simplified Chinese',
         'zh-TW': 'Traditional Chinese',
@@ -46,46 +52,57 @@ serve(async (req) => {
 
       const targetLanguageName = languageNames[targetLanguage] || targetLanguage;
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: `You are a professional localization specialist for educational platforms. Localize text accurately while preserving:
-              - Technical terminology
-              - Educational context
-              - UI/UX terminology
-              - Cultural appropriateness
-              - Formatting and structure
-              
-              Provide natural, contextually appropriate localization that feels native to speakers of the target language.
-              Only respond with the localized text, no explanations or additional content.`
-            },
-            {
-              role: 'user',
-              content: `Localize the following text to ${targetLanguageName}:\n\n${text}`
-            }
-          ],
-          temperature: 0.1,
-          max_tokens: 2000,
-        }),
-      });
+      console.log('Calling OpenAI API for translation to:', targetLanguageName);
 
-      if (response.ok) {
-        const data = await response.json();
-        localizedText = data.choices[0].message.content.trim();
-      } else {
-        console.error('ChatGPT localization failed:', response.status, response.statusText);
-        // Return original text if localization fails
-        localizedText = text;
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openAIApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              {
+                role: 'system',
+                content: `You are a professional localization specialist for educational platforms. Localize text accurately while preserving:
+                - Technical terminology
+                - Educational context
+                - UI/UX terminology
+                - Cultural appropriateness
+                - Formatting and structure
+                
+                Provide natural, contextually appropriate localization that feels native to speakers of the target language.
+                Only respond with the localized text, no explanations or additional content.`
+              },
+              {
+                role: 'user',
+                content: `Localize the following text to ${targetLanguageName}:\n\n${text}`
+              }
+            ],
+            temperature: 0.1,
+            max_tokens: 2000,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          localizedText = data.choices[0].message.content.trim();
+          console.log('OpenAI translation successful');
+        } else {
+          console.error('OpenAI API error:', response.status, response.statusText);
+          const errorData = await response.text();
+          console.error('OpenAI error details:', errorData);
+        }
+      } catch (openAIError) {
+        console.error('OpenAI request failed:', openAIError);
       }
+    } else if (!openAIApiKey) {
+      console.warn('OPENAI_API_KEY not found, returning original text');
     }
+
+    console.log('Returning localized text:', localizedText.substring(0, 50));
 
     return new Response(
       JSON.stringify({ localizedText }),

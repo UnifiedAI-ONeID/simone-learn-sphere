@@ -20,7 +20,7 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
   as: Component = 'span',
   showLoadingSpinner = true,
 }) => {
-  const { localizeText, currentLanguage } = useLocalization();
+  const { localizeText, currentLanguage, translationKey } = useLocalization();
   const [localizedText, setLocalizedText] = useState(text);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -34,11 +34,14 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
       
       const target = targetLanguage || currentLanguage.code;
       
-      // Reset to original text first to avoid showing stale translations
+      console.log('LocalizedText: Translating', text.substring(0, 30), 'to', target);
+      
+      // Always start with original text
       setLocalizedText(text);
       setHasError(false);
       
       if (target === 'en') {
+        console.log('Target is English, using original text');
         setLocalizedText(text);
         return;
       }
@@ -47,9 +50,10 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
       
       try {
         const result = await localizeText(text, target);
+        console.log('LocalizedText: Translation completed for', text.substring(0, 30));
         setLocalizedText(result);
       } catch (error) {
-        console.error('Localization error:', error);
+        console.error('LocalizedText: Translation error for', text.substring(0, 30), error);
         setLocalizedText(text);
         setHasError(true);
       } finally {
@@ -58,7 +62,7 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
     };
 
     localize();
-  }, [text, currentLanguage.code, targetLanguage, localizeText]);
+  }, [text, currentLanguage.code, targetLanguage, translationKey]); // Added translationKey as dependency
 
   if (isLoading && showLoadingSpinner) {
     return (

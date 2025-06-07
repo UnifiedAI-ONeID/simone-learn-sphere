@@ -33,6 +33,8 @@ interface LocalizationContextType {
   localizations: Record<string, string>;
   translationError: string | null;
   clearTranslationError: () => void;
+  translationKey: number; // Forces re-translation when incremented
+  forceRefresh: () => void; // Manual refresh trigger
 }
 
 const LocalizationContext = createContext<LocalizationContextType | undefined>(undefined);
@@ -63,6 +65,7 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [isLocalizing, setIsLocalizing] = useState(false);
   const [localizations, setLocalizations] = useState<Record<string, string>>({});
   const [translationError, setTranslationError] = useState<string | null>(null);
+  const [translationKey, setTranslationKey] = useState(0);
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem('selectedLanguage');
@@ -83,11 +86,22 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   const setLanguage = (language: SupportedLanguage) => {
+    console.log('Setting language to:', language.code);
     setCurrentLanguage(language);
     localStorage.setItem('selectedLanguage', language.code);
     setTranslationError(null);
-    // Clear cache when language changes to force re-translation
+    
+    // Clear all caches and force re-translation
     setLocalizations({});
+    setTranslationKey(prev => prev + 1);
+    
+    console.log('Language changed, translation key incremented');
+  };
+
+  const forceRefresh = () => {
+    console.log('Force refreshing translations');
+    setLocalizations({});
+    setTranslationKey(prev => prev + 1);
   };
 
   const clearTranslationError = () => {
@@ -106,6 +120,7 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const cacheKey = `${text}_${target}`;
     
     if (localizations[cacheKey]) {
+      console.log('Using cached translation for:', text.substring(0, 30));
       return localizations[cacheKey];
     }
 
@@ -113,6 +128,8 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setTranslationError(null);
     
     try {
+      console.log('Calling localize-text function for:', text.substring(0, 30), 'to', target);
+      
       const { data, error } = await supabase.functions.invoke('localize-text', {
         body: { 
           text, 
@@ -127,6 +144,9 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
 
       const localizedText = data?.localizedText || text;
+      console.log('Translation result:', localizedText.substring(0, 30));
+      
+      // Update cache
       setLocalizations(prev => ({ ...prev, [cacheKey]: localizedText }));
       return localizedText;
     } catch (error) {
@@ -148,6 +168,8 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         localizations,
         translationError,
         clearTranslationError,
+        translationKey,
+        forceRefresh,
       }}
     >
       {children}
