@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain } from 'lucide-react';
 import { TranslatedText } from '@/components/TranslatedText';
-import { TwoFactorLogin } from '@/components/TwoFactorLogin';
+import { SimpleMobileAuth } from '@/components/SimpleMobileAuth';
 
 export const MobileAuth = () => {
   return (
@@ -21,19 +20,7 @@ export const MobileAuth = () => {
           </p>
         </div>
 
-        <Card className="bg-white/80 backdrop-blur-sm border-purple-100 shadow-xl">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl">
-              <TranslatedText text="Sign In" />
-            </CardTitle>
-            <CardDescription>
-              <TranslatedText text="Access your mobile learning dashboard" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TwoFactorLogin />
-          </CardContent>
-        </Card>
+        <SimpleMobileAuth />
       </div>
     </div>
   );

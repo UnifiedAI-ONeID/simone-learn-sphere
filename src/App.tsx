@@ -11,7 +11,7 @@ import { RoleProtectedRoute } from "@/components/RoleProtectedRoute";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import { MobileAppLayout } from "@/components/layout/MobileAppLayout";
 import { Suspense, lazy, useEffect } from 'react';
-import { StatusBar } from '@capacitor/status-bar';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
 
 // Lazy load pages for optimal mobile performance
@@ -51,7 +51,7 @@ function App() {
     const initializeMobileApp = async () => {
       try {
         // Configure status bar for mobile
-        await StatusBar.setStyle({ style: 'DARK' });
+        await StatusBar.setStyle({ style: Style.Dark });
         await StatusBar.setBackgroundColor({ color: '#6366f1' });
         
         // Hide splash screen after app is ready
