@@ -1,108 +1,152 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Brain, BookOpen, Target, Wand2, GripVertical } from 'lucide-react';
+import { Plus, Brain, BookOpen, Target, Wand2, GripVertical, Save, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCourses } from '@/hooks/useCourses';
+import { useModules } from '@/hooks/useModules';
+import { useCourseDrafts } from '@/hooks/useCourseDrafts';
 import { AIAssistantSidebar } from './AIAssistantSidebar';
 import { ModuleCard } from './ModuleCard';
 import { LessonComposer } from './LessonComposer';
 import { CourseTemplates } from './CourseTemplates';
 
-interface Module {
-  id: string;
-  title: string;
-  description: string;
-  order: number;
-  lessons: Lesson[];
-}
-
-interface Lesson {
-  id: string;
-  title: string;
-  content: string;
-  type: 'text' | 'video' | 'quiz' | 'assignment';
-  order: number;
-}
-
 interface Course {
   id: string;
   title: string;
   description: string;
-  modules: Module[];
+  modules: any[];
 }
 
 export const ModularCourseBuilder = () => {
+  const { user } = useAuth();
   const { toast } = useToast();
+  const { createCourse, updateCourse } = useCourses();
+  const { debouncedSave, saving } = useCourseDrafts();
+  
   const [course, setCourse] = useState<Course>({
     id: 'new',
     title: '',
     description: '',
     modules: []
   });
+  
+  const [currentCourseId, setCurrentCourseId] = useState<string | null>(null);
+  const { modules, createModule, updateModule, createLesson, loading } = useModules(currentCourseId || '');
+  
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [currentView, setCurrentView] = useState<'overview' | 'module' | 'lesson'>('overview');
 
-  const addModule = () => {
-    const newModule: Module = {
-      id: `module-${Date.now()}`,
-      title: 'New Module',
-      description: '',
-      order: course.modules.length + 1,
-      lessons: []
-    };
-    setCourse(prev => ({
-      ...prev,
-      modules: [...prev.modules, newModule]
-    }));
+  // Auto-save draft when course data changes
+  useEffect(() => {
+    if (course.title || course.description || modules.length > 0) {
+      debouncedSave({
+        ...course,
+        modules: modules
+      }, course.title);
+    }
+  }, [course, modules, debouncedSave]);
+
+  const addModule = async () => {
+    if (!currentCourseId) {
+      // If no course exists yet, create one first
+      const newCourse = await createCourse({
+        title: course.title || 'Untitled Course',
+        description: course.description || '',
+      });
+      
+      if (newCourse) {
+        setCurrentCourseId(newCourse.id);
+        setCourse(prev => ({ ...prev, id: newCourse.id }));
+        
+        // Create the module
+        await createModule({
+          title: 'New Module',
+          description: '',
+        });
+      }
+    } else {
+      await createModule({
+        title: 'New Module',
+        description: '',
+      });
+    }
   };
 
-  const updateModule = (moduleId: string, updates: Partial<Module>) => {
-    setCourse(prev => ({
-      ...prev,
-      modules: prev.modules.map(m => 
-        m.id === moduleId ? { ...m, ...updates } : m
-      )
-    }));
+  const handleUpdateModule = async (moduleId: string, updates: any) => {
+    await updateModule(moduleId, updates);
   };
 
-  const addLesson = (moduleId: string) => {
-    const newLesson: Lesson = {
-      id: `lesson-${Date.now()}`,
+  const handleAddLesson = async (moduleId: string) => {
+    await createLesson(moduleId, {
       title: 'New Lesson',
       content: '',
-      type: 'text',
-      order: 1
-    };
-    
-    setCourse(prev => ({
-      ...prev,
-      modules: prev.modules.map(m => 
-        m.id === moduleId 
-          ? { ...m, lessons: [...m.lessons, newLesson] }
-          : m
-      )
-    }));
+      lesson_type: 'text',
+    });
+  };
+
+  const saveCourse = async () => {
+    if (!currentCourseId) {
+      const newCourse = await createCourse({
+        title: course.title || 'Untitled Course',
+        description: course.description || '',
+        is_published: true,
+      });
+      
+      if (newCourse) {
+        setCurrentCourseId(newCourse.id);
+        setCourse(prev => ({ ...prev, id: newCourse.id }));
+        toast({
+          title: "Success",
+          description: "Course created and published successfully!",
+        });
+      }
+    } else {
+      await updateCourse(currentCourseId, {
+        title: course.title,
+        description: course.description,
+        is_published: true,
+      });
+      toast({
+        title: "Success",
+        description: "Course updated and published successfully!",
+      });
+    }
   };
 
   const getBreadcrumbs = () => {
     const breadcrumbs = ['Course'];
     if (selectedModule) {
-      const module = course.modules.find(m => m.id === selectedModule);
+      const module = modules.find(m => m.id === selectedModule);
       breadcrumbs.push(module?.title || 'Module');
     }
     if (selectedLesson) {
-      const module = course.modules.find(m => m.id === selectedModule);
-      const lesson = module?.lessons.find(l => l.id === selectedLesson);
+      const module = modules.find(m => m.id === selectedModule);
+      const lesson = module?.lessons?.find(l => l.id === selectedLesson);
       breadcrumbs.push(lesson?.title || 'Lesson');
     }
     return breadcrumbs;
   };
+
+  const applyTemplate = (template: any) => {
+    setCourse(template);
+    setCurrentCourseId(null); // Reset to create new course
+  };
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-500">Please log in to create courses.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -123,6 +167,12 @@ export const ModularCourseBuilder = () => {
               <h1 className="text-3xl font-bold text-gray-900">
                 {course.title || 'New Course'}
               </h1>
+              {saving && (
+                <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+                  <Clock className="w-3 h-3 animate-spin" />
+                  <span>Auto-saving...</span>
+                </div>
+              )}
             </div>
             <div className="flex items-center space-x-2">
               <Button
@@ -132,8 +182,13 @@ export const ModularCourseBuilder = () => {
                 <Brain className="w-4 h-4 mr-2" />
                 AI Assistant
               </Button>
-              <Button className="bg-gradient-to-r from-purple-600 to-blue-600">
-                Save Course
+              <Button 
+                onClick={saveCourse}
+                className="bg-gradient-to-r from-purple-600 to-blue-600"
+                disabled={!course.title}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save & Publish Course
               </Button>
             </div>
           </div>
@@ -171,7 +226,7 @@ export const ModularCourseBuilder = () => {
               </Card>
 
               {/* Templates */}
-              <CourseTemplates onApplyTemplate={(template) => setCourse(template)} />
+              <CourseTemplates onApplyTemplate={applyTemplate} />
 
               {/* Modules */}
               <Card>
@@ -183,27 +238,38 @@ export const ModularCourseBuilder = () => {
                         Organize your content into modules
                       </CardDescription>
                     </div>
-                    <Button onClick={addModule} size="sm">
+                    <Button onClick={addModule} size="sm" disabled={loading}>
                       <Plus className="w-4 h-4 mr-2" />
                       Add Module
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {course.modules.length === 0 ? (
+                  {loading ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                      <p className="mt-2">Loading modules...</p>
+                    </div>
+                  ) : modules.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                       <p>No modules yet. Add your first module to get started.</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {course.modules.map((module, index) => (
+                      {modules.map((module, index) => (
                         <ModuleCard
                           key={module.id}
-                          module={module}
+                          module={{
+                            id: module.id,
+                            title: module.title,
+                            description: module.description || '',
+                            order: module.order_index,
+                            lessons: module.lessons || [],
+                          }}
                           index={index}
-                          onUpdate={(updates) => updateModule(module.id, updates)}
-                          onAddLesson={() => addLesson(module.id)}
+                          onUpdate={(updates) => handleUpdateModule(module.id, updates)}
+                          onAddLesson={() => handleAddLesson(module.id)}
                           onSelect={() => {
                             setSelectedModule(module.id);
                             setCurrentView('module');
@@ -220,7 +286,6 @@ export const ModularCourseBuilder = () => {
           {/* Module View */}
           {currentView === 'module' && selectedModule && (
             <div>
-              {/* Module content would go here */}
               <Button onClick={() => setCurrentView('overview')}>
                 Back to Course Overview
               </Button>
@@ -230,9 +295,9 @@ export const ModularCourseBuilder = () => {
           {/* Lesson View */}
           {currentView === 'lesson' && selectedLesson && (
             <LessonComposer
-              lesson={course.modules
+              lesson={modules
                 .find(m => m.id === selectedModule)
-                ?.lessons.find(l => l.id === selectedLesson)}
+                ?.lessons?.find(l => l.id === selectedLesson)}
               onBack={() => setCurrentView('module')}
             />
           )}
@@ -242,10 +307,12 @@ export const ModularCourseBuilder = () => {
       {/* AI Assistant Sidebar */}
       {showAIAssistant && (
         <AIAssistantSidebar
-          course={course}
+          course={{
+            ...course,
+            modules: modules
+          }}
           onClose={() => setShowAIAssistant(false)}
           onApplySuggestion={(suggestion) => {
-            // Apply AI suggestions to course
             toast({
               title: "AI Suggestion Applied",
               description: "The AI suggestion has been applied to your course.",

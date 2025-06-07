@@ -63,6 +63,33 @@ export type Database = {
         }
         Relationships: []
       }
+      course_drafts: {
+        Row: {
+          course_data: Json
+          created_at: string
+          id: string
+          last_saved_at: string
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          course_data: Json
+          created_at?: string
+          id?: string
+          last_saved_at?: string
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          course_data?: Json
+          created_at?: string
+          id?: string
+          last_saved_at?: string
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       course_enrollments: {
         Row: {
           completed_at: string | null
@@ -325,6 +352,7 @@ export type Database = {
           estimated_duration: number | null
           id: string
           lesson_type: string | null
+          module_id: string | null
           order_index: number
           title: string
           updated_at: string
@@ -337,6 +365,7 @@ export type Database = {
           estimated_duration?: number | null
           id?: string
           lesson_type?: string | null
+          module_id?: string | null
           order_index: number
           title: string
           updated_at?: string
@@ -349,6 +378,7 @@ export type Database = {
           estimated_duration?: number | null
           id?: string
           lesson_type?: string | null
+          module_id?: string | null
           order_index?: number
           title?: string
           updated_at?: string
@@ -357,6 +387,51 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      modules: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string | null
+          id: string
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "modules_course_id_fkey"
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"

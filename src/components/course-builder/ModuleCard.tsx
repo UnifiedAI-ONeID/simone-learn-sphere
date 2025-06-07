@@ -7,6 +7,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Brain, BookOpen, GripVertical, Edit2, Check, X } from 'lucide-react';
 
+interface Lesson {
+  id: string;
+  title: string;
+  content: string | null;
+  lesson_type: string;
+  order_index: number;
+  estimated_duration: number | null;
+}
+
 interface Module {
   id: string;
   title: string;
@@ -15,18 +24,10 @@ interface Module {
   lessons: Lesson[];
 }
 
-interface Lesson {
-  id: string;
-  title: string;
-  content: string;
-  type: 'text' | 'video' | 'quiz' | 'assignment';
-  order: number;
-}
-
 interface ModuleCardProps {
   module: Module;
   index: number;
-  onUpdate: (updates: Partial<Module>) => void;
+  onUpdate: (updates: { title?: string; description?: string }) => void;
   onAddLesson: () => void;
   onSelect: () => void;
 }
@@ -56,6 +57,10 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({
     setIsEditing(false);
   };
 
+  const totalDuration = module.lessons.reduce((total, lesson) => {
+    return total + (lesson.estimated_duration || 15);
+  }, 0);
+
   return (
     <Card className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
@@ -70,12 +75,14 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   className="font-semibold"
+                  placeholder="Module title"
                 />
                 <Textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   rows={2}
                   className="text-sm"
+                  placeholder="Module description"
                 />
               </div>
             ) : (
@@ -115,7 +122,7 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({
               {module.lessons.length} lesson{module.lessons.length !== 1 ? 's' : ''}
             </Badge>
             <Badge variant="outline" className="text-xs">
-              ~{module.lessons.length * 15} min
+              ~{totalDuration} min
             </Badge>
           </div>
           <div className="flex items-center space-x-2">
