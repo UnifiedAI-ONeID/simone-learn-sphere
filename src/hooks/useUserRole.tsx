@@ -78,5 +78,19 @@ export const useUserRole = () => {
     fetchUserRole();
   }, [user]);
 
-  return { role, loading };
+  // Helper function to check if user has a specific role
+  const hasRole = (targetRole: string): boolean => {
+    if (!role) return false;
+    if (role === 'admin') return true; // Admin has all roles
+    return role.split('+').includes(targetRole);
+  };
+
+  // Helper function to get all user roles as array
+  const getAllRoles = (): string[] => {
+    if (!role) return [];
+    if (role === 'admin') return ['admin', 'educator', 'student'];
+    return role.split('+');
+  };
+
+  return { role, loading, hasRole, getAllRoles };
 };

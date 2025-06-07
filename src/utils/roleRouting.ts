@@ -2,28 +2,39 @@
 export const getRoleBasedRoute = (role: string | null): string => {
   console.log('Getting route for role:', role);
   
-  switch (role) {
-    case 'admin':
-      return '/admin-dashboard';
-    case 'educator':
-      return '/educator-dashboard';
-    case 'student':
-      return '/student-dashboard';
-    default:
-      // Default to student dashboard for any unknown roles
-      console.warn('Unknown role, defaulting to student dashboard:', role);
-      return '/student-dashboard';
+  if (!role) {
+    console.warn('No role provided, defaulting to student dashboard');
+    return '/student-dashboard';
   }
+
+  // Handle combined roles - prioritize in order: admin > educator > student
+  if (role.includes('admin')) {
+    return '/admin-dashboard';
+  } else if (role.includes('educator')) {
+    return '/educator-dashboard';
+  } else if (role.includes('student')) {
+    return '/student-dashboard';
+  }
+  
+  // Default to student dashboard for any unknown roles
+  console.warn('Unknown role, defaulting to student dashboard:', role);
+  return '/student-dashboard';
 };
 
 export const canAccessRoute = (userRole: string | null, route: string): boolean => {
   if (!userRole) return false;
   
+  // Helper function to check if user has specific role
+  const hasRole = (targetRole: string): boolean => {
+    if (userRole === 'admin') return true; // Admin has all access
+    return userRole.split('+').includes(targetRole);
+  };
+  
   switch (route) {
     case '/admin-dashboard':
-      return userRole === 'admin';
+      return hasRole('admin');
     case '/educator-dashboard':
-      return userRole === 'educator' || userRole === 'admin';
+      return hasRole('educator') || hasRole('admin');
     case '/student-dashboard':
       return true; // All authenticated users can access student dashboard
     case '/auth':

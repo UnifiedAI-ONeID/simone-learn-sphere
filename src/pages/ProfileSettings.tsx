@@ -1,137 +1,106 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ProfilePictureUpload } from '@/components/ProfilePictureUpload';
-import { DashboardHeader } from '@/components/DashboardHeader';
+import { useAuth } from '@/contexts/AuthContext';
 import { TranslatedText } from '@/components/TranslatedText';
-import { Save, User } from 'lucide-react';
+import { UserRoleManager } from '@/components/UserRoleManager';
+import { ProfilePictureUpload } from '@/components/ProfilePictureUpload';
+import { TwoFactorSetup } from '@/components/TwoFactorSetup';
 
 const ProfileSettings = () => {
-  const { user, refreshProfile } = useAuth();
+  const { user, signOut } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [firstName, setFirstName] = useState(user?.user_metadata?.first_name || '');
+  const [lastName, setLastName] = useState(user?.user_metadata?.last_name || '');
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [profile, setProfile] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-  });
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, email')
-          .eq('id', user.id)
-          .single();
-
-        if (error) throw error;
-
-        setProfile({
-          firstName: data.first_name || '',
-          lastName: data.last_name || '',
-          email: data.email || '',
-        });
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load profile information.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    fetchProfile();
-  }, [user, toast]);
-
-  const handleSave = async () => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!user) return;
 
-    setLoading(true);
+    setIsLoading(true);
     try {
       const { error } = await supabase
         .from('profiles')
         .update({
-          first_name: profile.firstName.trim(),
-          last_name: profile.lastName.trim(),
+          first_name: firstName,
+          last_name: lastName,
+          updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
 
       if (error) throw error;
 
-      await refreshProfile();
-
       toast({
-        title: "Success",
-        description: "Profile updated successfully!",
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
       });
     } catch (error: any) {
-      console.error('Error updating profile:', error);
       toast({
-        title: "Update failed",
-        description: error.message || "Failed to update profile.",
+        title: "Error updating profile",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleInputChange = (field: keyof typeof profile, value: string) => {
-    setProfile(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error: any) {
+      toast({
+        title: "Error signing out",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardHeader
-        title="Profile Settings"
-        subtitle="Manage your account information and preferences"
-        badgeText="Settings"
-        badgeIcon={User}
-      />
-      
-      <div className="p-6">
-        <div className="max-w-2xl mx-auto space-y-6">
-          {/* Profile Picture Section */}
-          <ProfilePictureUpload
-            firstName={profile.firstName}
-            lastName={profile.lastName}
-          />
+    <div className="container mx-auto py-6 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">
+          <TranslatedText text="Profile Settings" />
+        </h1>
+        <p className="text-gray-600">
+          <TranslatedText text="Manage your account settings and preferences." />
+        </p>
+      </div>
 
-          {/* Personal Information Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <TranslatedText text="Personal Information" />
-              </CardTitle>
-              <CardDescription>
-                <TranslatedText text="Update your basic profile information" />
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid gap-6">
+        {/* Profile Picture */}
+        <ProfilePictureUpload />
+
+        {/* Basic Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <TranslatedText text="Basic Information" />
+            </CardTitle>
+            <CardDescription>
+              <TranslatedText text="Update your personal details." />
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">
                     <TranslatedText text="First Name" />
                   </Label>
                   <Input
                     id="firstName"
-                    value={profile.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Enter your first name"
-                    disabled={loading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -140,14 +109,12 @@ const ProfileSettings = () => {
                   </Label>
                   <Input
                     id="lastName"
-                    value={profile.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     placeholder="Enter your last name"
-                    disabled={loading}
                   />
                 </div>
               </div>
-              
               <div className="space-y-2">
                 <Label htmlFor="email">
                   <TranslatedText text="Email" />
@@ -155,30 +122,47 @@ const ProfileSettings = () => {
                 <Input
                   id="email"
                   type="email"
-                  value={profile.email}
+                  value={user?.email || ''}
                   disabled
-                  className="bg-gray-100 cursor-not-allowed"
+                  className="bg-gray-50"
                 />
                 <p className="text-sm text-gray-500">
-                  <TranslatedText text="Email cannot be changed. Contact support if you need to update your email address." />
+                  <TranslatedText text="Email cannot be changed" />
                 </p>
               </div>
+              <Button type="submit" disabled={isLoading}>
+                <TranslatedText text={isLoading ? 'Updating...' : 'Update Profile'} />
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
-              <div className="flex justify-end pt-4">
-                <Button
-                  onClick={handleSave}
-                  disabled={loading}
-                  className="flex items-center space-x-2"
-                >
-                  <Save className="h-4 w-4" />
-                  <span>
-                    <TranslatedText text={loading ? 'Saving...' : 'Save Changes'} />
-                  </span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Role Management */}
+        <UserRoleManager />
+
+        {/* Two-Factor Authentication */}
+        <TwoFactorSetup />
+
+        {/* Account Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <TranslatedText text="Account Actions" />
+            </CardTitle>
+            <CardDescription>
+              <TranslatedText text="Manage your account." />
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={handleSignOut}
+              variant="outline"
+              className="w-full"
+            >
+              <TranslatedText text="Sign Out" />
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ export const RoleProtectedRoute = ({
   fallbackPath 
 }: RoleProtectedRouteProps) => {
   const { user, loading: authLoading } = useAuth();
-  const { role, loading: roleLoading } = useUserRole();
+  const { role, loading: roleLoading, hasRole } = useUserRole();
 
   if (authLoading || roleLoading) {
     return (
@@ -30,7 +30,10 @@ export const RoleProtectedRoute = ({
     return <Navigate to="/auth" replace />;
   }
 
-  if (!role || !allowedRoles.includes(role)) {
+  // Check if user has any of the allowed roles
+  const hasAccess = allowedRoles.some(allowedRole => hasRole(allowedRole));
+
+  if (!hasAccess) {
     // Use provided fallback or determine based on user's actual role
     const redirectPath = fallbackPath || getRoleBasedRoute(role);
     return <Navigate to={redirectPath} replace />;
