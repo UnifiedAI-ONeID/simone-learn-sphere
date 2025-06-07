@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -291,7 +290,7 @@ export const UserManagement = () => {
                       <Select
                         value={user.role}
                         onValueChange={(role) => handleRoleChange(user.id, role)}
-                        disabled={!hasRole('admin') && role === 'admin'}
+                        disabled={!hasRole('admin')}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
