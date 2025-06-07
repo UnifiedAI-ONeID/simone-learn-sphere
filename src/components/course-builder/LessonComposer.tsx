@@ -10,9 +10,10 @@ import { ArrowLeft, Save, Eye, Video, FileText, HelpCircle, Target } from 'lucid
 interface Lesson {
   id: string;
   title: string;
-  content: string;
-  type: 'text' | 'video' | 'quiz' | 'assignment';
-  order: number;
+  content: string | null;
+  lesson_type: string;
+  order_index: number;
+  estimated_duration: number | null;
 }
 
 interface LessonComposerProps {
@@ -29,8 +30,9 @@ export const LessonComposer: React.FC<LessonComposerProps> = ({
       id: 'new',
       title: 'New Lesson',
       content: '',
-      type: 'text',
-      order: 1,
+      lesson_type: 'text',
+      order_index: 1,
+      estimated_duration: 15,
     }
   );
   const [isPreview, setIsPreview] = useState(false);
@@ -62,9 +64,9 @@ export const LessonComposer: React.FC<LessonComposerProps> = ({
               {lessonTypes.map((type) => (
                 <Badge
                   key={type.value}
-                  variant={lessonData.type === type.value ? 'default' : 'outline'}
+                  variant={lessonData.lesson_type === type.value ? 'default' : 'outline'}
                   className="cursor-pointer"
-                  onClick={() => setLessonData(prev => ({ ...prev, type: type.value as any }))}
+                  onClick={() => setLessonData(prev => ({ ...prev, lesson_type: type.value }))}
                 >
                   <type.icon className="w-3 h-3 mr-1" />
                   {type.label}
@@ -96,7 +98,7 @@ export const LessonComposer: React.FC<LessonComposerProps> = ({
           </CardHeader>
           <CardContent>
             <div className="prose max-w-none">
-              {lessonData.content.split('\n').map((paragraph, index) => (
+              {(lessonData.content || '').split('\n').map((paragraph, index) => (
                 <p key={index} className="mb-4">{paragraph}</p>
               ))}
             </div>
@@ -122,7 +124,7 @@ export const LessonComposer: React.FC<LessonComposerProps> = ({
                 <div>
                   <label className="text-sm font-medium mb-2 block">Content</label>
                   <Textarea
-                    value={lessonData.content}
+                    value={lessonData.content || ''}
                     onChange={(e) => setLessonData(prev => ({ ...prev, content: e.target.value }))}
                     rows={15}
                     placeholder="Write your lesson content here..."
@@ -170,7 +172,14 @@ export const LessonComposer: React.FC<LessonComposerProps> = ({
               <CardContent className="space-y-3">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Estimated Duration (minutes)</label>
-                  <Input type="number" placeholder="15" />
+                  <Input 
+                    type="number" 
+                    value={lessonData.estimated_duration || 15}
+                    onChange={(e) => setLessonData(prev => ({ 
+                      ...prev, 
+                      estimated_duration: parseInt(e.target.value) || 15 
+                    }))}
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Difficulty Level</label>

@@ -264,7 +264,7 @@ export const ModularCourseBuilder = () => {
                             id: module.id,
                             title: module.title,
                             description: module.description || '',
-                            order: module.order_index,
+                            order_index: module.order_index,
                             lessons: module.lessons || [],
                           }}
                           index={index}

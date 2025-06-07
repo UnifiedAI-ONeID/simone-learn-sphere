@@ -45,6 +45,7 @@ export const useModules = (courseId: string) => {
           *,
           lessons (
             id,
+            module_id,
             title,
             content,
             lesson_type,

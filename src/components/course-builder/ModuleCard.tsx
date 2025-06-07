@@ -20,7 +20,7 @@ interface Module {
   id: string;
   title: string;
   description: string;
-  order: number;
+  order_index: number;
   lessons: Lesson[];
 }
 
