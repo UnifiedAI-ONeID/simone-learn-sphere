@@ -5,10 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { BookOpen, Users, Brain, Trophy, Moon, Sun, Accessibility } from 'lucide-react';
+import { BookOpen, Users, Brain, Trophy, Moon, Sun } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { TranslatedText } from '@/components/TranslatedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { AccessibilityControls } from '@/components/accessibility/AccessibilityControls';
+import { KeyboardHelp } from '@/components/accessibility/KeyboardHelp';
+import { SkipLink } from '@/components/accessibility/SkipLink';
+import { useScreenReaderAnnouncement } from '@/components/accessibility/LiveRegion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
@@ -19,6 +23,7 @@ const Index = () => {
   const isMobileDevice = isMobile || isTablet;
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
+  const { announce, AnnouncementRegion } = useScreenReaderAnnouncement();
 
   // Redirect authenticated users to their dashboard
   useEffect(() => {
@@ -44,7 +49,9 @@ const Index = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-gray-600">Redirecting to your dashboard...</p>
+          <p className="text-gray-600">
+            <TranslatedText text="Redirecting to your dashboard..." />
+          </p>
         </div>
       </div>
     );
@@ -53,11 +60,14 @@ const Index = () => {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
-    toast.success(<TranslatedText text={`Switched to ${isDarkMode ? 'light' : 'dark'} mode`} />);
+    const newTheme = isDarkMode ? 'light' : 'dark';
+    toast.success(<TranslatedText text={`Switched to ${newTheme} mode`} />);
+    announce(`Switched to ${newTheme} mode`);
   };
 
   const handleGetStarted = () => {
     toast.success(<TranslatedText text="Welcome to SimoneLabs!" />);
+    announce("Welcome to SimoneLabs!");
     navigate('/auth');
   };
 
@@ -103,12 +113,15 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100'}`}>
+      <SkipLink />
+      <AnnouncementRegion />
+      
       {/* Navigation Header */}
       <header className="relative z-10 px-4 py-6 md:px-6 lg:px-8">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between" role="navigation" aria-label="Main navigation">
           <div className="flex items-center space-x-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-blue-600">
-              <Brain className="h-6 w-6 text-white" />
+              <Brain className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               <TranslatedText text="SimoneLabs" />
@@ -117,6 +130,8 @@ const Index = () => {
           
           <div className="flex items-center space-x-4">
             <LanguageSelector />
+            <AccessibilityControls />
+            <KeyboardHelp />
             <Button
               variant="ghost"
               size="icon"
@@ -126,22 +141,12 @@ const Index = () => {
             >
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
-            
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-gray-600 hover:text-purple-600 dark:text-gray-300 dark:hover:text-purple-400"
-              aria-label="Accessibility features"
-              onClick={() => toast.success(<TranslatedText text="Accessibility tools available throughout the platform" />)}
-            >
-              <Accessibility className="h-5 w-5" />
-            </Button>
           </div>
         </nav>
       </header>
 
       {/* Hero Section - Device Responsive */}
-      <main className="px-4 py-12 md:px-6 lg:px-8">
+      <main id="main-content" className="px-4 py-12 md:px-6 lg:px-8" role="main">
         <div className="mx-auto max-w-7xl">
           {isMobileDevice ? (
             // Mobile-First Landing
@@ -166,10 +171,11 @@ const Index = () => {
                   onClick={handleGetStarted}
                   size="lg" 
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 text-lg"
+                  aria-describedby="mobile-cta-description"
                 >
                   <TranslatedText text="Start Learning Today" />
                 </Button>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p id="mobile-cta-description" className="text-sm text-gray-500 dark:text-gray-400">
                   <TranslatedText text="Free to start • No credit card required" />
                 </p>
               </div>
@@ -198,6 +204,7 @@ const Index = () => {
                     onClick={handleGetStarted}
                     size="lg" 
                     className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4"
+                    aria-describedby="desktop-cta-description"
                   >
                     <TranslatedText text="Get Started Free" />
                   </Button>
@@ -205,23 +212,26 @@ const Index = () => {
                     variant="outline" 
                     size="lg"
                     className="border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/20 px-8 py-4"
-                    onClick={() => toast.success(<TranslatedText text="Demo coming soon!" />)}
+                    onClick={() => {
+                      toast.success(<TranslatedText text="Demo coming soon!" />);
+                      announce("Demo coming soon!");
+                    }}
                   >
                     <TranslatedText text="Watch Demo" />
                   </Button>
                 </div>
                 
-                <div className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
+                <div id="desktop-cta-description" className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full" aria-hidden="true"></div>
                     <TranslatedText text="Free to start" />
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full" aria-hidden="true"></div>
                     <TranslatedText text="No credit card required" />
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full" aria-hidden="true"></div>
                     <TranslatedText text="Fully accessible" />
                   </div>
                 </div>
@@ -234,7 +244,7 @@ const Index = () => {
                     {features.map((feature, index) => (
                       <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                         <CardHeader className="pb-3">
-                          <feature.icon className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                          <feature.icon className="h-8 w-8 text-purple-600 dark:text-purple-400" aria-hidden="true" />
                         </CardHeader>
                         <CardContent>
                           <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -261,12 +271,12 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8" role="list" aria-label="Features">
             {features.map((feature, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-800">
+              <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-800" role="listitem">
                 <CardHeader>
                   <div className="mx-auto w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-white" />
+                    <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
                   <CardTitle className="text-gray-900 dark:text-white">
                     <TranslatedText text={feature.title} />
@@ -293,13 +303,13 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto" role="list" aria-label="Co-founders">
             {coFounders.map((founder, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-800 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+              <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-800 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm" role="listitem">
                 <CardHeader className="pb-4">
                   <div className="flex justify-center mb-4">
                     <Avatar className="w-20 h-20 ring-4 ring-purple-100 dark:ring-purple-800">
-                      <AvatarImage src={founder.avatarUrl} alt={founder.name} />
+                      <AvatarImage src={founder.avatarUrl} alt={`Portrait of ${founder.name}`} />
                       <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xl font-semibold">
                         {founder.avatar}
                       </AvatarFallback>
@@ -345,7 +355,7 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-24 border-t border-gray-200 dark:border-gray-800 py-12">
+      <footer className="mt-24 border-t border-gray-200 dark:border-gray-800 py-12" role="contentinfo">
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
           <div className="text-center text-gray-500 dark:text-gray-400">
             <p>
