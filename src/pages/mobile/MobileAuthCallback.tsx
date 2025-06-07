@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Brain } from 'lucide-react';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 
 export const MobileAuthCallback = () => {
   return (
@@ -11,10 +11,10 @@ export const MobileAuthCallback = () => {
           <Brain className="w-8 h-8 text-white" />
         </div>
         <h2 className="text-xl font-semibold text-gray-900">
-          <TranslatedText text="Completing Sign In..." />
+          <LocalizedText text="Completing Sign In..." />
         </h2>
         <p className="text-gray-600">
-          <TranslatedText text="Please wait while we set up your account" />
+          <LocalizedText text="Please wait while we set up your account" />
         </p>
       </div>
     </div>

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Users, Brain, Trophy, Smartphone } from 'lucide-react';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
@@ -36,7 +36,7 @@ export const MobileIndex = () => {
             <Brain className="w-8 h-8 text-white" />
           </div>
           <p className="text-[var(--platform-text-secondary)]">
-            <TranslatedText text="Loading..." />
+            <LocalizedText text="Loading..." />
           </p>
         </div>
       </PlatformLayout>
@@ -94,21 +94,21 @@ export const MobileIndex = () => {
               platform === 'android' ? 'rounded-full uppercase tracking-wide text-xs' : ''
             }`}>
               <Smartphone className="w-4 h-4 mr-2" />
-              <TranslatedText text={`${platform.charAt(0).toUpperCase() + platform.slice(1)} Learning Platform`} />
+              <LocalizedText text={`${platform.charAt(0).toUpperCase() + platform.slice(1)} Learning Platform`} />
             </Badge>
             
             <h1 className={`text-4xl tracking-tight text-[var(--platform-text)] ${
               platform === 'ios' ? 'font-semibold' : 
               platform === 'android' ? 'font-medium' : 'font-bold'
             }`}>
-              <TranslatedText text="Learn & Teach" />
+              <LocalizedText text="Learn & Teach" />
               <span className="block bg-gradient-to-r from-[var(--platform-primary)] to-[var(--platform-secondary)] bg-clip-text text-transparent">
-                <TranslatedText text="On Your Phone" />
+                <LocalizedText text="On Your Phone" />
               </span>
             </h1>
             
             <p className="text-lg text-[var(--platform-text-secondary)] max-w-sm mx-auto leading-relaxed">
-              <TranslatedText text="Access powerful educational tools designed specifically for mobile. Create, learn, and connect with a global community." />
+              <LocalizedText text="Access powerful educational tools designed specifically for mobile. Create, learn, and connect with a global community." />
             </p>
           </div>
           
@@ -121,15 +121,15 @@ export const MobileIndex = () => {
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span><TranslatedText text="Starting..." /></span>
+                <span><LocalizedText text="Starting..." /></span>
               </div>
             ) : (
-              <TranslatedText text="Start Learning Today" />
+              <LocalizedText text="Start Learning Today" />
             )}
           </PlatformButton>
           
           <p className="text-sm text-[var(--platform-text-secondary)]">
-            <TranslatedText text="Free to start • No credit card required" />
+            <LocalizedText text="Free to start • No credit card required" />
           </p>
         </div>
       </div>
@@ -141,10 +141,10 @@ export const MobileIndex = () => {
             platform === 'ios' ? 'font-semibold' : 
             platform === 'android' ? 'font-medium' : 'font-bold'
           }`}>
-            <TranslatedText text="Everything You Need" />
+            <LocalizedText text="Everything You Need" />
           </h2>
           <p className="text-[var(--platform-text-secondary)]">
-            <TranslatedText text="Powerful features designed for mobile learning" />
+            <LocalizedText text="Powerful features designed for mobile learning" />
           </p>
         </div>
         
@@ -163,10 +163,10 @@ export const MobileIndex = () => {
                     platform === 'ios' ? 'text-lg font-medium' : 
                     platform === 'android' ? 'text-lg font-medium' : 'text-lg font-semibold'
                   }`}>
-                    <TranslatedText text={feature.title} />
+                    <LocalizedText text={feature.title} />
                   </h3>
                   <p className="text-[var(--platform-text-secondary)] text-sm">
-                    <TranslatedText text={feature.description} />
+                    <LocalizedText text={feature.description} />
                   </p>
                 </div>
               </div>
@@ -183,17 +183,17 @@ export const MobileIndex = () => {
               platform === 'ios' ? 'font-semibold' : 
               platform === 'android' ? 'font-medium' : 'font-bold'
             }`}>
-              <TranslatedText text="Ready to Transform Your Learning?" />
+              <LocalizedText text="Ready to Transform Your Learning?" />
             </h3>
             <p className="text-[var(--platform-text-secondary)] mb-6">
-              <TranslatedText text="Join thousands of learners already using SimoneLabs" />
+              <LocalizedText text="Join thousands of learners already using SimoneLabs" />
             </p>
             <PlatformButton 
               onClick={handleGetStarted}
               disabled={isLoading}
               className="px-8 py-3"
             >
-              <TranslatedText text="Get Started Free" />
+              <LocalizedText text="Get Started Free" />
             </PlatformButton>
           </div>
         </PlatformCard>
