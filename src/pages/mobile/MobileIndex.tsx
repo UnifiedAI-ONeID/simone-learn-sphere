@@ -1,21 +1,24 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { BookOpen, Users, Brain, Trophy, Smartphone } from 'lucide-react';
 import { TranslatedText } from '@/components/TranslatedText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { PlatformButton } from '@/components/platform/PlatformButton';
+import { PlatformCard } from '@/components/platform/PlatformCard';
+import { PlatformLayout } from '@/components/platform/PlatformLayout';
+import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
+import { Badge } from '@/components/ui/badge';
 
 export const MobileIndex = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
+  const { platform, theme } = usePlatformTheme();
 
   // Redirect authenticated users
   useEffect(() => {
@@ -27,16 +30,16 @@ export const MobileIndex = () => {
 
   if (authLoading || roleLoading || user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
+      <PlatformLayout className="flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center animate-pulse">
+          <div className="w-16 h-16 mx-auto bg-[var(--platform-primary)] rounded-full flex items-center justify-center animate-pulse">
             <Brain className="w-8 h-8 text-white" />
           </div>
-          <p className="text-gray-600">
+          <p className="text-[var(--platform-text-secondary)]">
             <TranslatedText text="Loading..." />
           </p>
         </div>
-      </div>
+      </PlatformLayout>
     );
   }
 
@@ -60,7 +63,7 @@ export const MobileIndex = () => {
     },
     {
       icon: BookOpen,
-      title: "Mobile-First Courses",
+      title: `${platform === 'ios' ? 'iOS' : platform === 'android' ? 'Android' : 'Mobile'}-First Courses`,
       description: "Learn anywhere, anytime on your device"
     },
     {
@@ -76,37 +79,44 @@ export const MobileIndex = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+    <PlatformLayout>
       {/* Hero Section */}
       <div className="px-4 pt-12 pb-8">
         <div className="text-center space-y-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 mx-auto shadow-xl">
+          <div className={`flex h-20 w-20 items-center justify-center mx-auto ${
+            platform === 'ios' ? 'rounded-2xl' : platform === 'android' ? 'rounded-full' : 'rounded-xl'
+          } bg-[var(--platform-primary)] shadow-xl`}>
             <Brain className="h-10 w-10 text-white" />
           </div>
           
           <div className="space-y-4">
-            <Badge variant="secondary" className="px-4 py-2 bg-purple-100 text-purple-800">
+            <Badge variant="secondary" className={`px-4 py-2 bg-[var(--platform-primary)]/10 text-[var(--platform-primary)] ${
+              platform === 'android' ? 'rounded-full uppercase tracking-wide text-xs' : ''
+            }`}>
               <Smartphone className="w-4 h-4 mr-2" />
-              <TranslatedText text="Mobile Learning Platform" />
+              <TranslatedText text={`${platform.charAt(0).toUpperCase() + platform.slice(1)} Learning Platform`} />
             </Badge>
             
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+            <h1 className={`text-4xl tracking-tight text-[var(--platform-text)] ${
+              platform === 'ios' ? 'font-semibold' : 
+              platform === 'android' ? 'font-medium' : 'font-bold'
+            }`}>
               <TranslatedText text="Learn & Teach" />
-              <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-[var(--platform-primary)] to-[var(--platform-secondary)] bg-clip-text text-transparent">
                 <TranslatedText text="On Your Phone" />
               </span>
             </h1>
             
-            <p className="text-lg text-gray-600 max-w-sm mx-auto leading-relaxed">
+            <p className="text-lg text-[var(--platform-text-secondary)] max-w-sm mx-auto leading-relaxed">
               <TranslatedText text="Access powerful educational tools designed specifically for mobile. Create, learn, and connect with a global community." />
             </p>
           </div>
           
-          <Button 
+          <PlatformButton 
             onClick={handleGetStarted}
             disabled={isLoading}
             size="lg" 
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 text-lg shadow-lg active:scale-95 transition-transform"
+            className="w-full py-4 text-lg"
           >
             {isLoading ? (
               <div className="flex items-center space-x-2">
@@ -116,9 +126,9 @@ export const MobileIndex = () => {
             ) : (
               <TranslatedText text="Start Learning Today" />
             )}
-          </Button>
+          </PlatformButton>
           
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--platform-text-secondary)]">
             <TranslatedText text="Free to start • No credit card required" />
           </p>
         </div>
@@ -127,57 +137,67 @@ export const MobileIndex = () => {
       {/* Features Grid */}
       <div className="px-4 py-8">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className={`text-2xl text-[var(--platform-text)] mb-2 ${
+            platform === 'ios' ? 'font-semibold' : 
+            platform === 'android' ? 'font-medium' : 'font-bold'
+          }`}>
             <TranslatedText text="Everything You Need" />
           </h2>
-          <p className="text-gray-600">
+          <p className="text-[var(--platform-text-secondary)]">
             <TranslatedText text="Powerful features designed for mobile learning" />
           </p>
         </div>
         
         <div className="grid grid-cols-1 gap-4">
           {features.map((feature, index) => (
-            <Card key={index} className="bg-white/70 backdrop-blur-sm border-purple-100 hover:shadow-lg transition-all duration-300 active:scale-95">
-              <CardHeader className="pb-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                    <feature.icon className="h-5 w-5 text-white" />
-                  </div>
-                  <CardTitle className="text-gray-900 text-lg">
-                    <TranslatedText text={feature.title} />
-                  </CardTitle>
+            <PlatformCard key={index} className="active:scale-95 transition-transform duration-200">
+              <div className="flex items-center space-x-3 p-2">
+                <div className={`w-10 h-10 bg-[var(--platform-primary)] flex items-center justify-center text-white ${
+                  platform === 'ios' ? 'rounded-lg' : 
+                  platform === 'android' ? 'rounded-xl' : 'rounded-lg'
+                }`}>
+                  <feature.icon className="h-5 w-5" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-600">
-                  <TranslatedText text={feature.description} />
-                </CardDescription>
-              </CardContent>
-            </Card>
+                <div className="flex-1">
+                  <h3 className={`text-[var(--platform-text)] ${
+                    platform === 'ios' ? 'text-lg font-medium' : 
+                    platform === 'android' ? 'text-lg font-medium' : 'text-lg font-semibold'
+                  }`}>
+                    <TranslatedText text={feature.title} />
+                  </h3>
+                  <p className="text-[var(--platform-text-secondary)] text-sm">
+                    <TranslatedText text={feature.description} />
+                  </p>
+                </div>
+              </div>
+            </PlatformCard>
           ))}
         </div>
       </div>
 
       {/* CTA Section */}
       <div className="px-4 py-8">
-        <Card className="bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200">
-          <CardContent className="py-8 text-center">
-            <h3 className="text-xl font-bold text-gray-900 mb-3">
+        <PlatformCard className="bg-gradient-to-r from-[var(--platform-primary)]/10 to-[var(--platform-secondary)]/10">
+          <div className="py-8 text-center">
+            <h3 className={`text-xl text-[var(--platform-text)] mb-3 ${
+              platform === 'ios' ? 'font-semibold' : 
+              platform === 'android' ? 'font-medium' : 'font-bold'
+            }`}>
               <TranslatedText text="Ready to Transform Your Learning?" />
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-[var(--platform-text-secondary)] mb-6">
               <TranslatedText text="Join thousands of learners already using SimoneLabs" />
             </p>
-            <Button 
+            <PlatformButton 
               onClick={handleGetStarted}
               disabled={isLoading}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-3 active:scale-95 transition-transform"
+              className="px-8 py-3"
             >
               <TranslatedText text="Get Started Free" />
-            </Button>
-          </CardContent>
-        </Card>
+            </PlatformButton>
+          </div>
+        </PlatformCard>
       </div>
-    </div>
+    </PlatformLayout>
   );
 };
