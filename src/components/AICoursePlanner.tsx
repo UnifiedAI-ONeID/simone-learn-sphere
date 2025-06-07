@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Lightbulb, BookOpen, Target, Wand2, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CourseOutline {
   title: string;
@@ -24,7 +25,7 @@ export const AICoursePlanner = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [courseOutline, setCourseOutline] = useState<CourseOutline | null>(null);
 
-  const generateCourseOutline = () => {
+  const generateCourseOutline = async () => {
     if (!topic.trim()) {
       toast({
         title: "Error",
@@ -36,39 +37,90 @@ export const AICoursePlanner = () => {
 
     setIsGenerating(true);
     
-    // Simulate AI generation (replace with actual AI API call)
-    setTimeout(() => {
-      const outline: CourseOutline = {
-        title: `Complete ${topic} Mastery Course`,
-        description: `A comprehensive course designed to teach ${topic} from fundamentals to advanced concepts. Perfect for ${targetAudience || 'beginners and intermediate learners'} who want to master this subject.`,
-        duration: '8 weeks',
-        difficulty: 'intermediate',
-        lessons: [
-          `Introduction to ${topic}`,
-          `Fundamentals and Core Concepts`,
-          `Practical Applications`,
-          `Advanced Techniques`,
-          `Best Practices and Common Pitfalls`,
-          `Real-world Projects`,
-          `Industry Standards`,
-          `Final Project and Assessment`
-        ],
-        objectives: [
-          `Understand the fundamentals of ${topic}`,
-          `Apply concepts in practical scenarios`,
-          `Develop problem-solving skills`,
-          `Create real-world projects`,
-          `Master advanced techniques`
-        ]
-      };
+    try {
+      const prompt = `Create a comprehensive course outline for "${topic}" targeting "${targetAudience || 'general learners'}". 
+      Please provide:
+      1. A catchy course title
+      2. A compelling description (2-3 sentences)
+      3. Estimated duration (in weeks)
+      4. Difficulty level (beginner/intermediate/advanced)
+      5. 6-8 lesson titles
+      6. 4-5 key learning objectives
       
-      setCourseOutline(outline);
-      setIsGenerating(false);
-      toast({
-        title: "Success",
-        description: "Course outline generated successfully!",
+      Format your response as a JSON object with the following structure:
+      {
+        "title": "Course Title",
+        "description": "Course description",
+        "duration": "X weeks",
+        "difficulty": "level",
+        "lessons": ["Lesson 1", "Lesson 2", ...],
+        "objectives": ["Objective 1", "Objective 2", ...]
+      }`;
+
+      const { data, error } = await supabase.functions.invoke('chat-gpt', {
+        body: {
+          messages: [{ role: 'user', content: prompt }],
+          userRole: 'educator'
+        }
       });
-    }, 2000);
+
+      if (error) throw error;
+
+      // Try to parse the JSON response
+      try {
+        const jsonMatch = data.message.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const outline = JSON.parse(jsonMatch[0]);
+          setCourseOutline(outline);
+          toast({
+            title: "Success",
+            description: "Course outline generated successfully!",
+          });
+        } else {
+          throw new Error('Invalid JSON response');
+        }
+      } catch (parseError) {
+        // Fallback to simple parsing if JSON parsing fails
+        console.error('JSON parsing failed, using fallback');
+        const outline: CourseOutline = {
+          title: `Complete ${topic} Mastery Course`,
+          description: `A comprehensive course designed to teach ${topic} from fundamentals to advanced concepts. Perfect for ${targetAudience || 'beginners and intermediate learners'} who want to master this subject.`,
+          duration: '8 weeks',
+          difficulty: 'intermediate',
+          lessons: [
+            `Introduction to ${topic}`,
+            `Fundamentals and Core Concepts`,
+            `Practical Applications`,
+            `Advanced Techniques`,
+            `Best Practices and Common Pitfalls`,
+            `Real-world Projects`,
+            `Industry Standards`,
+            `Final Project and Assessment`
+          ],
+          objectives: [
+            `Understand the fundamentals of ${topic}`,
+            `Apply concepts in practical scenarios`,
+            `Develop problem-solving skills`,
+            `Create real-world projects`,
+            `Master advanced techniques`
+          ]
+        };
+        setCourseOutline(outline);
+        toast({
+          title: "Success",
+          description: "Course outline generated successfully!",
+        });
+      }
+    } catch (error) {
+      console.error('Error generating course outline:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate course outline. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const copyToClipboard = (text: string) => {

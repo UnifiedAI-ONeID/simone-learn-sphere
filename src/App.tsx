@@ -9,6 +9,7 @@ import { TranslationProvider } from "@/contexts/TranslationContext";
 import { SecurityProvider } from "@/components/SecurityProvider";
 import { RoleProtectedRoute } from "@/components/RoleProtectedRoute";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
+import { ChatPopup } from "@/components/ChatPopup";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
@@ -76,6 +77,7 @@ function App() {
                     <Route path="/404" element={<NotFound />} />
                     <Route path="*" element={<Navigate to="/404" replace />} />
                   </Routes>
+                  <ChatPopup />
                 </div>
               </SecurityProvider>
             </TranslationProvider>
