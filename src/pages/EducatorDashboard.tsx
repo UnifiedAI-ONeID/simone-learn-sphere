@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { EnhancedEducatorDashboard } from '@/components/EnhancedEducatorDashboard';
 import { CourseCreator } from '@/components/CourseCreator';
+import { AICoursePlanner } from '@/components/AICoursePlanner';
 import { useEngagementTracking } from '@/hooks/useEngagementTracking';
 import { useSessionTracking } from '@/hooks/useSessionTracking';
 import { useEffect } from 'react';
@@ -24,9 +25,10 @@ const EducatorDashboard = () => {
       />
       <div className="container mx-auto px-6 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-lg">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="courses">My Courses</TabsTrigger>
+            <TabsTrigger value="ai-planner">AI Planner</TabsTrigger>
             <TabsTrigger value="create">Create Course</TabsTrigger>
           </TabsList>
           
@@ -39,6 +41,10 @@ const EducatorDashboard = () => {
               <h2 className="text-2xl font-bold mb-4">Course Management</h2>
               <p className="text-gray-600">Detailed course management interface coming soon...</p>
             </div>
+          </TabsContent>
+          
+          <TabsContent value="ai-planner" className="space-y-6">
+            <AICoursePlanner />
           </TabsContent>
           
           <TabsContent value="create" className="space-y-6">
