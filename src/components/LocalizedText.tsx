@@ -9,6 +9,7 @@ interface LocalizedTextProps {
   className?: string;
   fallback?: React.ReactNode;
   as?: keyof JSX.IntrinsicElements;
+  showLoadingSpinner?: boolean;
 }
 
 export const LocalizedText: React.FC<LocalizedTextProps> = ({
@@ -17,10 +18,12 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
   className,
   fallback,
   as: Component = 'span',
+  showLoadingSpinner = true,
 }) => {
   const { localizeText, currentLanguage } = useLocalization();
   const [localizedText, setLocalizedText] = useState(text);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const localize = async () => {
@@ -33,12 +36,15 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
       }
 
       setIsLoading(true);
+      setHasError(false);
+      
       try {
         const result = await localizeText(text, target);
         setLocalizedText(result);
       } catch (error) {
         console.error('Localization error:', error);
         setLocalizedText(text);
+        setHasError(true);
       } finally {
         setIsLoading(false);
       }
@@ -47,7 +53,7 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
     localize();
   }, [text, currentLanguage.code, targetLanguage, localizeText]);
 
-  if (isLoading) {
+  if (isLoading && showLoadingSpinner) {
     return (
       <Component className={className}>
         {fallback || (
@@ -60,5 +66,9 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
     );
   }
 
-  return <Component className={className}>{localizedText}</Component>;
+  return (
+    <Component className={className} title={hasError ? 'Translation failed, showing original text' : undefined}>
+      {localizedText}
+    </Component>
+  );
 };

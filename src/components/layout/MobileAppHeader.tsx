@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bell, Brain } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LocalizedText } from '@/components/LocalizedText';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { Badge } from '@/components/ui/badge';
 
 export const MobileAppHeader = () => {
@@ -26,7 +28,8 @@ export const MobileAppHeader = () => {
           </div>
         </div>
         
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
+          <LanguageSelector />
           <Button variant="ghost" size="sm" className="p-2 relative">
             <Bell className="h-5 w-5 text-gray-600" />
             <Badge className="absolute -top-1 -right-1 w-2 h-2 p-0 bg-red-500"></Badge>

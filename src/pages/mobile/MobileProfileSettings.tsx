@@ -3,9 +3,10 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Settings, User, Bell, Shield, LogOut } from 'lucide-react';
+import { Settings, User, Bell, Shield, LogOut, Globe } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LocalizedText } from '@/components/LocalizedText';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 export const MobileProfileSettings = () => {
   const { user, signOut } = useAuth();
@@ -35,6 +36,22 @@ export const MobileProfileSettings = () => {
               <p className="text-gray-600">{user?.email}</p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Language Settings */}
+      <Card className="bg-white/70 backdrop-blur-sm border-purple-100">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center space-x-2">
+            <Globe className="h-5 w-5 text-purple-600" />
+            <LocalizedText text="Language & Region" />
+          </CardTitle>
+          <CardDescription>
+            <LocalizedText text="Choose your preferred language for the interface" />
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <LanguageSelector />
         </CardContent>
       </Card>
 

@@ -11,21 +11,24 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Globe, Check, Bot } from 'lucide-react';
 import { useLocalization, SUPPORTED_LANGUAGES } from '@/contexts/LocalizationContext';
+import { usePlatformDetection } from '@/hooks/usePlatformDetection';
 
 export const LanguageSelector = () => {
   const { currentLanguage, setLanguage } = useLocalization();
+  const platform = usePlatformDetection();
+  const isMobile = platform !== 'desktop';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          size="sm" 
-          className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+          size={isMobile ? "default" : "sm"}
+          className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-800 w-full justify-start"
         >
           <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{currentLanguage.flag}</span>
-          <span className="hidden md:inline">{currentLanguage.nativeName}</span>
+          <span>{currentLanguage.flag}</span>
+          <span className={isMobile ? "block" : "hidden sm:inline"}>{currentLanguage.nativeName}</span>
           <Bot className="h-3 w-3 text-purple-600" />
         </Button>
       </DropdownMenuTrigger>

@@ -31,6 +31,8 @@ interface LocalizationContextType {
   localizeText: (text: string, targetLanguage?: string) => Promise<string>;
   isLocalizing: boolean;
   localizations: Record<string, string>;
+  translationError: string | null;
+  clearTranslationError: () => void;
 }
 
 const LocalizationContext = createContext<LocalizationContextType | undefined>(undefined);
@@ -64,6 +66,7 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(SUPPORTED_LANGUAGES[0]);
   const [isLocalizing, setIsLocalizing] = useState(false);
   const [localizations, setLocalizations] = useState<Record<string, string>>({});
+  const [translationError, setTranslationError] = useState<string | null>(null);
 
   useEffect(() => {
     // Load saved language preference or detect from browser
@@ -89,6 +92,12 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const setLanguage = (language: SupportedLanguage) => {
     setCurrentLanguage(language);
     localStorage.setItem('selectedLanguage', language.code);
+    // Clear any previous translation errors when language changes
+    setTranslationError(null);
+  };
+
+  const clearTranslationError = () => {
+    setTranslationError(null);
   };
 
   const localizeText = async (
@@ -107,6 +116,8 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     setIsLocalizing(true);
+    setTranslationError(null);
+    
     try {
       const { data, error } = await supabase.functions.invoke('localize-text', {
         body: { 
@@ -115,13 +126,18 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Translation service error:', error);
+        setTranslationError('Translation service temporarily unavailable');
+        return text;
+      }
 
-      const localizedText = data.localizedText || text;
+      const localizedText = data?.localizedText || text;
       setLocalizations(prev => ({ ...prev, [cacheKey]: localizedText }));
       return localizedText;
     } catch (error) {
       console.error('Localization error:', error);
+      setTranslationError('Failed to translate text');
       return text; // Return original text if localization fails
     } finally {
       setIsLocalizing(false);
@@ -136,6 +152,8 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         localizeText,
         isLocalizing,
         localizations,
+        translationError,
+        clearTranslationError,
       }}
     >
       {children}
