@@ -64,7 +64,58 @@ const Auth = () => {
 
   const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
     setIsLoading(true);
-    console.log(`Starting ${provider} OAuth signin with role:`, userRole);
+    console.log(`Starting ${provider} OAuth signin`);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        },
+      });
+
+      console.log('OAuth response:', { data, error });
+
+      if (error) {
+        console.error('OAuth error:', error);
+        
+        let errorMessage = 'Authentication failed. Please try again.';
+        
+        if (error.message?.includes('Provider not enabled')) {
+          errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication is not configured. Please contact support.`;
+        } else if (error.message?.includes('Invalid redirect URL')) {
+          errorMessage = 'OAuth configuration error. The redirect URL may not be properly configured in Supabase.';
+        } else if (error.message?.includes('unauthorized_client')) {
+          errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} OAuth client is not properly configured. Please check the OAuth settings.`;
+        }
+        
+        toast({
+          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+      
+    } catch (error: any) {
+      console.error('OAuth signin error:', error);
+      
+      toast({
+        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
+        description: 'Authentication failed. Please try again.',
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOAuthSignUp = async (provider: 'google' | 'linkedin_oidc') => {
+    setIsLoading(true);
+    console.log(`Starting ${provider} OAuth signup with role:`, userRole);
     
     try {
       // Store the selected role in localStorage to use after OAuth callback
@@ -98,7 +149,7 @@ const Auth = () => {
         }
         
         toast({
-          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
+          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign up failed`,
           description: errorMessage,
           variant: "destructive",
         });
@@ -108,13 +159,13 @@ const Auth = () => {
       }
       
     } catch (error: any) {
-      console.error('OAuth signin error:', error);
+      console.error('OAuth signup error:', error);
       
       // Clean up pending role on error
       localStorage.removeItem('pendingUserRole');
       
       toast({
-        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
+        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign up failed`,
         description: 'Authentication failed. Please try again.',
         variant: "destructive",
       });
@@ -304,47 +355,9 @@ const Auth = () => {
             <TranslatedText text="Welcome to SimoneLabs" />
           </h1>
           <p className="text-gray-600">
-            <TranslatedText text="Choose your role and start your educational journey" />
+            <TranslatedText text="Your educational AI platform" />
           </p>
         </div>
-
-        {/* Role Selection */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center text-lg">
-              <TranslatedText text="Select Your Role" />
-            </CardTitle>
-            <CardDescription className="text-center">
-              <TranslatedText text="This will customize your experience" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {roles.map((role) => (
-              <div
-                key={role.id}
-                onClick={() => setUserRole(role.id)}
-                className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                  userRole === role.id 
-                    ? role.color 
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <role.icon className="h-5 w-5" />
-                  <div className="flex-1">
-                    <div className="font-medium">{role.title}</div>
-                    <div className="text-sm text-gray-600">{role.description}</div>
-                  </div>
-                  {userRole === role.id && (
-                    <Badge variant="secondary" className="bg-white text-current">
-                      <TranslatedText text="Selected" />
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
 
         {/* Auth Forms */}
         <Card>
@@ -457,6 +470,44 @@ const Auth = () => {
             </TabsContent>
             
             <TabsContent value="signup">
+              {/* Role Selection - Only for Sign Up */}
+              <Card className="mb-4">
+                <CardHeader>
+                  <CardTitle className="text-center text-lg">
+                    <TranslatedText text="Select Your Role" />
+                  </CardTitle>
+                  <CardDescription className="text-center">
+                    <TranslatedText text="This will customize your experience" />
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {roles.map((role) => (
+                    <div
+                      key={role.id}
+                      onClick={() => setUserRole(role.id)}
+                      className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                        userRole === role.id 
+                          ? role.color 
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <role.icon className="h-5 w-5" />
+                        <div className="flex-1">
+                          <div className="font-medium">{role.title}</div>
+                          <div className="text-sm text-gray-600">{role.description}</div>
+                        </div>
+                        {userRole === role.id && (
+                          <Badge variant="secondary" className="bg-white text-current">
+                            <TranslatedText text="Selected" />
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
               <CardHeader>
                 <CardTitle>
                   <TranslatedText text="Create Account" />
@@ -471,7 +522,7 @@ const Auth = () => {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => handleOAuthSignIn('google')}
+                    onClick={() => handleOAuthSignUp('google')}
                     disabled={isLoading}
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -486,7 +537,7 @@ const Auth = () => {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => handleOAuthSignIn('linkedin_oidc')}
+                    onClick={() => handleOAuthSignUp('linkedin_oidc')}
                     disabled={isLoading}
                   >
                     <Linkedin className="w-5 h-5 mr-2" />
