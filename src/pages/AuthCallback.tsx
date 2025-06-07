@@ -95,8 +95,8 @@ const AuthCallback = () => {
             description: `Successfully signed in as ${userRole}.`,
           });
           
-          // Redirect to appropriate dashboard
-          const redirectRoute = getRoleBasedRoute(userRole);
+          // Redirect to appropriate dashboard - prioritize admin role
+          const redirectRoute = getRoleBasedRoute(userRole, true); // Pass true for login context
           console.log('AuthCallback: Redirecting to:', redirectRoute);
           
           navigate(redirectRoute, { replace: true });

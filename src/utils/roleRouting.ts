@@ -1,10 +1,16 @@
 
-export const getRoleBasedRoute = (role: string | null): string => {
-  console.log('Getting route for role:', role);
+export const getRoleBasedRoute = (role: string | null, isLoginContext: boolean = false): string => {
+  console.log('Getting route for role:', role, 'login context:', isLoginContext);
   
   if (!role) {
     console.warn('No role provided, defaulting to student dashboard');
     return '/student-dashboard';
+  }
+
+  // During login, always prioritize admin role if user has it
+  if (isLoginContext && role.includes('admin')) {
+    console.log('Login context: Admin user detected, routing to admin dashboard');
+    return '/admin-dashboard';
   }
 
   // Handle combined roles - prioritize in order: admin > educator > student
@@ -53,13 +59,14 @@ export const getRedirectRoute = (userRole: string | null, currentRoute: string):
   }
   
   // If user is on auth page but authenticated, redirect to their dashboard
+  // Always prioritize admin dashboard for admin users
   if (currentRoute === '/auth') {
-    return getRoleBasedRoute(userRole);
+    return getRoleBasedRoute(userRole, true);
   }
   
   // If user cannot access current route, redirect to their appropriate dashboard
   if (!canAccessRoute(userRole, currentRoute)) {
-    return getRoleBasedRoute(userRole);
+    return getRoleBasedRoute(userRole, true);
   }
   
   // No redirect needed

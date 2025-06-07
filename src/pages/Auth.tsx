@@ -216,7 +216,7 @@ const Auth = () => {
           description: "Welcome back!",
         });
         
-        // Get user role and redirect immediately
+        // Get user role and redirect immediately, prioritizing admin role
         try {
           const { data: profile } = await supabase
             .from('profiles')
@@ -225,7 +225,7 @@ const Auth = () => {
             .single();
           
           const userRole = profile?.role || 'student';
-          const redirectRoute = getRoleBasedRoute(userRole);
+          const redirectRoute = getRoleBasedRoute(userRole, true); // Pass true for login context
           console.log('Redirecting to:', redirectRoute);
           navigate(redirectRoute, { replace: true });
         } catch (error) {
@@ -302,13 +302,13 @@ const Auth = () => {
           return;
         }
         
-        // If logged in immediately, redirect
+        // If logged in immediately, redirect with login context
         toast({
           title: "Success",
           description: "Account created successfully!",
         });
         
-        const redirectRoute = getRoleBasedRoute(validated.role);
+        const redirectRoute = getRoleBasedRoute(validated.role, true);
         navigate(redirectRoute, { replace: true });
       }
     } catch (error: any) {
