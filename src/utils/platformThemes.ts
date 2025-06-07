@@ -3,14 +3,26 @@ import { Platform } from '@/hooks/usePlatformDetection';
 
 export interface PlatformTheme {
   colors: {
-    primary: string;
-    secondary: string;
-    background: string;
-    surface: string;
-    text: string;
-    textSecondary: string;
-    border: string;
-    accent: string;
+    light: {
+      primary: string;
+      secondary: string;
+      background: string;
+      surface: string;
+      text: string;
+      textSecondary: string;
+      border: string;
+      accent: string;
+    };
+    dark: {
+      primary: string;
+      secondary: string;
+      background: string;
+      surface: string;
+      text: string;
+      textSecondary: string;
+      border: string;
+      accent: string;
+    };
   };
   typography: {
     fontFamily: string;
@@ -30,14 +42,26 @@ export interface PlatformTheme {
 
 const iosTheme: PlatformTheme = {
   colors: {
-    primary: '#007AFF',
-    secondary: '#5856D6',
-    background: '#F2F2F7',
-    surface: '#FFFFFF',
-    text: '#000000',
-    textSecondary: '#8E8E93',
-    border: '#C6C6C8',
-    accent: '#FF3B30',
+    light: {
+      primary: '#007AFF',
+      secondary: '#5856D6',
+      background: '#F2F2F7',
+      surface: '#FFFFFF',
+      text: '#000000',
+      textSecondary: '#8E8E93',
+      border: '#C6C6C8',
+      accent: '#FF3B30',
+    },
+    dark: {
+      primary: '#0A84FF',
+      secondary: '#5E5CE6',
+      background: '#000000',
+      surface: '#1C1C1E',
+      text: '#FFFFFF',
+      textSecondary: '#8E8E93',
+      border: '#38383A',
+      accent: '#FF453A',
+    },
   },
   typography: {
     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
@@ -57,14 +81,26 @@ const iosTheme: PlatformTheme = {
 
 const androidTheme: PlatformTheme = {
   colors: {
-    primary: '#6750A4',
-    secondary: '#625B71',
-    background: '#FFFBFE',
-    surface: '#FFFFFF',
-    text: '#1D1B20',
-    textSecondary: '#49454F',
-    border: '#79747E',
-    accent: '#B3261E',
+    light: {
+      primary: '#6750A4',
+      secondary: '#625B71',
+      background: '#FFFBFE',
+      surface: '#FFFFFF',
+      text: '#1D1B20',
+      textSecondary: '#49454F',
+      border: '#79747E',
+      accent: '#B3261E',
+    },
+    dark: {
+      primary: '#D0BCFF',
+      secondary: '#CCC2DC',
+      background: '#141218',
+      surface: '#1D1B20',
+      text: '#E6E0E9',
+      textSecondary: '#CAC4D0',
+      border: '#938F99',
+      accent: '#F2B8B5',
+    },
   },
   typography: {
     fontFamily: 'Roboto, "Noto Sans", sans-serif',
@@ -84,14 +120,26 @@ const androidTheme: PlatformTheme = {
 
 const desktopTheme: PlatformTheme = {
   colors: {
-    primary: '#6366f1',
-    secondary: '#8b5cf6',
-    background: '#f8fafc',
-    surface: '#ffffff',
-    text: '#1e293b',
-    textSecondary: '#64748b',
-    border: '#e2e8f0',
-    accent: '#ef4444',
+    light: {
+      primary: '#6366f1',
+      secondary: '#8b5cf6',
+      background: '#f8fafc',
+      surface: '#ffffff',
+      text: '#1e293b',
+      textSecondary: '#64748b',
+      border: '#e2e8f0',
+      accent: '#ef4444',
+    },
+    dark: {
+      primary: '#818cf8',
+      secondary: '#a78bfa',
+      background: '#0f172a',
+      surface: '#1e293b',
+      text: '#f1f5f9',
+      textSecondary: '#94a3b8',
+      border: '#334155',
+      accent: '#f87171',
+    },
   },
   typography: {
     fontFamily: 'Inter, "Segoe UI", system-ui, sans-serif',

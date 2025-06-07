@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { TranslationProvider } from "@/contexts/TranslationContext";
+import { LocalizationProvider } from "@/contexts/LocalizationContext";
 import { PlatformThemeProvider } from "@/contexts/PlatformThemeContext";
 import { SecurityProvider } from "@/components/SecurityProvider";
 import { RoleProtectedRoute } from "@/components/RoleProtectedRoute";
@@ -185,7 +185,7 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <TranslationProvider>
+            <LocalizationProvider>
               <PlatformThemeProvider>
                 <SecurityProvider>
                   <div className="min-h-screen bg-background">
@@ -196,7 +196,7 @@ function App() {
                   </div>
                 </SecurityProvider>
               </PlatformThemeProvider>
-            </TranslationProvider>
+            </LocalizationProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

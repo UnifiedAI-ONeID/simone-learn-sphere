@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BookOpen, Users, Brain, Trophy, Moon, Sun } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { AccessibilityControls } from '@/components/accessibility/AccessibilityControls';
 import { KeyboardHelp } from '@/components/accessibility/KeyboardHelp';
@@ -16,14 +16,15 @@ import { useScreenReaderAnnouncement } from '@/components/accessibility/LiveRegi
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 
 const Index = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const navigate = useNavigate();
   const isMobileDevice = isMobile || isTablet;
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
   const { announce, AnnouncementRegion } = useScreenReaderAnnouncement();
+  const { isDarkMode, toggleDarkMode } = usePlatformTheme();
 
   // Redirect authenticated users to their dashboard
   useEffect(() => {
@@ -50,23 +51,15 @@ const Index = () => {
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
           <p className="text-gray-600">
-            <TranslatedText text="Redirecting to your dashboard..." />
+            <LocalizedText text="Redirecting to your dashboard..." />
           </p>
         </div>
       </div>
     );
   }
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-    const newTheme = isDarkMode ? 'light' : 'dark';
-    toast.success(<TranslatedText text={`Switched to ${newTheme} mode`} />);
-    announce(`Switched to ${newTheme} mode`);
-  };
-
   const handleGetStarted = () => {
-    toast.success(<TranslatedText text="Welcome to SimoneLabs!" />);
+    toast.success(<LocalizedText text="Welcome to SimoneLabs!" />);
     announce("Welcome to SimoneLabs!");
     navigate('/auth');
   };
@@ -124,7 +117,7 @@ const Index = () => {
               <Brain className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              <TranslatedText text="SimoneLabs" />
+              <LocalizedText text="SimoneLabs" />
             </h1>
           </div>
           
@@ -135,7 +128,7 @@ const Index = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleTheme}
+              onClick={toggleDarkMode}
               className="text-gray-600 hover:text-purple-600 dark:text-gray-300 dark:hover:text-purple-400"
               aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
             >
@@ -153,16 +146,16 @@ const Index = () => {
             <div className="text-center space-y-8">
               <div className="space-y-4">
                 <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                  📱 <TranslatedText text="Mobile-Optimized Learning" />
+                  📱 <LocalizedText text="Mobile-Optimized Learning" />
                 </Badge>
                 <h2 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
-                  <TranslatedText text="Learn & Teach" />
+                  <LocalizedText text="Learn & Teach" />
                   <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                    <TranslatedText text="On the Go" />
+                    <LocalizedText text="On the Go" />
                   </span>
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                  <TranslatedText text="Access powerful educational tools from your mobile device. Create courses, learn with AI assistance, and connect with a global community of learners." />
+                  <LocalizedText text="Access powerful educational tools from your mobile device. Create courses, learn with AI assistance, and connect with a global community of learners." />
                 </p>
               </div>
               
@@ -173,10 +166,10 @@ const Index = () => {
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 text-lg"
                   aria-describedby="mobile-cta-description"
                 >
-                  <TranslatedText text="Start Learning Today" />
+                  <LocalizedText text="Start Learning Today" />
                 </Button>
                 <p id="mobile-cta-description" className="text-sm text-gray-500 dark:text-gray-400">
-                  <TranslatedText text="Free to start • No credit card required" />
+                  <LocalizedText text="Free to start • No credit card required" />
                 </p>
               </div>
             </div>
@@ -186,16 +179,16 @@ const Index = () => {
               <div className="space-y-8">
                 <div className="space-y-4">
                   <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                    🚀 <TranslatedText text="Democratizing Education Worldwide" />
+                    🚀 <LocalizedText text="Democratizing Education Worldwide" />
                   </Badge>
                   <h2 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-white lg:text-6xl">
-                    <TranslatedText text="Empower Your" />
+                    <LocalizedText text="Empower Your" />
                     <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                      <TranslatedText text="Teaching Journey" />
+                      <LocalizedText text="Teaching Journey" />
                     </span>
                   </h2>
                   <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl">
-                    <TranslatedText text="Create immersive educational experiences with AI-powered tools. Build, deliver, and monetize courses while connecting with learners globally." />
+                    <LocalizedText text="Create immersive educational experiences with AI-powered tools. Build, deliver, and monetize courses while connecting with learners globally." />
                   </p>
                 </div>
                 
@@ -206,33 +199,33 @@ const Index = () => {
                     className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4"
                     aria-describedby="desktop-cta-description"
                   >
-                    <TranslatedText text="Get Started Free" />
+                    <LocalizedText text="Get Started Free" />
                   </Button>
                   <Button 
                     variant="outline" 
                     size="lg"
                     className="border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/20 px-8 py-4"
                     onClick={() => {
-                      toast.success(<TranslatedText text="Demo coming soon!" />);
+                      toast.success(<LocalizedText text="Demo coming soon!" />);
                       announce("Demo coming soon!");
                     }}
                   >
-                    <TranslatedText text="Watch Demo" />
+                    <LocalizedText text="Watch Demo" />
                   </Button>
                 </div>
                 
                 <div id="desktop-cta-description" className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full" aria-hidden="true"></div>
-                    <TranslatedText text="Free to start" />
+                    <LocalizedText text="Free to start" />
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full" aria-hidden="true"></div>
-                    <TranslatedText text="No credit card required" />
+                    <LocalizedText text="No credit card required" />
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full" aria-hidden="true"></div>
-                    <TranslatedText text="Fully accessible" />
+                    <LocalizedText text="Fully accessible" />
                   </div>
                 </div>
               </div>
@@ -248,7 +241,7 @@ const Index = () => {
                         </CardHeader>
                         <CardContent>
                           <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
-                            <TranslatedText text={feature.title} />
+                            <LocalizedText text={feature.title} />
                           </CardTitle>
                         </CardContent>
                       </Card>
@@ -264,10 +257,10 @@ const Index = () => {
         <div className="mx-auto max-w-7xl mt-24">
           <div className="text-center space-y-4 mb-16">
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-              <TranslatedText text="Everything You Need to Succeed" />
+              <LocalizedText text="Everything You Need to Succeed" />
             </h3>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              <TranslatedText text="From AI-powered course creation to community building, SimoneLabs provides all the tools for modern education." />
+              <LocalizedText text="From AI-powered course creation to community building, SimoneLabs provides all the tools for modern education." />
             </p>
           </div>
           
@@ -279,12 +272,12 @@ const Index = () => {
                     <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
                   <CardTitle className="text-gray-900 dark:text-white">
-                    <TranslatedText text={feature.title} />
+                    <LocalizedText text={feature.title} />
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-600 dark:text-gray-300">
-                    <TranslatedText text={feature.description} />
+                    <LocalizedText text={feature.description} />
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -296,10 +289,10 @@ const Index = () => {
         <div className="mx-auto max-w-7xl mt-24">
           <div className="text-center space-y-4 mb-16">
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-              <TranslatedText text="Meet Our Co-Founders" />
+              <LocalizedText text="Meet Our Co-Founders" />
             </h3>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              <TranslatedText text="Passionate leaders dedicated to transforming education through innovation and technology." />
+              <LocalizedText text="Passionate leaders dedicated to transforming education through innovation and technology." />
             </p>
           </div>
           
@@ -316,15 +309,15 @@ const Index = () => {
                     </Avatar>
                   </div>
                   <CardTitle className="text-xl text-gray-900 dark:text-white">
-                    <TranslatedText text={founder.name} />
+                    <LocalizedText text={founder.name} />
                   </CardTitle>
                   <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                    <TranslatedText text={founder.role} />
+                    <LocalizedText text={founder.role} />
                   </Badge>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-600 dark:text-gray-300 text-base">
-                    <TranslatedText text={founder.description} />
+                    <LocalizedText text={founder.description} />
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -337,17 +330,17 @@ const Index = () => {
           <Card className="border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
             <CardContent className="py-12">
               <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                <TranslatedText text="Ready to Transform Education?" />
+                <LocalizedText text="Ready to Transform Education?" />
               </h3>
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-                <TranslatedText text="Join thousands of educators who are already creating amazing learning experiences with SimoneLabs." />
+                <LocalizedText text="Join thousands of educators who are already creating amazing learning experiences with SimoneLabs." />
               </p>
               <Button 
                 onClick={handleGetStarted}
                 size="lg" 
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-12 py-4 text-lg"
               >
-                <TranslatedText text="Start Your Journey" />
+                <LocalizedText text="Start Your Journey" />
               </Button>
             </CardContent>
           </Card>
@@ -359,7 +352,7 @@ const Index = () => {
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
           <div className="text-center text-gray-500 dark:text-gray-400">
             <p>
-              <TranslatedText text="© 2024 SimoneLabs. Democratizing education worldwide." />
+              <LocalizedText text="© 2024 SimoneLabs. Democratizing education worldwide." />
             </p>
           </div>
         </div>

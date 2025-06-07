@@ -10,10 +10,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Globe, Check, Bot } from 'lucide-react';
-import { useTranslation, SUPPORTED_LANGUAGES } from '@/contexts/TranslationContext';
+import { useLocalization, SUPPORTED_LANGUAGES } from '@/contexts/LocalizationContext';
 
 export const LanguageSelector = () => {
-  const { currentLanguage, setLanguage } = useTranslation();
+  const { currentLanguage, setLanguage } = useLocalization();
 
   return (
     <DropdownMenu>
@@ -30,9 +30,9 @@ export const LanguageSelector = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 max-h-80 overflow-y-auto">
-        {/* Translation Info */}
+        {/* Localization Info */}
         <div className="px-2 py-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">
-          AI-Powered Translation
+          AI-Powered Localization
         </div>
         <div className="px-2 py-1 text-xs text-gray-400 mb-2">
           <div className="flex items-center space-x-2">

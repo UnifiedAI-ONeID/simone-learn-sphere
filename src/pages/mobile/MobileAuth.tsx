@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Brain } from 'lucide-react';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { SimpleMobileAuth } from '@/components/SimpleMobileAuth';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
@@ -23,10 +23,10 @@ export const MobileAuth = () => {
             platform === 'ios' ? 'font-semibold' : 
             platform === 'android' ? 'font-medium' : 'font-bold'
           }`}>
-            <TranslatedText text="Welcome Back" />
+            <LocalizedText text="Welcome Back" />
           </h1>
           <p className="text-[var(--platform-text-secondary)] mt-2">
-            <TranslatedText text="Sign in to continue learning" />
+            <LocalizedText text="Sign in to continue learning" />
           </p>
         </div>
 
