@@ -9,6 +9,77 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_abuse_tracking: {
+        Row: {
+          abuse_type: string
+          created_at: string
+          id: string
+          locked_until: string | null
+          severity: number
+          user_id: string
+        }
+        Insert: {
+          abuse_type: string
+          created_at?: string
+          id?: string
+          locked_until?: string | null
+          severity?: number
+          user_id: string
+        }
+        Update: {
+          abuse_type?: string
+          created_at?: string
+          id?: string
+          locked_until?: string | null
+          severity?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_tutor_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          intent_classification: string
+          lesson_id: string | null
+          moderation_flags: Json | null
+          question: string
+          quiz_context: boolean | null
+          response: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intent_classification: string
+          lesson_id?: string | null
+          moderation_flags?: Json | null
+          question: string
+          quiz_context?: boolean | null
+          response: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intent_classification?: string
+          lesson_id?: string | null
+          moderation_flags?: Json | null
+          question?: string
+          quiz_context?: boolean | null
+          response?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_tutor_sessions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badges: {
         Row: {
           created_at: string
@@ -707,8 +778,20 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_user_ai_locked: {
+        Args: { check_user_id: string }
+        Returns: boolean
+      }
       log_admin_action: {
         Args: { action_type: string; action_details?: Json }
+        Returns: undefined
+      }
+      log_ai_abuse: {
+        Args: {
+          abuse_user_id: string
+          abuse_type_param: string
+          severity_param?: number
+        }
         Returns: undefined
       }
       log_security_event: {
