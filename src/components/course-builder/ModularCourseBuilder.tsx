@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Brain, BookOpen, Target, Wand2, DragHandleDots2Icon as GripVertical } from 'lucide-react';
+import { Plus, Brain, BookOpen, Target, Wand2, GripVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AIAssistantSidebar } from './AIAssistantSidebar';
 import { ModuleCard } from './ModuleCard';
