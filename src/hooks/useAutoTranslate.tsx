@@ -9,7 +9,7 @@ interface UseAutoTranslateOptions {
 
 export const useAutoTranslate = (text: string, options: UseAutoTranslateOptions = {}) => {
   const { enabled = true, targetLanguage } = options;
-  const { localizeText, currentLanguage } = useLocalization();
+  const { getTranslation, currentLanguage } = useLocalization();
   const [translatedText, setTranslatedText] = useState(text);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export const useAutoTranslate = (text: string, options: UseAutoTranslateOptions 
       setError(null);
       
       try {
-        const result = await localizeText(text, target);
+        const result = await getTranslation(text, target);
         setTranslatedText(result);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Translation failed');
@@ -42,7 +42,7 @@ export const useAutoTranslate = (text: string, options: UseAutoTranslateOptions 
     };
 
     translate();
-  }, [text, currentLanguage.code, targetLanguage, localizeText, enabled]);
+  }, [text, currentLanguage.code, targetLanguage, getTranslation, enabled]);
 
   return {
     translatedText,
