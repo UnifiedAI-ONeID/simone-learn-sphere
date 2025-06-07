@@ -9,6 +9,8 @@ export type SupportedLanguage = {
   flag: string;
 };
 
+export type TranslationProvider = 'chatgpt' | 'google';
+
 export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
   { code: 'zh-CN', name: 'Simplified Chinese', nativeName: '简体中文', flag: '🇨🇳' },
@@ -28,9 +30,11 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
 interface TranslationContextType {
   currentLanguage: SupportedLanguage;
   setLanguage: (language: SupportedLanguage) => void;
-  translateText: (text: string, targetLanguage?: string) => Promise<string>;
+  translateText: (text: string, targetLanguage?: string, provider?: TranslationProvider) => Promise<string>;
   isTranslating: boolean;
   translations: Record<string, string>;
+  translationProvider: TranslationProvider;
+  setTranslationProvider: (provider: TranslationProvider) => void;
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
@@ -47,6 +51,7 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(SUPPORTED_LANGUAGES[0]);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [translationProvider, setTranslationProvider] = useState<TranslationProvider>('chatgpt');
 
   useEffect(() => {
     // Load saved language preference
@@ -57,6 +62,12 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         setCurrentLanguage(language);
       }
     }
+
+    // Load saved translation provider preference
+    const savedProvider = localStorage.getItem('translationProvider') as TranslationProvider;
+    if (savedProvider && ['chatgpt', 'google'].includes(savedProvider)) {
+      setTranslationProvider(savedProvider);
+    }
   }, []);
 
   const setLanguage = (language: SupportedLanguage) => {
@@ -64,13 +75,24 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.setItem('selectedLanguage', language.code);
   };
 
-  const translateText = async (text: string, targetLanguage?: string): Promise<string> => {
+  const setProvider = (provider: TranslationProvider) => {
+    setTranslationProvider(provider);
+    localStorage.setItem('translationProvider', provider);
+  };
+
+  const translateText = async (
+    text: string, 
+    targetLanguage?: string, 
+    provider?: TranslationProvider
+  ): Promise<string> => {
     if (!text) return text;
     
     const target = targetLanguage || currentLanguage.code;
     if (target === 'en') return text; // No translation needed for English
 
-    const cacheKey = `${text}_${target}`;
+    const selectedProvider = provider || translationProvider;
+    const cacheKey = `${text}_${target}_${selectedProvider}`;
+    
     if (translations[cacheKey]) {
       return translations[cacheKey];
     }
@@ -78,7 +100,11 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setIsTranslating(true);
     try {
       const { data, error } = await supabase.functions.invoke('translate-text', {
-        body: { text, targetLanguage: target }
+        body: { 
+          text, 
+          targetLanguage: target,
+          provider: selectedProvider 
+        }
       });
 
       if (error) throw error;
@@ -102,6 +128,8 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         translateText,
         isTranslating,
         translations,
+        translationProvider,
+        setTranslationProvider: setProvider,
       }}
     >
       {children}
