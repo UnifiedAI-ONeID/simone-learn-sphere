@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, SignUpFormData, SignInFormData } from '@/schemas/authSchemas';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 
 const Auth = () => {
@@ -327,15 +326,15 @@ const Auth = () => {
   const roles = [
     {
       id: 'student' as const,
-      title: <TranslatedText text="Student" />,
-      description: <TranslatedText text="Learn with personalized AI-powered experiences" />,
+      title: <LocalizedText text="Student" />,
+      description: <LocalizedText text="Learn with personalized AI-powered experiences" />,
       icon: GraduationCap,
       color: 'bg-blue-100 text-blue-800 border-blue-200'
     },
     {
       id: 'educator' as const,
-      title: <TranslatedText text="Educator" />,
-      description: <TranslatedText text="Create and monetize educational content" />,
+      title: <LocalizedText text="Educator" />,
+      description: <LocalizedText text="Create and monetize educational content" />,
       icon: User,
       color: 'bg-purple-100 text-purple-800 border-purple-200'
     }
@@ -352,10 +351,10 @@ const Auth = () => {
             </div>
           </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            <TranslatedText text="Welcome to SimoneLabs" />
+            <LocalizedText text="Welcome to SimoneLabs" />
           </h1>
           <p className="text-gray-600">
-            <TranslatedText text="Your educational AI platform" />
+            <LocalizedText text="Your educational AI platform" />
           </p>
         </div>
 
@@ -364,20 +363,20 @@ const Auth = () => {
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">
-                <TranslatedText text="Sign In" />
+                <LocalizedText text="Sign In" />
               </TabsTrigger>
               <TabsTrigger value="signup">
-                <TranslatedText text="Sign Up" />
+                <LocalizedText text="Sign Up" />
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
               <CardHeader>
                 <CardTitle>
-                  <TranslatedText text="Sign In" />
+                  <LocalizedText text="Sign In" />
                 </CardTitle>
                 <CardDescription>
-                  <TranslatedText text="Welcome back! Enter your credentials to continue." />
+                  <LocalizedText text="Welcome back! Enter your credentials to continue." />
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -395,7 +394,7 @@ const Auth = () => {
                       <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                       <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    <TranslatedText text="Continue with Google" />
+                    <LocalizedText text="Continue with Google" />
                   </Button>
                   
                   <Button 
@@ -405,7 +404,7 @@ const Auth = () => {
                     disabled={isLoading}
                   >
                     <Linkedin className="w-5 h-5 mr-2" />
-                    <TranslatedText text="Continue with LinkedIn" />
+                    <LocalizedText text="Continue with LinkedIn" />
                   </Button>
                   
                   <div className="relative">
@@ -414,7 +413,7 @@ const Auth = () => {
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                       <span className="bg-background px-2 text-muted-foreground">
-                        <TranslatedText text="Or continue with email" />
+                        <LocalizedText text="Or continue with email" />
                       </span>
                     </div>
                   </div>
@@ -423,7 +422,7 @@ const Auth = () => {
                 {/* Email/Password Form Fields */}
                 <div className="space-y-2">
                   <Label htmlFor="login-email">
-                    <TranslatedText text="Email" />
+                    <LocalizedText text="Email" />
                   </Label>
                   <Input 
                     id="login-email" 
@@ -436,13 +435,13 @@ const Auth = () => {
                   />
                   {validationErrors.email && (
                     <p className="text-sm text-red-600">
-                      <TranslatedText text={validationErrors.email} />
+                      <LocalizedText text={validationErrors.email} />
                     </p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">
-                    <TranslatedText text="Password" />
+                    <LocalizedText text="Password" />
                   </Label>
                   <Input 
                     id="login-password" 
@@ -455,16 +454,16 @@ const Auth = () => {
                   />
                   {validationErrors.password && (
                     <p className="text-sm text-red-600">
-                      <TranslatedText text={validationErrors.password} />
+                      <LocalizedText text={validationErrors.password} />
                     </p>
                   )}
                 </div>
                 <Button 
                   onClick={handleSignIn}
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  className="w-full"
                 >
-                  <TranslatedText text={isLoading ? 'Signing In...' : 'Sign In'} />
+                  <LocalizedText text={isLoading ? 'Signing in...' : 'Sign In'} />
                 </Button>
               </CardContent>
             </TabsContent>
@@ -474,10 +473,10 @@ const Auth = () => {
               <Card className="mb-4">
                 <CardHeader>
                   <CardTitle className="text-center text-lg">
-                    <TranslatedText text="Select Your Role" />
+                    <LocalizedText text="Select Your Role" />
                   </CardTitle>
                   <CardDescription className="text-center">
-                    <TranslatedText text="This will customize your experience" />
+                    <LocalizedText text="This will customize your experience" />
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -499,7 +498,7 @@ const Auth = () => {
                         </div>
                         {userRole === role.id && (
                           <Badge variant="secondary" className="bg-white text-current">
-                            <TranslatedText text="Selected" />
+                            <LocalizedText text="Selected" />
                           </Badge>
                         )}
                       </div>
@@ -510,10 +509,10 @@ const Auth = () => {
 
               <CardHeader>
                 <CardTitle>
-                  <TranslatedText text="Create Account" />
+                  <LocalizedText text="Create Account" />
                 </CardTitle>
                 <CardDescription>
-                  <TranslatedText text="Join SimoneLabs and start your learning journey." />
+                  <LocalizedText text="Choose your role and get started with SimoneLabs." />
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -531,7 +530,7 @@ const Auth = () => {
                       <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                       <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    <TranslatedText text="Sign up with Google" />
+                    <LocalizedText text="Sign up with Google" />
                   </Button>
                   
                   <Button 
@@ -541,7 +540,7 @@ const Auth = () => {
                     disabled={isLoading}
                   >
                     <Linkedin className="w-5 h-5 mr-2" />
-                    <TranslatedText text="Sign up with LinkedIn" />
+                    <LocalizedText text="Sign up with LinkedIn" />
                   </Button>
                   
                   <div className="relative">
@@ -550,7 +549,7 @@ const Auth = () => {
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                       <span className="bg-background px-2 text-muted-foreground">
-                        <TranslatedText text="Or sign up with email" />
+                        <LocalizedText text="Or sign up with email" />
                       </span>
                     </div>
                   </div>
@@ -559,7 +558,7 @@ const Auth = () => {
                 {/* Name, Email, Password Form Fields */}
                 <div className="space-y-2">
                   <Label htmlFor="firstname">
-                    <TranslatedText text="First Name" />
+                    <LocalizedText text="First Name" />
                   </Label>
                   <Input 
                     id="firstname" 
@@ -571,13 +570,13 @@ const Auth = () => {
                   />
                   {validationErrors.firstName && (
                     <p className="text-xs text-red-600">
-                      <TranslatedText text={validationErrors.firstName} />
+                      <LocalizedText text={validationErrors.firstName} />
                     </p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastname">
-                    <TranslatedText text="Last Name" />
+                    <LocalizedText text="Last Name" />
                   </Label>
                   <Input 
                     id="lastname" 
@@ -589,13 +588,13 @@ const Auth = () => {
                   />
                   {validationErrors.lastName && (
                     <p className="text-xs text-red-600">
-                      <TranslatedText text={validationErrors.lastName} />
+                      <LocalizedText text={validationErrors.lastName} />
                     </p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">
-                    <TranslatedText text="Email" />
+                    <LocalizedText text="Email" />
                   </Label>
                   <Input 
                     id="signup-email" 
@@ -608,13 +607,13 @@ const Auth = () => {
                   />
                   {validationErrors.email && (
                     <p className="text-sm text-red-600">
-                      <TranslatedText text={validationErrors.email} />
+                      <LocalizedText text={validationErrors.email} />
                     </p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">
-                    <TranslatedText text="Password" />
+                    <LocalizedText text="Password" />
                   </Label>
                   <Input 
                     id="signup-password" 
@@ -627,19 +626,19 @@ const Auth = () => {
                   />
                   {validationErrors.password && (
                     <p className="text-sm text-red-600">
-                      <TranslatedText text={validationErrors.password} />
+                      <LocalizedText text={validationErrors.password} />
                     </p>
                   )}
                   <p className="text-xs text-gray-600">
-                    <TranslatedText text="Must be 8+ characters with uppercase, lowercase, and number" />
+                    <LocalizedText text="Must be 8+ characters with uppercase, lowercase, and number" />
                   </p>
                 </div>
                 <Button 
                   onClick={handleSignUp}
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  className="w-full"
                 >
-                  <TranslatedText text={isLoading ? 'Creating Account...' : 'Create Account'} />
+                  <LocalizedText text={isLoading ? 'Creating account...' : 'Create Account'} />
                 </Button>
               </CardContent>
             </TabsContent>

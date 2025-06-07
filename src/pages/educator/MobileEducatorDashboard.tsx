@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Users, BookOpen, Plus, BarChart3 } from 'lucide-react';
 import { useEngagementTracking } from '@/hooks/useEngagementTracking';
 import { useSessionTracking } from '@/hooks/useSessionTracking';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 
 export const MobileEducatorDashboard = () => {
   const { trackPageView } = useEngagementTracking();
@@ -26,7 +26,7 @@ export const MobileEducatorDashboard = () => {
               <BookOpen className="h-4 w-4 text-green-500" />
               <div>
                 <p className="text-xs text-gray-500">
-                  <TranslatedText text="Active Courses" />
+                  <LocalizedText text="Active Courses" />
                 </p>
                 <p className="text-lg font-semibold">5</p>
               </div>
@@ -40,7 +40,7 @@ export const MobileEducatorDashboard = () => {
               <Users className="h-4 w-4 text-blue-500" />
               <div>
                 <p className="text-xs text-gray-500">
-                  <TranslatedText text="Students" />
+                  <LocalizedText text="Students" />
                 </p>
                 <p className="text-lg font-semibold">127</p>
               </div>
@@ -53,17 +53,17 @@ export const MobileEducatorDashboard = () => {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">
-            <TranslatedText text="Quick Actions" />
+            <LocalizedText text="Quick Actions" />
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Button className="w-full justify-start" variant="outline">
             <Plus className="h-4 w-4 mr-2" />
-            <TranslatedText text="Create New Course" />
+            <LocalizedText text="Create New Course" />
           </Button>
           <Button className="w-full justify-start" variant="outline">
             <BarChart3 className="h-4 w-4 mr-2" />
-            <TranslatedText text="View Analytics" />
+            <LocalizedText text="View Analytics" />
           </Button>
         </CardContent>
       </Card>
@@ -72,7 +72,7 @@ export const MobileEducatorDashboard = () => {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">
-            <TranslatedText text="Recent Activity" />
+            <LocalizedText text="Recent Activity" />
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">

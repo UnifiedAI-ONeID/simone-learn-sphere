@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Settings, User, Bell, Shield, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 
 export const MobileProfileSettings = () => {
   const { user, signOut } = useAuth();
@@ -49,10 +49,10 @@ export const MobileProfileSettings = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900">
-                    <TranslatedText text={option.label} />
+                    <LocalizedText text={option.label} />
                   </h3>
                   <p className="text-sm text-gray-600">
-                    <TranslatedText text={option.description} />
+                    <LocalizedText text={option.description} />
                   </p>
                 </div>
               </div>
@@ -70,7 +70,7 @@ export const MobileProfileSettings = () => {
             className="w-full justify-start text-red-600 hover:bg-red-100"
           >
             <LogOut className="h-5 w-5 mr-3" />
-            <TranslatedText text="Sign Out" />
+            <LocalizedText text="Sign Out" />
           </Button>
         </CardContent>
       </Card>

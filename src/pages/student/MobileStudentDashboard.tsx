@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, Clock, Trophy, Target } from 'lucide-react';
 import { useEngagementTracking } from '@/hooks/useEngagementTracking';
 import { useSessionTracking } from '@/hooks/useSessionTracking';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 
 export const MobileStudentDashboard = () => {
   const { trackPageView } = useEngagementTracking();
@@ -27,7 +27,7 @@ export const MobileStudentDashboard = () => {
               <BookOpen className="h-4 w-4 text-blue-500" />
               <div>
                 <p className="text-xs text-gray-500">
-                  <TranslatedText text="Active Courses" />
+                  <LocalizedText text="Active Courses" />
                 </p>
                 <p className="text-lg font-semibold">3</p>
               </div>
@@ -41,7 +41,7 @@ export const MobileStudentDashboard = () => {
               <Trophy className="h-4 w-4 text-yellow-500" />
               <div>
                 <p className="text-xs text-gray-500">
-                  <TranslatedText text="Badges" />
+                  <LocalizedText text="Badges" />
                 </p>
                 <p className="text-lg font-semibold">12</p>
               </div>
@@ -54,7 +54,7 @@ export const MobileStudentDashboard = () => {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">
-            <TranslatedText text="Current Progress" />
+            <LocalizedText text="Current Progress" />
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -79,7 +79,7 @@ export const MobileStudentDashboard = () => {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">
-            <TranslatedText text="Continue Learning" />
+            <LocalizedText text="Continue Learning" />
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
