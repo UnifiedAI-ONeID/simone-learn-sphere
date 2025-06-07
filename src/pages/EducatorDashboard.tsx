@@ -5,6 +5,7 @@ import { DashboardHeader } from '@/components/DashboardHeader';
 import { EnhancedEducatorDashboard } from '@/components/EnhancedEducatorDashboard';
 import { CourseCreator } from '@/components/CourseCreator';
 import { AICoursePlanner } from '@/components/AICoursePlanner';
+import { AIContentGenerator } from '@/components/AIContentGenerator';
 import { useEngagementTracking } from '@/hooks/useEngagementTracking';
 import { useSessionTracking } from '@/hooks/useSessionTracking';
 import { useEffect } from 'react';
