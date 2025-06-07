@@ -1,8 +1,7 @@
-
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { UserCheck, X, Crown } from 'lucide-react';
 import { useImpersonation } from '@/hooks/useImpersonation';
 
@@ -29,13 +28,13 @@ export const ImpersonationBanner = () => {
         <div className="flex items-center gap-3">
           <UserCheck className="h-4 w-4 text-orange-600" />
           <span className="font-medium text-orange-800 dark:text-orange-200">
-            <TranslatedText text="Admin Impersonation Active" />
+            <LocalizedText text="Admin Impersonation Active" />
           </span>
           <span className="text-orange-700 dark:text-orange-300">
-            <TranslatedText text="You are viewing as" />: {impersonationContext.target_first_name} {impersonationContext.target_last_name}
+            <LocalizedText text="You are viewing as" />: {impersonationContext.target_first_name} {impersonationContext.target_last_name}
           </span>
           <Badge className={getRoleBadgeColor(impersonationContext.target_role)}>
-            <TranslatedText text={impersonationContext.target_role} />
+            <LocalizedText text={impersonationContext.target_role} />
           </Badge>
           <span className="text-sm text-orange-600 dark:text-orange-400">
             ({impersonationContext.target_email})
@@ -50,7 +49,7 @@ export const ImpersonationBanner = () => {
           className="text-orange-700 border-orange-300 hover:bg-orange-100 dark:text-orange-200 dark:border-orange-700 dark:hover:bg-orange-900/20"
         >
           <X className="h-4 w-4 mr-1" />
-          <TranslatedText text="End Impersonation" />
+          <LocalizedText text="End Impersonation" />
         </Button>
       </AlertDescription>
     </Alert>

@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { PlatformButton } from '@/components/platform/PlatformButton';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
@@ -120,7 +119,7 @@ export const SimpleMobileAuth = () => {
           className="w-full"
           disabled={isLoading}
         >
-          <TranslatedText text={isLoading ? "Please wait..." : (isSignUp ? "Create Account" : "Sign In")} />
+          <LocalizedText text={isLoading ? "Please wait..." : (isSignUp ? "Create Account" : "Sign In")} />
         </PlatformButton>
 
         <div className="text-center">
@@ -130,7 +129,7 @@ export const SimpleMobileAuth = () => {
             onClick={() => setIsSignUp(!isSignUp)}
             className="text-sm text-[var(--platform-text-secondary)] hover:text-[var(--platform-text)]"
           >
-            <TranslatedText text={isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"} />
+            <LocalizedText text={isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"} />
           </PlatformButton>
         </div>
       </form>

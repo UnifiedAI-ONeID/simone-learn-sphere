@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Brain, Home, BookOpen, Users, BarChart3, Shield, Settings, Bot } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { cn } from '@/lib/utils';
 
 export const DesktopSidebar = () => {
@@ -59,7 +58,7 @@ export const DesktopSidebar = () => {
           <Brain className="h-6 w-6 text-white" />
         </div>
         <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          <TranslatedText text="SimoneLabs" />
+          <LocalizedText text="SimoneLabs" />
         </h2>
       </div>
 
@@ -79,7 +78,7 @@ export const DesktopSidebar = () => {
           >
             <item.icon className="h-5 w-5" />
             <span className="font-medium">
-              <TranslatedText text={item.label} />
+              <LocalizedText text={item.label} />
             </span>
           </NavLink>
         ))}

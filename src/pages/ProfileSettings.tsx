@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { UserRoleManager } from '@/components/UserRoleManager';
 import { ProfilePictureUpload } from '@/components/ProfilePictureUpload';
 import { TwoFactorSetup } from '@/components/TwoFactorSetup';
@@ -68,10 +67,10 @@ const ProfileSettings = () => {
     <div className="container mx-auto py-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
-          <TranslatedText text="Profile Settings" />
+          <LocalizedText text="Profile Settings" />
         </h1>
         <p className="text-gray-600">
-          <TranslatedText text="Manage your account settings and preferences." />
+          <LocalizedText text="Manage your account settings and preferences." />
         </p>
       </div>
 
@@ -83,10 +82,10 @@ const ProfileSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <TranslatedText text="Basic Information" />
+              <LocalizedText text="Basic Information" />
             </CardTitle>
             <CardDescription>
-              <TranslatedText text="Update your personal details." />
+              <LocalizedText text="Update your personal details." />
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -94,7 +93,7 @@ const ProfileSettings = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">
-                    <TranslatedText text="First Name" />
+                    <LocalizedText text="First Name" />
                   </Label>
                   <Input
                     id="firstName"
@@ -105,7 +104,7 @@ const ProfileSettings = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">
-                    <TranslatedText text="Last Name" />
+                    <LocalizedText text="Last Name" />
                   </Label>
                   <Input
                     id="lastName"
@@ -117,7 +116,7 @@ const ProfileSettings = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  <TranslatedText text="Email" />
+                  <LocalizedText text="Email" />
                 </Label>
                 <Input
                   id="email"
@@ -127,11 +126,11 @@ const ProfileSettings = () => {
                   className="bg-gray-50"
                 />
                 <p className="text-sm text-gray-500">
-                  <TranslatedText text="Email cannot be changed" />
+                  <LocalizedText text="Email cannot be changed" />
                 </p>
               </div>
               <Button type="submit" disabled={isLoading}>
-                <TranslatedText text={isLoading ? 'Updating...' : 'Update Profile'} />
+                <LocalizedText text={isLoading ? 'Updating...' : 'Update Profile'} />
               </Button>
             </form>
           </CardContent>
@@ -150,10 +149,10 @@ const ProfileSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <TranslatedText text="Account Actions" />
+              <LocalizedText text="Account Actions" />
             </CardTitle>
             <CardDescription>
-              <TranslatedText text="Manage your account." />
+              <LocalizedText text="Manage your account." />
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -162,7 +161,7 @@ const ProfileSettings = () => {
               variant="outline"
               className="w-full"
             >
-              <TranslatedText text="Sign Out" />
+              <LocalizedText text="Sign Out" />
             </Button>
           </CardContent>
         </Card>

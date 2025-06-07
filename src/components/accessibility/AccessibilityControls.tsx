@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +20,7 @@ import {
   Plus,
   Settings
 } from 'lucide-react';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { useToast } from '@/hooks/use-toast';
 
 export const AccessibilityControls: React.FC = () => {
@@ -171,7 +170,7 @@ export const AccessibilityControls: React.FC = () => {
           <div className="flex items-center space-x-2 mb-4">
             <Accessibility className="h-4 w-4" />
             <span className="font-semibold">
-              <TranslatedText text="Accessibility Settings" />
+              <LocalizedText text="Accessibility Settings" />
             </span>
           </div>
           
@@ -181,7 +180,7 @@ export const AccessibilityControls: React.FC = () => {
               <div className="flex items-center space-x-2 mb-2">
                 <Type className="h-4 w-4" />
                 <span className="text-sm font-medium">
-                  <TranslatedText text="Text Size" />
+                  <LocalizedText text="Text Size" />
                 </span>
               </div>
               <div className="flex space-x-1">
@@ -192,7 +191,7 @@ export const AccessibilityControls: React.FC = () => {
                   className="flex-1"
                 >
                   <Minus className="h-3 w-3 mr-1" />
-                  <TranslatedText text="Small" />
+                  <LocalizedText text="Small" />
                 </Button>
                 <Button
                   variant={fontSize === 'medium' ? 'default' : 'outline'}
@@ -200,7 +199,7 @@ export const AccessibilityControls: React.FC = () => {
                   onClick={() => handleFontSizeChange('medium')}
                   className="flex-1"
                 >
-                  <TranslatedText text="Medium" />
+                  <LocalizedText text="Medium" />
                 </Button>
                 <Button
                   variant={fontSize === 'large' ? 'default' : 'outline'}
@@ -209,7 +208,7 @@ export const AccessibilityControls: React.FC = () => {
                   className="flex-1"
                 >
                   <Plus className="h-3 w-3 mr-1" />
-                  <TranslatedText text="Large" />
+                  <LocalizedText text="Large" />
                 </Button>
               </div>
             </div>
@@ -221,7 +220,7 @@ export const AccessibilityControls: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Contrast className="h-4 w-4" />
                 <span className="text-sm font-medium">
-                  <TranslatedText text="High Contrast" />
+                  <LocalizedText text="High Contrast" />
                 </span>
               </div>
               <Button
@@ -230,9 +229,9 @@ export const AccessibilityControls: React.FC = () => {
                 onClick={handleHighContrastToggle}
               >
                 {highContrast ? (
-                  <TranslatedText text="Enabled" />
+                  <LocalizedText text="Enabled" />
                 ) : (
-                  <TranslatedText text="Disabled" />
+                  <LocalizedText text="Disabled" />
                 )}
               </Button>
             </div>
@@ -242,7 +241,7 @@ export const AccessibilityControls: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Eye className="h-4 w-4" />
                 <span className="text-sm font-medium">
-                  <TranslatedText text="Reduce Motion" />
+                  <LocalizedText text="Reduce Motion" />
                 </span>
               </div>
               <Button
@@ -251,9 +250,9 @@ export const AccessibilityControls: React.FC = () => {
                 onClick={handleReducedMotionToggle}
               >
                 {reducedMotion ? (
-                  <TranslatedText text="Enabled" />
+                  <LocalizedText text="Enabled" />
                 ) : (
-                  <TranslatedText text="Disabled" />
+                  <LocalizedText text="Disabled" />
                 )}
               </Button>
             </div>
@@ -263,7 +262,7 @@ export const AccessibilityControls: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Volume className="h-4 w-4" />
                 <span className="text-sm font-medium">
-                  <TranslatedText text="Announcements" />
+                  <LocalizedText text="Announcements" />
                 </span>
               </div>
               <Button
@@ -272,9 +271,9 @@ export const AccessibilityControls: React.FC = () => {
                 onClick={handleAnnouncementsToggle}
               >
                 {announcements ? (
-                  <TranslatedText text="On" />
+                  <LocalizedText text="On" />
                 ) : (
-                  <TranslatedText text="Off" />
+                  <LocalizedText text="Off" />
                 )}
               </Button>
             </div>
@@ -283,7 +282,7 @@ export const AccessibilityControls: React.FC = () => {
           <Separator className="my-4" />
 
           <div className="text-xs text-gray-500">
-            <TranslatedText text="Settings are saved automatically and persist between sessions." />
+            <LocalizedText text="Settings are saved automatically and persist between sessions." />
           </div>
         </div>
       </DropdownMenuContent>

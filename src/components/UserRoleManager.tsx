@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { User, GraduationCap, Settings, Shield } from 'lucide-react';
 
 export const UserRoleManager = () => {
@@ -105,16 +104,16 @@ export const UserRoleManager = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Settings className="h-5 w-5" />
-          <TranslatedText text="Manage Your Roles" />
+          <LocalizedText text="Manage Your Roles" />
         </CardTitle>
         <CardDescription>
-          <TranslatedText text="Add additional roles to expand your platform capabilities" />
+          <LocalizedText text="Add additional roles to expand your platform capabilities" />
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
           <h4 className="text-sm font-medium mb-2">
-            <TranslatedText text="Current Roles:" />
+            <LocalizedText text="Current Roles:" />
           </h4>
           <div className="flex flex-wrap gap-2">
             {currentRoles.map((role) => (
@@ -142,7 +141,7 @@ export const UserRoleManager = () => {
 
         <div>
           <h4 className="text-sm font-medium mb-2">
-            <TranslatedText text="Available Roles to Add:" />
+            <LocalizedText text="Available Roles to Add:" />
           </h4>
           <div className="space-y-2">
             {availableRoles.map((role) => {
@@ -173,17 +172,17 @@ export const UserRoleManager = () => {
                         size="sm"
                         variant="outline"
                       >
-                        <TranslatedText text="Add Role" />
+                        <LocalizedText text="Add Role" />
                       </Button>
                     )}
                     {hasRole && (
                       <Badge variant="secondary">
-                        <TranslatedText text="Current" />
+                        <LocalizedText text="Current" />
                       </Badge>
                     )}
                     {isAdmin && (
                       <Badge variant="secondary">
-                        <TranslatedText text="Admin has all access" />
+                        <LocalizedText text="Admin has all access" />
                       </Badge>
                     )}
                   </div>
@@ -194,11 +193,11 @@ export const UserRoleManager = () => {
         </div>
 
         <div className="text-xs text-gray-500 mt-4 space-y-1">
-          <p><TranslatedText text="Note: Adding roles will combine your access levels. You can access features from all your assigned roles." /></p>
+          <p><LocalizedText text="Note: Adding roles will combine your access levels. You can access features from all your assigned roles." /></p>
           {!hasRole('admin') && (
             <p className="text-amber-600 dark:text-amber-400">
               <Shield className="h-3 w-3 inline mr-1" />
-              <TranslatedText text="Admin roles can only be assigned by existing administrators for security." />
+              <LocalizedText text="Admin roles can only be assigned by existing administrators for security." />
             </p>
           )}
         </div>

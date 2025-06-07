@@ -1,10 +1,9 @@
-
 import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bell, Search, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useOptimizedPerformance } from '@/hooks/useOptimizedPerformance';
 
@@ -32,7 +31,7 @@ const OptimizedMobileHeaderComponent = () => {
             <Menu className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            <TranslatedText text="SimoneLabs" />
+            <LocalizedText text="SimoneLabs" />
           </h1>
         </div>
         

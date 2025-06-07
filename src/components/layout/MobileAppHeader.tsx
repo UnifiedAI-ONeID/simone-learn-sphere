@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bell, Brain } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { Badge } from '@/components/ui/badge';
 
 export const MobileAppHeader = () => {
@@ -19,10 +18,10 @@ export const MobileAppHeader = () => {
           </div>
           <div>
             <h1 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              <TranslatedText text="SimoneLabs" />
+              <LocalizedText text="SimoneLabs" />
             </h1>
             <p className="text-xs text-gray-500">
-              <TranslatedText text="Mobile Learning" />
+              <LocalizedText text="Mobile Learning" />
             </p>
           </div>
         </div>

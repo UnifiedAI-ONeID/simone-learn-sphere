@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bell, Search, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { AccessibilityControls } from '@/components/accessibility/AccessibilityControls';
 
@@ -16,10 +15,10 @@ export const DesktopHeader = () => {
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-            <TranslatedText text="Welcome back!" />
+            <LocalizedText text="Welcome back!" />
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            <TranslatedText text="Here's what's happening with your learning today." />
+            <LocalizedText text="Here's what's happening with your learning today." />
           </p>
         </div>
         

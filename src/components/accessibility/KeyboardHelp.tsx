@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -12,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Keyboard, HelpCircle } from 'lucide-react';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export const KeyboardHelp: React.FC = () => {
@@ -92,10 +91,10 @@ export const KeyboardHelp: React.FC = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Keyboard className="h-5 w-5" />
-            <TranslatedText text="Keyboard Shortcuts" />
+            <LocalizedText text="Keyboard Shortcuts" />
           </DialogTitle>
           <DialogDescription>
-            <TranslatedText text="Use these keyboard shortcuts to navigate the application more efficiently." />
+            <LocalizedText text="Use these keyboard shortcuts to navigate the application more efficiently." />
           </DialogDescription>
         </DialogHeader>
         
@@ -103,14 +102,14 @@ export const KeyboardHelp: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                <TranslatedText text="Navigation Shortcuts" />
+                <LocalizedText text="Navigation Shortcuts" />
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {shortcuts.map((shortcut, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-sm">
-                    <TranslatedText text={shortcut.description} />
+                    <LocalizedText text={shortcut.description} />
                   </span>
                   <Badge variant="outline" className="font-mono">
                     {formatShortcut(shortcut)}
@@ -123,25 +122,25 @@ export const KeyboardHelp: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                <TranslatedText text="Accessibility Features" />
+                <LocalizedText text="Accessibility Features" />
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="space-y-2 text-sm">
                 <p>
-                  <TranslatedText text="• All interactive elements are keyboard accessible" />
+                  <LocalizedText text="• All interactive elements are keyboard accessible" />
                 </p>
                 <p>
-                  <TranslatedText text="• Screen reader compatible with proper ARIA labels" />
+                  <LocalizedText text="• Screen reader compatible with proper ARIA labels" />
                 </p>
                 <p>
-                  <TranslatedText text="• High contrast mode available in accessibility settings" />
+                  <LocalizedText text="• High contrast mode available in accessibility settings" />
                 </p>
                 <p>
-                  <TranslatedText text="• Font size controls for better readability" />
+                  <LocalizedText text="• Font size controls for better readability" />
                 </p>
                 <p>
-                  <TranslatedText text="• Reduced motion options for users with vestibular disorders" />
+                  <LocalizedText text="• Reduced motion options for users with vestibular disorders" />
                 </p>
               </div>
             </CardContent>
@@ -149,7 +148,7 @@ export const KeyboardHelp: React.FC = () => {
 
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <HelpCircle className="h-4 w-4" />
-            <TranslatedText text="Press ? anywhere to open this help dialog" />
+            <LocalizedText text="Press ? anywhere to open this help dialog" />
           </div>
         </div>
       </DialogContent>

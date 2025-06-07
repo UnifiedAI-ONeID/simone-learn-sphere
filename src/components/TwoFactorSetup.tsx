@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Shield, Mail, Check, X } from 'lucide-react';
 import { useEmailTwoFactor } from '@/hooks/useEmailTwoFactor';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 
 interface TwoFactorSetupProps {
   userEmail: string;
@@ -49,10 +48,10 @@ export const TwoFactorSetup = ({ userEmail, isEnabled = false, onSetupComplete }
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-green-800">
             <Check className="h-5 w-5" />
-            <TranslatedText text="Two-Factor Authentication Enabled" />
+            <LocalizedText text="Two-Factor Authentication Enabled" />
           </CardTitle>
           <CardDescription className="text-green-600">
-            <TranslatedText text="Your account is protected with email-based two-factor authentication." />
+            <LocalizedText text="Your account is protected with email-based two-factor authentication." />
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -67,7 +66,7 @@ export const TwoFactorSetup = ({ userEmail, isEnabled = false, onSetupComplete }
             className="border-red-300 text-red-700 hover:bg-red-50"
           >
             <X className="h-4 w-4 mr-2" />
-            <TranslatedText text="Disable 2FA" />
+            <LocalizedText text="Disable 2FA" />
           </Button>
         </CardContent>
       </Card>
@@ -79,10 +78,10 @@ export const TwoFactorSetup = ({ userEmail, isEnabled = false, onSetupComplete }
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shield className="h-5 w-5" />
-          <TranslatedText text="Enable Two-Factor Authentication" />
+          <LocalizedText text="Enable Two-Factor Authentication" />
         </CardTitle>
         <CardDescription>
-          <TranslatedText text="Add an extra layer of security to your account with email verification codes." />
+          <LocalizedText text="Add an extra layer of security to your account with email verification codes." />
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -90,7 +89,7 @@ export const TwoFactorSetup = ({ userEmail, isEnabled = false, onSetupComplete }
           <>
             <div className="space-y-2">
               <Label htmlFor="email">
-                <TranslatedText text="Email Address" />
+                <LocalizedText text="Email Address" />
               </Label>
               <Input
                 id="email"
@@ -100,7 +99,7 @@ export const TwoFactorSetup = ({ userEmail, isEnabled = false, onSetupComplete }
                 className="bg-gray-50"
               />
               <p className="text-sm text-gray-600">
-                <TranslatedText text="Verification codes will be sent to this email address." />
+                <LocalizedText text="Verification codes will be sent to this email address." />
               </p>
             </div>
             <Button 
@@ -109,14 +108,14 @@ export const TwoFactorSetup = ({ userEmail, isEnabled = false, onSetupComplete }
               className="w-full"
             >
               <Mail className="h-4 w-4 mr-2" />
-              <TranslatedText text={state.isLoading ? 'Sending Code...' : 'Send Verification Code'} />
+              <LocalizedText text={state.isLoading ? 'Sending Code...' : 'Send Verification Code'} />
             </Button>
           </>
         ) : (
           <>
             <div className="space-y-2">
               <Label htmlFor="verification-code">
-                <TranslatedText text="Enter Verification Code" />
+                <LocalizedText text="Enter Verification Code" />
               </Label>
               <div className="flex justify-center">
                 <InputOTP
@@ -135,7 +134,7 @@ export const TwoFactorSetup = ({ userEmail, isEnabled = false, onSetupComplete }
                 </InputOTP>
               </div>
               <p className="text-sm text-gray-600 text-center">
-                <TranslatedText text="Check your email for the 6-digit verification code." />
+                <LocalizedText text="Check your email for the 6-digit verification code." />
               </p>
             </div>
             <div className="flex gap-2">
@@ -144,14 +143,14 @@ export const TwoFactorSetup = ({ userEmail, isEnabled = false, onSetupComplete }
                 disabled={state.isLoading || verificationCode.length !== 6}
                 className="flex-1"
               >
-                <TranslatedText text={state.isLoading ? 'Verifying...' : 'Verify & Enable'} />
+                <LocalizedText text={state.isLoading ? 'Verifying...' : 'Verify & Enable'} />
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setVerificationCode('')}
                 disabled={state.isLoading}
               >
-                <TranslatedText text="Cancel" />
+                <LocalizedText text="Cancel" />
               </Button>
             </div>
           </>

@@ -1,4 +1,3 @@
-
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { SecurityDashboard } from '@/components/SecurityDashboard';
@@ -8,7 +7,7 @@ import { RealTimeUserActivity } from '@/components/RealTimeUserActivity';
 import { SystemConfiguration } from '@/components/SystemConfiguration';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart3, Shield, Users, Activity, ShieldCheck, Settings } from 'lucide-react';
-import { TranslatedText } from '@/components/TranslatedText';
+import { LocalizedText } from '@/components/LocalizedText';
 
 const AdminDashboard = () => {
   return (
@@ -21,10 +20,10 @@ const AdminDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            <TranslatedText text="Admin Dashboard" />
+            <LocalizedText text="Admin Dashboard" />
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
-            <TranslatedText text="Comprehensive platform management and analytics" />
+            <LocalizedText text="Comprehensive platform management and analytics" />
           </p>
         </div>
 
@@ -32,27 +31,27 @@ const AdminDashboard = () => {
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="metrics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              <TranslatedText text="Metrics" />
+              <LocalizedText text="Metrics" />
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              <TranslatedText text="Users" />
+              <LocalizedText text="Users" />
             </TabsTrigger>
             <TabsTrigger value="security" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              <TranslatedText text="Security" />
+              <LocalizedText text="Security" />
             </TabsTrigger>
             <TabsTrigger value="enhanced-security" className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4" />
-              <TranslatedText text="Enhanced Security" />
+              <LocalizedText text="Enhanced Security" />
             </TabsTrigger>
             <TabsTrigger value="activity" className="flex items-center gap-2">
               <Activity className="h-4 w-4" />
-              <TranslatedText text="Activity" />
+              <LocalizedText text="Activity" />
             </TabsTrigger>
             <TabsTrigger value="configuration" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
-              <TranslatedText text="Configuration" />
+              <LocalizedText text="Configuration" />
             </TabsTrigger>
           </TabsList>
 
