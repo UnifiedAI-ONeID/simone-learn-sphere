@@ -21,14 +21,15 @@ const EducatorDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
       <DashboardHeader 
         title="Educator Dashboard"
-        subtitle="Manage your courses and track student engagement"
+        subtitle="Manage your courses and track student engagement with AI assistance"
       />
       <div className="container mx-auto px-6 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="courses">My Courses</TabsTrigger>
             <TabsTrigger value="ai-planner">AI Planner</TabsTrigger>
+            <TabsTrigger value="content-gen">AI Content</TabsTrigger>
             <TabsTrigger value="create">Create Course</TabsTrigger>
           </TabsList>
           
@@ -45,6 +46,10 @@ const EducatorDashboard = () => {
           
           <TabsContent value="ai-planner" className="space-y-6">
             <AICoursePlanner />
+          </TabsContent>
+          
+          <TabsContent value="content-gen" className="space-y-6">
+            <AIContentGenerator />
           </TabsContent>
           
           <TabsContent value="create" className="space-y-6">
