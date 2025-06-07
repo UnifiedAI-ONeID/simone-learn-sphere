@@ -1,4 +1,3 @@
-
 import { isMobile, isTablet } from 'react-device-detect';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
+import { LandingPageAssistant } from '@/components/LandingPageAssistant';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -358,6 +358,9 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Landing Page Assistant */}
+      <LandingPageAssistant />
     </div>
   );
 };
