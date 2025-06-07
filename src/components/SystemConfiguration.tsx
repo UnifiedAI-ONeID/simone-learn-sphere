@@ -70,13 +70,25 @@ export const SystemConfiguration = () => {
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
+      // Convert settings to JSON-compatible format for Supabase
+      const settingsJson = {
+        settings_updated: {
+          registration_enabled: settings.registration_enabled,
+          email_verification_required: settings.email_verification_required,
+          admin_approval_required: settings.admin_approval_required,
+          max_session_duration: settings.max_session_duration,
+          password_min_length: settings.password_min_length,
+          two_factor_required: settings.two_factor_required,
+          platform_name: settings.platform_name,
+          welcome_message: settings.welcome_message
+        },
+        updated_fields: Object.keys(settings)
+      };
+
       // Log admin action
       await supabase.rpc('log_admin_action', {
         action_type: 'system_configuration_update',
-        action_details: {
-          settings_updated: settings,
-          updated_fields: Object.keys(settings)
-        }
+        action_details: settingsJson
       });
 
       toast({

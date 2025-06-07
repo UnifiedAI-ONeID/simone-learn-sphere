@@ -270,7 +270,7 @@ export const UserManagement = () => {
                       <div className="font-medium text-gray-900 dark:text-white">
                         {user.first_name} {user.last_name}
                         {user.email === 'simon.luke@unswalumni.com' && (
-                          <Crown className="inline h-4 w-4 ml-2 text-yellow-500" title="System Administrator" />
+                          <Crown className="inline h-4 w-4 ml-2 text-yellow-500" />
                         )}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-300">
@@ -290,8 +290,8 @@ export const UserManagement = () => {
                     <div className="flex items-center gap-2">
                       <Select
                         value={user.role}
-                        onValueChange={(newRole) => handleRoleChange(user.id, newRole)}
-                        disabled={!hasRole('admin') && newRole === 'admin'}
+                        onValueChange={(role) => handleRoleChange(user.id, role)}
+                        disabled={!hasRole('admin') && role === 'admin'}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
