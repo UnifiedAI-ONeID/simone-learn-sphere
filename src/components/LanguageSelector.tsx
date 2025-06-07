@@ -9,23 +9,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { Globe, Check, Zap, Bot } from 'lucide-react';
-import { useTranslation, SUPPORTED_LANGUAGES, TranslationProvider } from '@/contexts/TranslationContext';
+import { Globe, Check, Bot } from 'lucide-react';
+import { useTranslation, SUPPORTED_LANGUAGES } from '@/contexts/TranslationContext';
 
 export const LanguageSelector = () => {
-  const { currentLanguage, setLanguage, translationProvider, setTranslationProvider } = useTranslation();
-
-  const providerIcons = {
-    chatgpt: Bot,
-    google: Globe,
-  };
-
-  const providerNames = {
-    chatgpt: 'ChatGPT (Smart)',
-    google: 'Google Translate',
-  };
-
-  const ProviderIcon = providerIcons[translationProvider];
+  const { currentLanguage, setLanguage } = useTranslation();
 
   return (
     <DropdownMenu>
@@ -38,38 +26,23 @@ export const LanguageSelector = () => {
           <Globe className="h-4 w-4" />
           <span className="hidden sm:inline">{currentLanguage.flag}</span>
           <span className="hidden md:inline">{currentLanguage.nativeName}</span>
-          <ProviderIcon className="h-3 w-3 text-purple-600" />
+          <Bot className="h-3 w-3 text-purple-600" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 max-h-80 overflow-y-auto">
-        {/* Translation Provider Selection */}
+        {/* Translation Info */}
         <div className="px-2 py-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">
-          Translation Provider
+          AI-Powered Translation
         </div>
-        {(Object.keys(providerNames) as TranslationProvider[]).map((provider) => {
-          const Icon = providerIcons[provider];
-          return (
-            <DropdownMenuItem
-              key={provider}
-              onClick={() => setTranslationProvider(provider)}
-              className="flex items-center justify-between cursor-pointer"
-            >
-              <div className="flex items-center space-x-3">
-                <Icon className="h-4 w-4" />
-                <span>{providerNames[provider]}</span>
-                {provider === 'chatgpt' && (
-                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
-                    <Zap className="h-3 w-3 mr-1" />
-                    Smart
-                  </Badge>
-                )}
-              </div>
-              {translationProvider === provider && (
-                <Check className="h-4 w-4 text-green-600" />
-              )}
-            </DropdownMenuItem>
-          );
-        })}
+        <div className="px-2 py-1 text-xs text-gray-400 mb-2">
+          <div className="flex items-center space-x-2">
+            <Bot className="h-3 w-3" />
+            <span>Powered by ChatGPT</span>
+            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
+              Smart
+            </Badge>
+          </div>
+        </div>
         
         <DropdownMenuSeparator />
         

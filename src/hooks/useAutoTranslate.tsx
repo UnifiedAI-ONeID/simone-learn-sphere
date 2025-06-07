@@ -1,15 +1,14 @@
 
 import { useEffect, useState } from 'react';
-import { useTranslation, TranslationProvider } from '@/contexts/TranslationContext';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 interface UseAutoTranslateOptions {
   enabled?: boolean;
   targetLanguage?: string;
-  provider?: TranslationProvider;
 }
 
 export const useAutoTranslate = (text: string, options: UseAutoTranslateOptions = {}) => {
-  const { enabled = true, targetLanguage, provider } = options;
+  const { enabled = true, targetLanguage } = options;
   const { translateText, currentLanguage } = useTranslation();
   const [translatedText, setTranslatedText] = useState(text);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +31,7 @@ export const useAutoTranslate = (text: string, options: UseAutoTranslateOptions 
       setError(null);
       
       try {
-        const result = await translateText(text, target, provider);
+        const result = await translateText(text, target);
         setTranslatedText(result);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Translation failed');
@@ -43,7 +42,7 @@ export const useAutoTranslate = (text: string, options: UseAutoTranslateOptions 
     };
 
     translate();
-  }, [text, currentLanguage.code, targetLanguage, translateText, enabled, provider]);
+  }, [text, currentLanguage.code, targetLanguage, translateText, enabled]);
 
   return {
     translatedText,

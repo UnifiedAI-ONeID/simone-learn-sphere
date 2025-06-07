@@ -3,7 +3,6 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const googleTranslateApiKey = Deno.env.get('GOOGLE_TRANSLATE_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, targetLanguage, provider = 'chatgpt' } = await req.json();
+    const { text, targetLanguage } = await req.json();
 
     if (!text || !targetLanguage) {
       return new Response(
@@ -27,7 +26,7 @@ serve(async (req) => {
 
     let translatedText = text;
 
-    if (provider === 'chatgpt' && openAIApiKey) {
+    if (openAIApiKey && targetLanguage !== 'en') {
       // Use ChatGPT for translation
       const languageNames = {
         'zh-CN': 'Simplified Chinese',
@@ -80,46 +79,9 @@ serve(async (req) => {
         const data = await response.json();
         translatedText = data.choices[0].message.content.trim();
       } else {
-        console.warn('ChatGPT translation failed, falling back to Google Translate');
-        // Fallback to Google Translate if available
-        if (googleTranslateApiKey) {
-          const fallbackResponse = await fetch(
-            `https://translation.googleapis.com/language/translate/v2?key=${googleTranslateApiKey}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                q: text,
-                target: targetLanguage,
-                format: 'text'
-              }),
-            }
-          );
-          
-          if (fallbackResponse.ok) {
-            const fallbackData = await fallbackResponse.json();
-            translatedText = fallbackData.data.translations[0].translatedText;
-          }
-        }
-      }
-    } else if (provider === 'google' && googleTranslateApiKey) {
-      // Use Google Translate
-      const response = await fetch(
-        `https://translation.googleapis.com/language/translate/v2?key=${googleTranslateApiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            q: text,
-            target: targetLanguage,
-            format: 'text'
-          }),
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        translatedText = data.data.translations[0].translatedText;
+        console.error('ChatGPT translation failed:', response.status, response.statusText);
+        // Return original text if translation fails
+        translatedText = text;
       }
     }
 
