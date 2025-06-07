@@ -6,10 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, Search, UserCheck, Crown, GraduationCap } from 'lucide-react';
+import { Users, Search, UserCheck, Crown, GraduationCap, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useImpersonation } from '@/hooks/useImpersonation';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface User {
   id: string;
@@ -27,6 +28,7 @@ export const UserManagement = () => {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const { toast } = useToast();
   const { startImpersonation, loading: impersonationLoading } = useImpersonation();
+  const { hasRole } = useUserRole();
 
   const fetchUsers = async () => {
     try {
@@ -51,6 +53,16 @@ export const UserManagement = () => {
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
+      // Additional frontend validation for admin role assignment
+      if (newRole === 'admin' && !hasRole('admin')) {
+        toast({
+          title: "Permission denied",
+          description: "Only administrators can assign admin roles.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update({ role: newRole })
@@ -61,6 +73,18 @@ export const UserManagement = () => {
       setUsers(users.map(user => 
         user.id === userId ? { ...user, role: newRole } : user
       ));
+
+      // Log admin action
+      if (hasRole('admin')) {
+        await supabase.rpc('log_admin_action', {
+          action_type: 'role_assignment',
+          action_details: {
+            target_user_id: userId,
+            new_role: newRole,
+            target_email: users.find(u => u.id === userId)?.email
+          }
+        });
+      }
 
       toast({
         title: "Role updated",
@@ -78,6 +102,18 @@ export const UserManagement = () => {
   const handleImpersonate = async (user: User) => {
     try {
       await startImpersonation(user.id, user.role);
+      
+      // Log admin action
+      if (hasRole('admin')) {
+        await supabase.rpc('log_admin_action', {
+          action_type: 'impersonation_started',
+          action_details: {
+            target_user_id: user.id,
+            target_email: user.email,
+            target_role: user.role
+          }
+        });
+      }
     } catch (error) {
       // Error handling is done in the hook
     }
@@ -105,6 +141,15 @@ export const UserManagement = () => {
     }
   };
 
+  const getAvailableRoles = () => {
+    const baseRoles = ['student', 'educator'];
+    // Only admins can assign admin role
+    if (hasRole('admin')) {
+      return ['student', 'educator', 'admin'];
+    }
+    return baseRoles;
+  };
+
   const filteredUsers = users.filter(user => {
     const matchesSearch = 
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -116,16 +161,40 @@ export const UserManagement = () => {
     return matchesSearch && matchesRole;
   });
 
+  const adminCount = users.filter(u => u.role === 'admin').length;
+
   useEffect(() => {
     fetchUsers();
   }, []);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h2>
-        <p className="text-gray-600 dark:text-gray-300">Manage users, roles, and impersonation</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h2>
+          <p className="text-gray-600 dark:text-gray-300">Manage users, roles, and impersonation</p>
+        </div>
+        {hasRole('admin') && (
+          <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
+            <Shield className="h-4 w-4" />
+            <span>Admin privileges active</span>
+          </div>
+        )}
       </div>
+
+      {hasRole('admin') && (
+        <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+              <Crown className="h-5 w-5" />
+              <div>
+                <p className="font-medium">Administrator Access</p>
+                <p className="text-sm">You have full system access. Current admin count: {adminCount}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Search and Filter */}
       <Card>
@@ -200,6 +269,9 @@ export const UserManagement = () => {
                     <div>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {user.first_name} {user.last_name}
+                        {user.email === 'simon.luke@unswalumni.com' && (
+                          <Crown className="inline h-4 w-4 ml-2 text-yellow-500" title="System Administrator" />
+                        )}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-300">
                         {user.email}
@@ -219,26 +291,31 @@ export const UserManagement = () => {
                       <Select
                         value={user.role}
                         onValueChange={(newRole) => handleRoleChange(user.id, newRole)}
+                        disabled={!hasRole('admin') && newRole === 'admin'}
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="student">Student</SelectItem>
-                          <SelectItem value="educator">Educator</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
+                          {getAvailableRoles().map((role) => (
+                            <SelectItem key={role} value={role}>
+                              {role}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleImpersonate(user)}
-                        disabled={impersonationLoading}
-                      >
-                        <UserCheck className="h-4 w-4 mr-1" />
-                        Impersonate
-                      </Button>
+                      {hasRole('admin') && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleImpersonate(user)}
+                          disabled={impersonationLoading}
+                        >
+                          <UserCheck className="h-4 w-4 mr-1" />
+                          Impersonate
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

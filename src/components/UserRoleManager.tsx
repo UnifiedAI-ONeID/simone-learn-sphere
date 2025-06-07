@@ -8,11 +8,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { TranslatedText } from '@/components/TranslatedText';
-import { User, GraduationCap, Settings } from 'lucide-react';
+import { User, GraduationCap, Settings, Shield } from 'lucide-react';
 
 export const UserRoleManager = () => {
   const { user } = useAuth();
-  const { role: currentRole } = useUserRole();
+  const { role: currentRole, hasRole } = useUserRole();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -31,10 +31,21 @@ export const UserRoleManager = () => {
       icon: User,
       color: 'bg-purple-100 text-purple-800'
     }
+    // Note: Admin role is intentionally excluded from self-assignment
   ];
 
   const handleAddRole = async (newRole: string) => {
     if (!user || !currentRole) return;
+
+    // Prevent admin self-assignment
+    if (newRole === 'admin') {
+      toast({
+        title: "Permission denied",
+        description: "Admin roles can only be assigned by existing administrators.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -108,11 +119,26 @@ export const UserRoleManager = () => {
           <div className="flex flex-wrap gap-2">
             {currentRoles.map((role) => (
               <Badge key={role} variant="secondary" className="capitalize">
+                {role === 'admin' && <Shield className="h-3 w-3 mr-1" />}
                 {role}
               </Badge>
             ))}
           </div>
         </div>
+
+        {hasRole('admin') && (
+          <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                <Shield className="h-4 w-4" />
+                <div>
+                  <p className="text-sm font-medium">Administrator Access</p>
+                  <p className="text-xs">You have full system privileges. Admin roles cannot be self-assigned or removed.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div>
           <h4 className="text-sm font-medium mb-2">
@@ -167,8 +193,14 @@ export const UserRoleManager = () => {
           </div>
         </div>
 
-        <div className="text-xs text-gray-500 mt-4">
-          <TranslatedText text="Note: Adding roles will combine your access levels. You can access features from all your assigned roles." />
+        <div className="text-xs text-gray-500 mt-4 space-y-1">
+          <p><TranslatedText text="Note: Adding roles will combine your access levels. You can access features from all your assigned roles." /></p>
+          {!hasRole('admin') && (
+            <p className="text-amber-600 dark:text-amber-400">
+              <Shield className="h-3 w-3 inline mr-1" />
+              <TranslatedText text="Admin roles can only be assigned by existing administrators for security." />
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

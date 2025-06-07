@@ -628,6 +628,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      is_current_user_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      log_admin_action: {
+        Args: { action_type: string; action_details?: Json }
+        Returns: undefined
+      }
       log_security_event: {
         Args: {
           event_type: string

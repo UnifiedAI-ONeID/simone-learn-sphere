@@ -5,8 +5,9 @@ import { SecurityDashboard } from '@/components/SecurityDashboard';
 import { EnhancedSecurityDashboard } from '@/components/EnhancedSecurityDashboard';
 import { UserManagement } from '@/components/UserManagement';
 import { RealTimeUserActivity } from '@/components/RealTimeUserActivity';
+import { SystemConfiguration } from '@/components/SystemConfiguration';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, Shield, Users, Activity, ShieldCheck } from 'lucide-react';
+import { BarChart3, Shield, Users, Activity, ShieldCheck, Settings } from 'lucide-react';
 import { TranslatedText } from '@/components/TranslatedText';
 
 const AdminDashboard = () => {
@@ -28,10 +29,14 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs defaultValue="metrics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="metrics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               <TranslatedText text="Metrics" />
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <TranslatedText text="Users" />
             </TabsTrigger>
             <TabsTrigger value="security" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
@@ -41,18 +46,22 @@ const AdminDashboard = () => {
               <ShieldCheck className="h-4 w-4" />
               <TranslatedText text="Enhanced Security" />
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <TranslatedText text="Users" />
-            </TabsTrigger>
             <TabsTrigger value="activity" className="flex items-center gap-2">
               <Activity className="h-4 w-4" />
               <TranslatedText text="Activity" />
+            </TabsTrigger>
+            <TabsTrigger value="configuration" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              <TranslatedText text="Configuration" />
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="metrics">
             <MetricsDashboard />
+          </TabsContent>
+
+          <TabsContent value="users">
+            <UserManagement />
           </TabsContent>
 
           <TabsContent value="security">
@@ -63,12 +72,12 @@ const AdminDashboard = () => {
             <EnhancedSecurityDashboard />
           </TabsContent>
 
-          <TabsContent value="users">
-            <UserManagement />
-          </TabsContent>
-
           <TabsContent value="activity">
             <RealTimeUserActivity />
+          </TabsContent>
+
+          <TabsContent value="configuration">
+            <SystemConfiguration />
           </TabsContent>
         </Tabs>
       </div>
