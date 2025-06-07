@@ -27,16 +27,23 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
 
   useEffect(() => {
     const localize = async () => {
-      if (!text) return;
+      if (!text) {
+        setLocalizedText('');
+        return;
+      }
       
       const target = targetLanguage || currentLanguage.code;
+      
+      // Reset to original text first to avoid showing stale translations
+      setLocalizedText(text);
+      setHasError(false);
+      
       if (target === 'en') {
         setLocalizedText(text);
         return;
       }
 
       setIsLoading(true);
-      setHasError(false);
       
       try {
         const result = await localizeText(text, target);

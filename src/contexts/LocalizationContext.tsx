@@ -45,20 +45,16 @@ export const useLocalization = () => {
   return context;
 };
 
-// Detect user's preferred language based on browser locale
 const detectUserLanguage = (): SupportedLanguage => {
   const browserLanguage = navigator.language || navigator.languages?.[0] || 'en';
   
-  // Try exact match first
   let detectedLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code === browserLanguage);
   
-  // If no exact match, try matching the main language code
   if (!detectedLanguage) {
     const mainLanguageCode = browserLanguage.split('-')[0];
     detectedLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code.split('-')[0] === mainLanguageCode);
   }
   
-  // Fallback to English if no match found
   return detectedLanguage || SUPPORTED_LANGUAGES[0];
 };
 
@@ -69,20 +65,17 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [translationError, setTranslationError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load saved language preference or detect from browser
     const savedLanguage = localStorage.getItem('selectedLanguage');
     if (savedLanguage) {
       const language = SUPPORTED_LANGUAGES.find(lang => lang.code === savedLanguage);
       if (language) {
         setCurrentLanguage(language);
       } else {
-        // If saved language is invalid, detect from browser
         const detectedLanguage = detectUserLanguage();
         setCurrentLanguage(detectedLanguage);
         localStorage.setItem('selectedLanguage', detectedLanguage.code);
       }
     } else {
-      // Auto-detect language from browser
       const detectedLanguage = detectUserLanguage();
       setCurrentLanguage(detectedLanguage);
       localStorage.setItem('selectedLanguage', detectedLanguage.code);
@@ -92,8 +85,9 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const setLanguage = (language: SupportedLanguage) => {
     setCurrentLanguage(language);
     localStorage.setItem('selectedLanguage', language.code);
-    // Clear any previous translation errors when language changes
     setTranslationError(null);
+    // Clear cache when language changes to force re-translation
+    setLocalizations({});
   };
 
   const clearTranslationError = () => {
@@ -107,7 +101,7 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!text) return text;
     
     const target = targetLanguage || currentLanguage.code;
-    if (target === 'en') return text; // No localization needed for English
+    if (target === 'en') return text;
 
     const cacheKey = `${text}_${target}`;
     
@@ -138,7 +132,7 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch (error) {
       console.error('Localization error:', error);
       setTranslationError('Failed to translate text');
-      return text; // Return original text if localization fails
+      return text;
     } finally {
       setIsLocalizing(false);
     }
