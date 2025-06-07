@@ -73,33 +73,37 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const language = SUPPORTED_LANGUAGES.find(lang => lang.code === savedLanguage);
       if (language) {
         setCurrentLanguage(language);
+        console.log('LocalizationProvider: Loaded saved language:', language.code);
       } else {
         const detectedLanguage = detectUserLanguage();
         setCurrentLanguage(detectedLanguage);
         localStorage.setItem('selectedLanguage', detectedLanguage.code);
+        console.log('LocalizationProvider: Using detected language:', detectedLanguage.code);
       }
     } else {
       const detectedLanguage = detectUserLanguage();
       setCurrentLanguage(detectedLanguage);
       localStorage.setItem('selectedLanguage', detectedLanguage.code);
+      console.log('LocalizationProvider: Using detected language:', detectedLanguage.code);
     }
   }, []);
 
   const setLanguage = (language: SupportedLanguage) => {
-    console.log('Setting language to:', language.code);
+    console.log('LocalizationProvider: Setting language to:', language.code);
     setCurrentLanguage(language);
     localStorage.setItem('selectedLanguage', language.code);
     setTranslationError(null);
     
-    // Clear all caches and force re-translation
-    setLocalizations({});
-    setTranslationKey(prev => prev + 1);
-    
-    console.log('Language changed, translation key incremented');
+    // Clear all caches and force re-translation with a delay to ensure state updates
+    setTimeout(() => {
+      setLocalizations({});
+      setTranslationKey(prev => prev + 1);
+      console.log('LocalizationProvider: Cache cleared, translation key incremented');
+    }, 100);
   };
 
   const forceRefresh = () => {
-    console.log('Force refreshing translations');
+    console.log('LocalizationProvider: Force refreshing translations');
     setLocalizations({});
     setTranslationKey(prev => prev + 1);
   };
@@ -112,45 +116,50 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     text: string, 
     targetLanguage?: string
   ): Promise<string> => {
-    if (!text) return text;
+    if (!text || !text.trim()) {
+      console.log('LocalizationProvider: Empty text, returning as-is');
+      return text;
+    }
     
     const target = targetLanguage || currentLanguage.code;
-    if (target === 'en') return text;
+    if (target === 'en') {
+      console.log('LocalizationProvider: Target is English, returning original text');
+      return text;
+    }
 
-    const cacheKey = `${text}_${target}`;
+    const cacheKey = `${text.trim()}_${target}_${translationKey}`;
     
     if (localizations[cacheKey]) {
-      console.log('Using cached translation for:', text.substring(0, 30));
+      console.log('LocalizationProvider: Using cached translation for:', text.substring(0, 30));
       return localizations[cacheKey];
     }
 
+    console.log('LocalizationProvider: Starting translation for:', text.substring(0, 30), 'to', target);
     setIsLocalizing(true);
     setTranslationError(null);
     
     try {
-      console.log('Calling localize-text function for:', text.substring(0, 30), 'to', target);
-      
       const { data, error } = await supabase.functions.invoke('localize-text', {
         body: { 
-          text, 
+          text: text.trim(), 
           targetLanguage: target
         }
       });
 
       if (error) {
-        console.error('Translation service error:', error);
+        console.error('LocalizationProvider: Translation service error:', error);
         setTranslationError('Translation service temporarily unavailable');
         return text;
       }
 
       const localizedText = data?.localizedText || text;
-      console.log('Translation result:', localizedText.substring(0, 30));
+      console.log('LocalizationProvider: Translation result:', localizedText.substring(0, 30));
       
-      // Update cache
+      // Update cache with new key including translationKey
       setLocalizations(prev => ({ ...prev, [cacheKey]: localizedText }));
       return localizedText;
     } catch (error) {
-      console.error('Localization error:', error);
+      console.error('LocalizationProvider: Localization error:', error);
       setTranslationError('Failed to translate text');
       return text;
     } finally {

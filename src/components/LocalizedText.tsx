@@ -26,43 +26,60 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+    
     const localize = async () => {
-      if (!text) {
-        setLocalizedText('');
+      if (!text || !text.trim()) {
+        if (isMounted) {
+          setLocalizedText('');
+        }
         return;
       }
       
       const target = targetLanguage || currentLanguage.code;
       
-      console.log('LocalizedText: Translating', text.substring(0, 30), 'to', target);
+      console.log('LocalizedText: Processing text:', text.substring(0, 30), 'to', target);
       
       // Always start with original text
-      setLocalizedText(text);
-      setHasError(false);
+      if (isMounted) {
+        setLocalizedText(text);
+        setHasError(false);
+      }
       
       if (target === 'en') {
-        console.log('Target is English, using original text');
-        setLocalizedText(text);
+        console.log('LocalizedText: Target is English, using original text');
         return;
       }
 
-      setIsLoading(true);
+      if (isMounted) {
+        setIsLoading(true);
+      }
       
       try {
-        const result = await localizeText(text, target);
-        console.log('LocalizedText: Translation completed for', text.substring(0, 30));
-        setLocalizedText(result);
+        const result = await localizeText(text.trim(), target);
+        if (isMounted) {
+          console.log('LocalizedText: Translation completed for:', text.substring(0, 30));
+          setLocalizedText(result);
+        }
       } catch (error) {
-        console.error('LocalizedText: Translation error for', text.substring(0, 30), error);
-        setLocalizedText(text);
-        setHasError(true);
+        console.error('LocalizedText: Translation error for:', text.substring(0, 30), error);
+        if (isMounted) {
+          setLocalizedText(text);
+          setHasError(true);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     localize();
-  }, [text, currentLanguage.code, targetLanguage, translationKey]); // Added translationKey as dependency
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [text, currentLanguage.code, targetLanguage, translationKey, localizeText]);
 
   if (isLoading && showLoadingSpinner) {
     return (
