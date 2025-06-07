@@ -141,7 +141,10 @@ const ProfileSettings = () => {
         <UserRoleManager />
 
         {/* Two-Factor Authentication */}
-        <TwoFactorSetup />
+        <TwoFactorSetup 
+          userEmail={user?.email || ''} 
+          isEnabled={user?.user_metadata?.two_factor_enabled || false}
+        />
 
         {/* Account Actions */}
         <Card>
