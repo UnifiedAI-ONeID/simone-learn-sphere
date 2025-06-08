@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Users, Brain, Trophy, Smartphone } from 'lucide-react';
 import { LocalizedText } from '@/components/LocalizedText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { PlatformButton } from '@/components/platform/PlatformButton';
-import { PlatformCard } from '@/components/platform/PlatformCard';
-import { PlatformLayout } from '@/components/platform/PlatformLayout';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { Badge } from '@/components/ui/badge';
+
+// Lazy load heavy components
+const Haptics = lazy(() => import('@capacitor/haptics').then(m => ({ default: m.Haptics })));
+const PlatformButton = lazy(() => import('@/components/platform/PlatformButton').then(m => ({ default: m.PlatformButton })));
+const PlatformCard = lazy(() => import('@/components/platform/PlatformCard').then(m => ({ default: m.PlatformCard })));
+const PlatformLayout = lazy(() => import('@/components/platform/PlatformLayout').then(m => ({ default: m.PlatformLayout })));
+const ThemeToggle = lazy(() => import('@/components/ThemeToggle').then(m => ({ default: m.ThemeToggle })));
 
 export const MobileIndex = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,10 +32,11 @@ export const MobileIndex = () => {
 
   if (authLoading || roleLoading || user) {
     return (
-      <PlatformLayout className="flex items-center justify-center bg-background text-foreground transition-colors duration-300">
-        {/* Theme Toggle */}
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground transition-colors duration-300">
         <div className="absolute top-4 right-4 z-10">
-          <ThemeToggle />
+          <Suspense fallback={null}>
+            <ThemeToggle />
+          </Suspense>
         </div>
         <div className="text-center space-y-4">
           <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center animate-pulse">
@@ -43,12 +46,14 @@ export const MobileIndex = () => {
             <LocalizedText text="Loading..." />
           </p>
         </div>
-      </PlatformLayout>
+      </div>
     );
   }
 
   const handleGetStarted = async () => {
     try {
+      // Use dynamic import for haptics to avoid blocking
+      const { Haptics, ImpactStyle } = await import('@capacitor/haptics');
       await Haptics.impact({ style: ImpactStyle.Medium });
     } catch (error) {
       // Haptics not available
@@ -138,117 +143,128 @@ export const MobileIndex = () => {
   };
 
   return (
-    <PlatformLayout className="bg-background text-foreground transition-colors duration-300">
-      {/* Theme Toggle */}
-      <div className="absolute top-4 right-4 z-10">
-        <ThemeToggle />
-      </div>
-
-      {/* Hero Section */}
-      <div className="px-4 pt-12 pb-8">
-        <div className="text-center space-y-6">
-          <div className={`flex h-20 w-20 items-center justify-center mx-auto ${getHeroIconStyles()}`}>
-            <Brain className="h-10 w-10 text-primary-foreground" />
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center animate-pulse">
+            <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
-          
-          <div className="space-y-4">
-            <Badge variant="secondary" className={getBadgeStyles()}>
-              <Smartphone className="w-4 h-4 mr-2" />
-              <LocalizedText text={`${platform.charAt(0).toUpperCase() + platform.slice(1)} Learning Platform`} />
-            </Badge>
-            
-            <h1 className={getHeadingStyles()}>
-              <LocalizedText text="Learn & Teach" />
-              <span className="block bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                <LocalizedText text="Anywhere" />
-              </span>
-            </h1>
-            
-            <p className="text-lg text-muted-foreground max-w-sm mx-auto leading-relaxed">
-              <LocalizedText text="Access powerful educational tools designed for your device. Create, learn, and connect with a global community." />
-            </p>
-          </div>
-          
-          <PlatformButton 
-            onClick={handleGetStarted}
-            disabled={isLoading}
-            size="lg" 
-            className="w-full py-4 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            {isLoading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                <span><LocalizedText text="Starting..." /></span>
-              </div>
-            ) : (
-              <LocalizedText text="Start Learning Today" />
-            )}
-          </PlatformButton>
-          
-          <p className="text-sm text-muted-foreground">
-            <LocalizedText text="Free to start • No credit card required" />
-          </p>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
-
-      {/* Features Grid */}
-      <div className="px-4 py-8">
-        <div className="text-center mb-8">
-          <h2 className={getHeadingStyles().replace('text-4xl', 'text-2xl')}>
-            <LocalizedText text="Everything You Need" />
-          </h2>
-          <p className="text-muted-foreground mt-2">
-            <LocalizedText text="Powerful features designed for mobile learning" />
-          </p>
+    }>
+      <PlatformLayout className="bg-background text-foreground transition-colors duration-300">
+        {/* Theme Toggle */}
+        <div className="absolute top-4 right-4 z-10">
+          <ThemeToggle />
         </div>
-        
-        <div className="grid grid-cols-1 gap-4">
-          {features.map((feature, index) => (
-            <PlatformCard key={index} className={`${getFeatureCardStyles()} bg-card border-border`}>
-              <div className="flex items-center space-x-4 p-2">
-                <div className={getFeatureIconStyles()}>
-                  <feature.icon className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <h3 className={`text-foreground ${
-                    platform === 'ios' ? 'text-lg font-medium' : 
-                    platform === 'android' ? 'text-lg font-medium' : 'text-lg font-semibold'
-                  }`}>
-                    <LocalizedText text={feature.title} />
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    <LocalizedText text={feature.description} />
-                  </p>
-                </div>
-              </div>
-            </PlatformCard>
-          ))}
-        </div>
-      </div>
 
-      {/* CTA Section */}
-      <div className="px-4 py-8">
-        <PlatformCard className="bg-gradient-to-r from-primary/10 to-primary/5 border-border">
-          <div className="py-8 text-center">
-            <h3 className={`text-xl text-foreground mb-3 ${
-              platform === 'ios' ? 'font-semibold' : 
-              platform === 'android' ? 'font-medium' : 'font-bold'
-            }`}>
-              <LocalizedText text="Ready to Transform Your Learning?" />
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              <LocalizedText text="Join thousands of learners already using SimoneLabs" />
-            </p>
+        {/* Hero Section */}
+        <div className="px-4 pt-12 pb-8">
+          <div className="text-center space-y-6">
+            <div className={`flex h-20 w-20 items-center justify-center mx-auto ${getHeroIconStyles()}`}>
+              <Brain className="h-10 w-10 text-primary-foreground" />
+            </div>
+            
+            <div className="space-y-4">
+              <Badge variant="secondary" className={getBadgeStyles()}>
+                <Smartphone className="w-4 h-4 mr-2" />
+                <LocalizedText text={`${platform.charAt(0).toUpperCase() + platform.slice(1)} Learning Platform`} />
+              </Badge>
+              
+              <h1 className={getHeadingStyles()}>
+                <LocalizedText text="Learn & Teach" />
+                <span className="block bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                  <LocalizedText text="Anywhere" />
+                </span>
+              </h1>
+              
+              <p className="text-lg text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                <LocalizedText text="Access powerful educational tools designed for your device. Create, learn, and connect with a global community." />
+              </p>
+            </div>
+            
             <PlatformButton 
               onClick={handleGetStarted}
               disabled={isLoading}
-              className="px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90"
+              size="lg" 
+              className="w-full py-4 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              <LocalizedText text="Get Started Free" />
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                  <span><LocalizedText text="Starting..." /></span>
+                </div>
+              ) : (
+                <LocalizedText text="Start Learning Today" />
+              )}
             </PlatformButton>
+            
+            <p className="text-sm text-muted-foreground">
+              <LocalizedText text="Free to start • No credit card required" />
+            </p>
           </div>
-        </PlatformCard>
-      </div>
-    </PlatformLayout>
+        </div>
+
+        {/* Features Grid */}
+        <div className="px-4 py-8">
+          <div className="text-center mb-8">
+            <h2 className={getHeadingStyles().replace('text-4xl', 'text-2xl')}>
+              <LocalizedText text="Everything You Need" />
+            </h2>
+            <p className="text-muted-foreground mt-2">
+              <LocalizedText text="Powerful features designed for mobile learning" />
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-4">
+            {features.map((feature, index) => (
+              <PlatformCard key={index} className={`${getFeatureCardStyles()} bg-card border-border`}>
+                <div className="flex items-center space-x-4 p-2">
+                  <div className={getFeatureIconStyles()}>
+                    <feature.icon className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-foreground ${
+                      platform === 'ios' ? 'text-lg font-medium' : 
+                      platform === 'android' ? 'text-lg font-medium' : 'text-lg font-semibold'
+                    }`}>
+                      <LocalizedText text={feature.title} />
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      <LocalizedText text={feature.description} />
+                    </p>
+                  </div>
+                </div>
+              </PlatformCard>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="px-4 py-8">
+          <PlatformCard className="bg-gradient-to-r from-primary/10 to-primary/5 border-border">
+            <div className="py-8 text-center">
+              <h3 className={`text-xl text-foreground mb-3 ${
+                platform === 'ios' ? 'font-semibold' : 
+                platform === 'android' ? 'font-medium' : 'font-bold'
+              }`}>
+                <LocalizedText text="Ready to Transform Your Learning?" />
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                <LocalizedText text="Join thousands of learners already using SimoneLabs" />
+              </p>
+              <PlatformButton 
+                onClick={handleGetStarted}
+                disabled={isLoading}
+                className="px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <LocalizedText text="Get Started Free" />
+              </PlatformButton>
+            </div>
+          </PlatformCard>
+        </div>
+      </PlatformLayout>
+    </Suspense>
   );
 };
