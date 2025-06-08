@@ -142,12 +142,12 @@ const Index = () => {
             </div>
           }>
             <PlatformOverview 
-              totalUsers={50000}
-              activeCourses={1200}
-              completionRate={85}
-              aiUsage={95}
-              userEngagement={92}
-              securityScore={98}
+              totalUsers={0}
+              activeCourses={0}
+              completionRate={0}
+              aiUsage={0}
+              userEngagement={0}
+              securityScore={100}
             />
           </Suspense>
         </div>

@@ -4,22 +4,123 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { BarChart3, TrendingUp, Users, Activity, Server, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  Users, 
+  Server, 
+  Activity, 
+  Shield, 
+  BarChart3, 
+  Settings, 
+  Download, 
+  Brain, 
+  Flag, 
+  RefreshCw, 
+  MessageSquare, 
+  FileText,
+  AlertTriangle,
+  CheckCircle,
+  DollarSign,
+  TrendingUp
+} from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
+import { useAdminDashboardData } from '@/hooks/useDashboardData';
 
 export const AdminDashboardContent = () => {
-  const adminAnalytics = {
-    totalUsers: 12457,
-    activeUsers: 8923,
-    totalCourses: 156,
-    systemHealth: 98,
-    securityAlerts: 2,
-    pendingApprovals: 5
-  };
+  const { data: adminData, loading, error, refetch } = useAdminDashboardData();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          <UnifiedLocalizedText text="Failed to load admin data. Please try again." />
+          <Button variant="outline" size="sm" onClick={refetch} className="ml-2">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="Retry" />
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!adminData) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4">
+              <Users className="h-16 w-16 text-blue-600" />
+            </div>
+            <CardTitle className="text-2xl">
+              <UnifiedLocalizedText text="Welcome to Admin Dashboard" />
+            </CardTitle>
+            <CardDescription className="text-lg">
+              <UnifiedLocalizedText text="Start managing your platform by adding users and courses" />
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-muted-foreground">
+              <UnifiedLocalizedText text="Your platform is ready to go! Invite educators and students to get started." />
+            </p>
+            <div className="flex justify-center space-x-4">
+              <Button>
+                <Users className="h-4 w-4 mr-2" />
+                <UnifiedLocalizedText text="Invite Users" />
+              </Button>
+              <Button variant="outline">
+                <Settings className="h-4 w-4 mr-2" />
+                <UnifiedLocalizedText text="Platform Settings" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Analytics Overview */}
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">
+            <UnifiedLocalizedText text="Admin Dashboard" />
+          </h1>
+          <p className="text-muted-foreground">
+            <UnifiedLocalizedText text="Manage and monitor your platform" />
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={refetch}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="Refresh" />
+          </Button>
+          <Button>
+            <Download className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="Export Data" />
+          </Button>
+        </div>
+      </div>
+
+      {/* System Status Alert */}
+      <Alert>
+        <Server className="h-4 w-4" />
+        <AlertDescription>
+          <UnifiedLocalizedText text="All systems operational. Platform is running smoothly." />
+        </AlertDescription>
+      </Alert>
+
+      {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -29,9 +130,9 @@ export const AdminDashboardContent = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{adminAnalytics.totalUsers.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{adminData.totalUsers.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+12%</span> <UnifiedLocalizedText text="from last month" />
+              <span className="text-green-600">Active users</span>
             </p>
           </CardContent>
         </Card>
@@ -44,9 +145,9 @@ export const AdminDashboardContent = () => {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{adminAnalytics.activeUsers.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{adminData.activeUsers.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+8%</span> <UnifiedLocalizedText text="from last week" />
+              <UnifiedLocalizedText text="Currently online" />
             </p>
           </CardContent>
         </Card>
@@ -54,17 +155,14 @@ export const AdminDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="System Health" />
+              <UnifiedLocalizedText text="Total Courses" />
             </CardTitle>
-            <Server className="h-4 w-4 text-muted-foreground" />
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{adminAnalytics.systemHealth}%</div>
+            <div className="text-2xl font-bold">{adminData.totalCourses.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">
-                <CheckCircle className="h-3 w-3 inline mr-1" />
-                <UnifiedLocalizedText text="All systems operational" />
-              </span>
+              <UnifiedLocalizedText text="Published courses" />
             </p>
           </CardContent>
         </Card>
@@ -72,46 +170,67 @@ export const AdminDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Security Alerts" />
+              <UnifiedLocalizedText text="Platform Revenue" />
             </CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{adminAnalytics.securityAlerts}</div>
+            <div className="text-2xl font-bold">${adminData.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-orange-600">
-                <AlertTriangle className="h-3 w-3 inline mr-1" />
-                <UnifiedLocalizedText text="Requires attention" />
-              </span>
+              <UnifiedLocalizedText text="Total revenue" />
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Actions */}
+      {/* User Distribution */}
       <Card>
         <CardHeader>
           <CardTitle>
-            <UnifiedLocalizedText text="Quick Actions" />
+            <UnifiedLocalizedText text="User Distribution by Role" />
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Frequently used administrative tasks" />
+            <UnifiedLocalizedText text="Breakdown of users by their roles" />
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button className="h-20 flex-col gap-2">
-              <Users className="h-6 w-6" />
-              <UnifiedLocalizedText text="Manage Users" />
-            </Button>
-            <Button className="h-20 flex-col gap-2" variant="outline">
-              <BarChart3 className="h-6 w-6" />
-              <UnifiedLocalizedText text="View Analytics" />
-            </Button>
-            <Button className="h-20 flex-col gap-2" variant="outline">
-              <Shield className="h-6 w-6" />
-              <UnifiedLocalizedText text="Security Center" />
-            </Button>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="font-medium">
+                <UnifiedLocalizedText text="Students" />
+              </span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-muted-foreground">{adminData.usersByRole.students}</span>
+                <Progress 
+                  value={(adminData.usersByRole.students / adminData.totalUsers) * 100} 
+                  className="w-24" 
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-medium">
+                <UnifiedLocalizedText text="Educators" />
+              </span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-muted-foreground">{adminData.usersByRole.educators}</span>
+                <Progress 
+                  value={(adminData.usersByRole.educators / adminData.totalUsers) * 100} 
+                  className="w-24" 
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-medium">
+                <UnifiedLocalizedText text="Admins" />
+              </span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-muted-foreground">{adminData.usersByRole.admins}</span>
+                <Progress 
+                  value={(adminData.usersByRole.admins / adminData.totalUsers) * 100} 
+                  className="w-24" 
+                />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -120,41 +239,65 @@ export const AdminDashboardContent = () => {
       <Card>
         <CardHeader>
           <CardTitle>
-            <UnifiedLocalizedText text="Recent Activity" />
+            <UnifiedLocalizedText text="Recent Platform Activity" />
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Latest platform activities and events" />
+            <UnifiedLocalizedText text="Latest events and system updates" />
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {adminData.recentActivities.length === 0 ? (
+            <div className="text-center py-8">
+              <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">
+                <UnifiedLocalizedText text="No recent activity to display. Activity will appear here as users interact with the platform." />
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {adminData.recentActivities.map((activity, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-2 h-2 rounded-full bg-blue-500`}></div>
+                    <span className="text-sm">
+                      <UnifiedLocalizedText text={activity.message} />
+                    </span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{activity.time}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* System Metrics */}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <UnifiedLocalizedText text="System Health" />
+          </CardTitle>
+          <CardDescription>
+            <UnifiedLocalizedText text="Real-time system performance metrics" />
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm">
-                  <UnifiedLocalizedText text="New user registered" />
-                </span>
+            {adminData.systemMetrics.map((metric, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-3 h-3 rounded-full ${
+                    metric.status === 'healthy' ? 'bg-green-500' : 
+                    metric.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
+                  }`}></div>
+                  <span className="font-medium">{metric.name}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-muted-foreground">{metric.value}%</span>
+                  <Progress value={metric.value} className="w-24" />
+                </div>
               </div>
-              <span className="text-xs text-muted-foreground">2 minutes ago</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm">
-                  <UnifiedLocalizedText text="Course updated" />
-                </span>
-              </div>
-              <span className="text-xs text-muted-foreground">15 minutes ago</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                <span className="text-sm">
-                  <UnifiedLocalizedText text="Security alert resolved" />
-                </span>
-              </div>
-              <span className="text-xs text-muted-foreground">1 hour ago</span>
-            </div>
+            ))}
           </div>
         </CardContent>
       </Card>

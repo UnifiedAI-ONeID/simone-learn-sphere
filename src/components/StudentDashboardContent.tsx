@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   BookOpen, 
   TrendingUp, 
@@ -23,23 +24,43 @@ import {
   MessageSquare,
   Brain,
   PlusCircle,
-  Sparkles
+  Sparkles,
+  Play,
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
+import { useStudentDashboardData } from '@/hooks/useDashboardData';
 
 export const StudentDashboardContent = () => {
   const navigate = useNavigate();
-  
-  // Simulate checking if user has any data - in real app this would come from props/hooks
-  const hasAnyActivity = false; // This should be determined by actual user data
-  const totalXP = 0;
-  const currentStreak = 0;
-  const totalLessonsCompleted = 0;
-  const averageQuizScore = 0;
-  const enrolledCourses = [];
+  const { data: studentData, loading, error, refetch } = useStudentDashboardData();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          <UnifiedLocalizedText text="Failed to load your dashboard data. Please try again." />
+          <Button variant="outline" size="sm" onClick={refetch} className="ml-2">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="Retry" />
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   // Show encouraging empty states for new users
-  if (!hasAnyActivity && enrolledCourses.length === 0) {
+  if (!studentData || studentData.enrolledCourses === 0) {
     return (
       <div className="space-y-6">
         {/* Welcome Message */}
@@ -210,18 +231,7 @@ export const StudentDashboardContent = () => {
     );
   }
 
-  // Active user dashboard with data
-  const myLearningData = [
-    { id: 1, title: 'React Fundamentals', progress: 75, totalLessons: 24, completedLessons: 18, nextDeadline: '2 days', status: 'active' },
-    { id: 2, title: 'JavaScript ES6+', progress: 45, totalLessons: 18, completedLessons: 8, nextDeadline: '5 days', status: 'active' },
-    { id: 3, title: 'CSS Grid & Flexbox', progress: 90, totalLessons: 12, completedLessons: 11, nextDeadline: 'Completed', status: 'completed' }
-  ];
-
-  const upcomingDeadlines = [
-    { title: 'React State Management Quiz', course: 'React Fundamentals', dueDate: 'Tomorrow', type: 'quiz', courseId: 1 },
-    { title: 'Portfolio Project Submission', course: 'JavaScript ES6+', dueDate: 'Friday', type: 'project', courseId: 2 }
-  ];
-
+  // Active user dashboard with real data
   return (
     <div className="space-y-6">
       {/* Stats Overview */}
@@ -230,12 +240,12 @@ export const StudentDashboardContent = () => {
               onClick={() => navigate('/student/streak')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Daily Streak" />
+              <UnifiedLocalizedText text="Current Streak" />
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">7 days</div>
+            <div className="text-2xl font-bold text-foreground">{studentData.currentStreak} days</div>
             <p className="text-xs text-muted-foreground">
               <UnifiedLocalizedText text="Keep it going!" />
             </p>
@@ -245,14 +255,14 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Total XP" />
+              <UnifiedLocalizedText text="Total Points" />
             </CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">1,250</div>
+            <div className="text-2xl font-bold text-foreground">{studentData.totalPoints}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Level 5" />
+              <UnifiedLocalizedText text="Learning points earned" />
             </p>
           </CardContent>
         </Card>
@@ -260,14 +270,14 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Courses Active" />
+              <UnifiedLocalizedText text="Enrolled Courses" />
             </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">3</div>
+            <div className="text-2xl font-bold text-foreground">{studentData.enrolledCourses}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="2 in progress" />
+              <UnifiedLocalizedText text="Active courses" />
             </p>
           </CardContent>
         </Card>
@@ -281,52 +291,52 @@ export const StudentDashboardContent = () => {
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">12</div>
+            <div className="text-2xl font-bold text-foreground">{studentData.badges.length}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="3 this week" />
+              <UnifiedLocalizedText text="Achievements unlocked" />
             </p>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* My Courses */}
+        {/* Recent Courses */}
         <Card className="bg-card text-card-foreground">
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <BookOpen className="h-5 w-5" />
-                <UnifiedLocalizedText text="My Courses" />
+                <UnifiedLocalizedText text="Continue Learning" />
               </CardTitle>
               <Button size="sm" onClick={() => navigate('/student/courses')}>
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Browse More
+                <UnifiedLocalizedText text="View All" />
               </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {myLearningData.map((course) => (
+            {studentData.recentCourses.map((course) => (
               <div key={course.id} className="p-4 border border-border rounded-lg bg-background cursor-pointer hover:bg-accent transition-colors"
                    onClick={() => navigate(`/student/course/${course.id}`)}>
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="font-semibold text-foreground">{course.title}</h3>
-                    <Badge variant={course.status === 'completed' ? 'default' : 'secondary'} className="mt-1">
-                      {course.status}
+                    <Badge variant="secondary" className="mt-1">
+                      In Progress
                     </Badge>
                   </div>
                   <Button size="sm" variant="outline">
-                    {course.status === 'completed' ? 'Review' : 'Continue'}
+                    <Play className="h-4 w-4 mr-2" />
+                    Continue
                   </Button>
                 </div>
                 
                 <Progress value={course.progress} className="mb-3" />
                 
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{course.completedLessons}/{course.totalLessons} lessons</span>
+                  <span>{course.progress}% complete</span>
                   <span className="flex items-center">
                     <Clock className="h-3 w-3 mr-1" />
-                    {course.nextDeadline}
+                    {new Date(course.lastAccessed).toLocaleDateString()}
                   </span>
                 </div>
               </div>
@@ -334,40 +344,45 @@ export const StudentDashboardContent = () => {
           </CardContent>
         </Card>
 
-        {/* Upcoming Deadlines */}
+        {/* Achievements */}
         <Card className="bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
-              <Calendar className="h-5 w-5" />
-              <UnifiedLocalizedText text="Upcoming Deadlines" />
+              <Trophy className="h-5 w-5" />
+              <UnifiedLocalizedText text="Recent Achievements" />
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Stay on track with your assignments" />
+              <UnifiedLocalizedText text="Your latest badges and milestones" />
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {upcomingDeadlines.map((deadline, index) => (
-              <div key={index} className="p-3 border border-border rounded-lg bg-background cursor-pointer hover:bg-accent transition-colors"
-                   onClick={() => navigate(`/student/course/${deadline.courseId}/assignments`)}>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-foreground">{deadline.title}</h4>
-                    <p className="text-sm text-muted-foreground">{deadline.course}</p>
-                  </div>
-                  <div className="text-right">
-                    <Badge variant="outline" className="mb-1">
-                      {deadline.type}
-                    </Badge>
-                    <p className="text-sm text-muted-foreground">{deadline.dueDate}</p>
-                  </div>
-                </div>
+          <CardContent>
+            {studentData.badges.length === 0 ? (
+              <div className="text-center py-8">
+                <Trophy className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">
+                  <UnifiedLocalizedText text="Start learning to earn your first badge!" />
+                </p>
               </div>
-            ))}
-            
-            <Button variant="outline" className="w-full" onClick={() => navigate('/student/assignments')}>
-              <Activity className="h-4 w-4 mr-2" />
-              View All Deadlines
-            </Button>
+            ) : (
+              <div className="space-y-4">
+                {studentData.badges.slice(0, 3).map((badge) => (
+                  <div key={badge.id} className="flex items-center space-x-3 p-3 border rounded-lg bg-background">
+                    <div className="text-2xl">{badge.icon}</div>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-foreground">{badge.name}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Earned {new Date(badge.earnedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                
+                <Button variant="outline" className="w-full" onClick={() => navigate('/student/badges')}>
+                  <Award className="h-4 w-4 mr-2" />
+                  View All Badges
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -379,7 +394,7 @@ export const StudentDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Brain className="h-5 w-5" />
-              <UnifiedLocalizedText text="Ask AI Tutor" />
+              <UnifiedLocalizedText text="AI Study Assistant" />
             </CardTitle>
           </CardHeader>
           <CardContent>
