@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bell, Search, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
 export const MobileHeader = () => {
@@ -17,7 +18,7 @@ export const MobileHeader = () => {
             <Menu className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            <LocalizedText text="SimoneLabs" />
+            <UnifiedLocalizedText text="SimoneLabs" />
           </h1>
         </div>
         
