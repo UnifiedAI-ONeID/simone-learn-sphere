@@ -114,7 +114,6 @@ export const PlatformOverview = () => {
 
       {/* Co-Founders Section */}
       <section className="space-y-12">
-        {console.log('PlatformOverview: Rendering Co-Founders section')}
         <div className="text-center space-y-4">
           <h2 className="text-4xl font-bold text-foreground">
             <LocalizedText text="Meet Our Co-Founders" />
