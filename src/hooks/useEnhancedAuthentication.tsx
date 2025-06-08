@@ -12,6 +12,7 @@ import {
   validatePasswordStrength,
   cleanupAuthState,
   shouldSuggestOAuth,
+  getOAuthRedirectUrl,
   AuthResult
 } from '@/utils/enhancedAuthUtils';
 import toast from 'react-hot-toast';
@@ -31,8 +32,8 @@ export const useEnhancedAuthentication = () => {
   const isMobile = useIsMobile();
 
   const getRedirectUrl = useCallback(() => {
-    return `${window.location.origin}/auth/callback`;
-  }, []);
+    return getOAuthRedirectUrl(isMobile);
+  }, [isMobile]);
 
   const navigateBasedOnRole = useCallback((role: string) => {
     const redirectRoute = isMobile 
@@ -206,26 +207,24 @@ export const useEnhancedAuthentication = () => {
       const redirectUrl = getRedirectUrl();
       console.log('Starting OAuth with redirect:', redirectUrl);
 
-      const oauthOperation = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider,
-          options: {
-            redirectTo: redirectUrl,
-            queryParams: {
-              access_type: 'offline',
-              prompt: 'consent',
-            }
+      // Don't use retry for OAuth as it can cause popup issues
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
           }
-        });
+        }
+      });
 
-        if (error) throw error;
-      };
-
-      await withAuthRetry(oauthOperation, 2);
+      if (error) throw error;
       
       // Log OAuth attempt
       await logAuthEvent('oauth_attempt', provider, true);
       
+      // Don't set loading to false here as the redirect will happen
       return { success: true };
     } catch (error: any) {
       console.error('OAuth error:', error);

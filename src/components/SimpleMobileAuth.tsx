@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
+import { useEnhancedAuthentication } from '@/hooks/useEnhancedAuthentication';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { 
   Eye, 
@@ -40,16 +40,16 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
   const {
     isLoading,
     error,
-    setError,
+    clearError,
     signUpWithEmail,
     signInWithEmail,
     signInWithOAuth,
-    storeRoleForAuth
-  } = useEnhancedAuth();
+    authState
+  } = useEnhancedAuthentication();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (error) setError('');
+    if (error) clearError();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +57,6 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
     
     if (activeTab === 'signup') {
       if (!selectedRole) {
-        setError('Please select a role before continuing');
         return;
       }
       const result = await signUpWithEmail(
@@ -67,7 +66,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
         formData.lastName,
         selectedRole
       );
-      if (result.success) {
+      if (result.success && !result.requiresEmailVerification) {
         onSuccess();
       }
     } else {
@@ -81,11 +80,13 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
   const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
     const role = activeTab === 'signup' ? selectedRole : undefined;
     if (activeTab === 'signup' && !selectedRole) {
-      setError('Please select a role before continuing');
       return;
     }
     
-    await signInWithOAuth(provider, role);
+    const result = await signInWithOAuth(provider, role);
+    if (result.success) {
+      // OAuth will redirect, so we don't need to manually call onSuccess
+    }
   };
 
   const roleOptions = [
@@ -125,6 +126,14 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {authState.suggestOAuth && (
+          <Alert>
+            <AlertDescription>
+              <UnifiedLocalizedText text="Try signing in with Google or LinkedIn for a faster experience!" />
+            </AlertDescription>
           </Alert>
         )}
 

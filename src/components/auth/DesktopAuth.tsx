@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { RoleSelector } from './RoleSelector';
-import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
+import { useEnhancedAuthentication } from '@/hooks/useEnhancedAuthentication';
 import { 
   Mail, 
   Lock, 
@@ -40,15 +40,16 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
   const {
     isLoading,
     error,
-    setError,
+    clearError,
     signUpWithEmail,
     signInWithEmail,
-    signInWithOAuth
-  } = useEnhancedAuth();
+    signInWithOAuth,
+    authState
+  } = useEnhancedAuthentication();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (error) setError('');
+    if (error) clearError();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +57,6 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
     
     if (activeTab === 'signup') {
       if (!selectedRole) {
-        setError('Please select a role before continuing');
         return;
       }
       const result = await signUpWithEmail(
@@ -66,7 +66,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
         formData.lastName,
         selectedRole
       );
-      if (result.success) {
+      if (result.success && !result.requiresEmailVerification) {
         onClose();
       }
     } else {
@@ -80,11 +80,13 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
   const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
     const role = activeTab === 'signup' ? selectedRole : undefined;
     if (activeTab === 'signup' && !selectedRole) {
-      setError('Please select a role before continuing');
       return;
     }
     
-    await signInWithOAuth(provider, role);
+    const result = await signInWithOAuth(provider, role);
+    if (result.success) {
+      // OAuth will redirect, so we don't need to manually close
+    }
   };
 
   return (
@@ -105,6 +107,14 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {authState.suggestOAuth && (
+            <Alert>
+              <AlertDescription>
+                <UnifiedLocalizedText text="Try signing in with Google or LinkedIn for a faster experience!" />
+              </AlertDescription>
             </Alert>
           )}
 

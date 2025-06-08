@@ -18,6 +18,8 @@ export const AUTH_ERRORS = {
   USER_ALREADY_REGISTERED: 'user_already_registered',
   NETWORK_ERROR: 'network_error',
   SMTP_ERROR: '535',
+  OAUTH_ERROR: 'oauth_error',
+  REDIRECT_ERROR: 'redirect_error',
 } as const;
 
 export const getRateLimitDelay = (attemptCount: number): number => {
@@ -43,11 +45,31 @@ export const isNetworkError = (error: any): boolean => {
          !navigator.onLine;
 };
 
+export const isOAuthError = (error: any): boolean => {
+  return error?.message?.includes('oauth') ||
+         error?.message?.includes('provider') ||
+         error?.message?.includes('redirect') ||
+         error?.code?.includes('oauth');
+};
+
 export const getEnhancedAuthErrorMessage = (error: any): string => {
   if (!error) return 'An unexpected error occurred';
 
   const errorMessage = error.message?.toLowerCase() || '';
   const errorCode = error.error_code || error.code;
+
+  console.log('Enhanced Auth Error:', { error, errorMessage, errorCode });
+
+  // OAuth specific errors
+  if (isOAuthError(error)) {
+    if (errorMessage.includes('redirect')) {
+      return 'OAuth redirect error. Please check your browser settings and try again.';
+    }
+    if (errorMessage.includes('provider')) {
+      return 'OAuth provider error. Please try again or use email authentication.';
+    }
+    return 'OAuth authentication failed. Please try again or use email sign-in.';
+  }
 
   // Rate limiting errors
   if (isRateLimitError(error)) {
@@ -79,6 +101,10 @@ export const getEnhancedAuthErrorMessage = (error: any): string => {
 
   if (errorMessage.includes('password') && errorMessage.includes('weak')) {
     return 'Password is too weak. Please use at least 8 characters with a mix of letters, numbers, and symbols.';
+  }
+
+  if (errorMessage.includes('popup') || errorMessage.includes('closed')) {
+    return 'Sign-in popup was closed. Please try again and complete the sign-in process.';
   }
 
   return 'Authentication failed. Please try again or use an alternative sign-in method.';
@@ -124,7 +150,8 @@ export const withAuthRetry = async <T>(
         error.status === 401 ||
         error.status === 403 ||
         error.message?.includes('invalid login credentials') ||
-        error.message?.includes('user already registered')
+        error.message?.includes('user already registered') ||
+        isOAuthError(error) // Don't retry OAuth errors
       ) {
         throw error;
       }
@@ -165,8 +192,17 @@ export const cleanupAuthState = () => {
   localStorage.removeItem('pendingUserRole');
   localStorage.removeItem('authAttempts');
   localStorage.removeItem('lastAuthAttempt');
+  
+  // Clear any OAuth state
+  localStorage.removeItem('oauth_state');
+  localStorage.removeItem('oauth_provider');
 };
 
 export const shouldSuggestOAuth = (error: any): boolean => {
   return isRateLimitError(error) || isSMTPError(error) || isNetworkError(error);
+};
+
+export const getOAuthRedirectUrl = (isMobile: boolean = false): string => {
+  const baseUrl = window.location.origin;
+  return isMobile ? `${baseUrl}/auth/callback` : `${baseUrl}/auth/callback`;
 };
