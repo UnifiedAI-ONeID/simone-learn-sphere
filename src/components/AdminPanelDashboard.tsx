@@ -58,6 +58,25 @@ export const AdminPanelDashboard = () => {
         </Card>
       )}
 
+      {/* Platform Growth Encouragement */}
+      {metrics.totalUsers < 100 && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <Users className="h-5 w-5 text-blue-500" />
+              <div>
+                <p className="font-medium text-blue-800">
+                  <LocalizedText text="Growing Platform" />
+                </p>
+                <p className="text-sm text-blue-600">
+                  <LocalizedText text="Your platform is building momentum! Consider promotional strategies to attract more users." />
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
@@ -156,6 +175,13 @@ export const AdminPanelDashboard = () => {
               </span>
               <span className="font-semibold">{metrics.weeklyCompletionRate}%</span>
             </div>
+            {metrics.totalCourses === 0 && (
+              <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <p className="text-sm text-yellow-800">
+                  <LocalizedText text="No courses yet. Encourage educators to create engaging content!" />
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -195,6 +221,35 @@ export const AdminPanelDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Admin Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="h-5 w-5" />
+            <LocalizedText text="System Management" />
+          </CardTitle>
+          <CardDescription>
+            <LocalizedText text="Essential admin tools and maintenance" />
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button variant="outline" className="w-full">
+              <Users className="h-4 w-4 mr-2" />
+              <LocalizedText text="User Management" />
+            </Button>
+            <Button variant="outline" className="w-full">
+              <Server className="h-4 w-4 mr-2" />
+              <LocalizedText text="System Health" />
+            </Button>
+            <Button variant="outline" className="w-full">
+              <Shield className="h-4 w-4 mr-2" />
+              <LocalizedText text="Security Center" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -28,7 +28,13 @@ export const useSecurityMonitor = () => {
 
       // Monitor for suspicious activity
       const userAgent = navigator.userAgent;
-      const clientIP = await getClientIP();
+      let clientIP = 'unknown';
+      
+      try {
+        clientIP = await getClientIP();
+      } catch (error) {
+        console.log('Could not get client IP:', error);
+      }
 
       // Check for unusual browser patterns
       if (userAgent.includes('HeadlessChrome') || userAgent.includes('PhantomJS')) {

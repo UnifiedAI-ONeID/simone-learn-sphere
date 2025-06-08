@@ -2,7 +2,7 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { EnhancedEducatorDashboard } from '@/components/EnhancedEducatorDashboard';
+import { EducatorDashboardContent } from '@/components/EducatorDashboardContent';
 import { CourseCreator } from '@/components/CourseCreator';
 import { AICoursePlanner } from '@/components/AICoursePlanner';
 import { AIContentGenerator } from '@/components/AIContentGenerator';
@@ -33,7 +33,7 @@ const EducatorDashboard = () => {
         </TabsList>
         
         <TabsContent value="dashboard" className="space-y-6">
-          <EnhancedEducatorDashboard />
+          <EducatorDashboardContent />
         </TabsContent>
         
         <TabsContent value="courses" className="space-y-6">

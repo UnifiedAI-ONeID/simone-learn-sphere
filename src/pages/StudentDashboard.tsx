@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { EnhancedStudentDashboard } from '@/components/EnhancedStudentDashboard';
+import { StudentDashboardContent } from '@/components/StudentDashboardContent';
 import { CourseCatalog } from '@/components/CourseCatalog';
 import { AIStudyAssistant } from '@/components/AIStudyAssistant';
 import { useEngagementTracking } from '@/hooks/useEngagementTracking';
@@ -30,7 +30,7 @@ const StudentDashboard = () => {
         </TabsList>
         
         <TabsContent value="dashboard" className="space-y-6">
-          <EnhancedStudentDashboard />
+          <StudentDashboardContent />
         </TabsContent>
         
         <TabsContent value="courses" className="space-y-6">
