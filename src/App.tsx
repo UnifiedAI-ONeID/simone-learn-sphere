@@ -11,13 +11,19 @@ import { SecurityHeadersProvider } from '@/components/security/SecurityHeadersPr
 import { EnhancedSecurityAlert } from '@/components/security/EnhancedSecurityAlert';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { TranslationErrorBoundary } from '@/components/TranslationErrorBoundary';
+import { RoleProtectedRoute } from '@/components/RoleProtectedRoute';
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
+import AuthCallback from '@/pages/AuthCallback';
 import StudentDashboard from '@/pages/StudentDashboard';
 import EducatorDashboard from '@/pages/EducatorDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
 import { MobileIndex } from '@/pages/mobile/MobileIndex';
+import { MobileAuth } from '@/pages/mobile/MobileAuth';
 import { MobileAuthCallback } from '@/pages/mobile/MobileAuthCallback';
+import { MobileStudentDashboard } from '@/pages/student/MobileStudentDashboard';
+import { MobileEducatorDashboard } from '@/pages/educator/MobileEducatorDashboard';
+import { MobileAdminDashboard } from '@/pages/admin/MobileAdminDashboard';
 import { usePlatformDetection } from '@/hooks/usePlatformDetection';
 
 const queryClient = new QueryClient({
@@ -36,6 +42,7 @@ const queryClient = new QueryClient({
 
 function App() {
   const platform = usePlatformDetection();
+  const isMobile = platform === 'ios' || platform === 'android';
 
   return (
     <ErrorBoundary>
@@ -52,12 +59,39 @@ function App() {
                           <Routes>
                             <Route path="/" element={<Index />} />
                             <Route path="/auth" element={<Auth />} />
-                            <Route path="/student-dashboard" element={<StudentDashboard />} />
-                            <Route path="/educator-dashboard" element={<EducatorDashboard />} />
-                            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-                            {(platform === 'ios' || platform === 'android') && (
+                            <Route path="/auth/callback" element={<AuthCallback />} />
+                            
+                            {/* Protected Dashboard Routes */}
+                            <Route 
+                              path="/student-dashboard" 
+                              element={
+                                <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
+                                  {isMobile ? <MobileStudentDashboard /> : <StudentDashboard />}
+                                </RoleProtectedRoute>
+                              } 
+                            />
+                            <Route 
+                              path="/educator-dashboard" 
+                              element={
+                                <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
+                                  {isMobile ? <MobileEducatorDashboard /> : <EducatorDashboard />}
+                                </RoleProtectedRoute>
+                              } 
+                            />
+                            <Route 
+                              path="/admin-dashboard" 
+                              element={
+                                <RoleProtectedRoute allowedRoles={['admin']}>
+                                  {isMobile ? <MobileAdminDashboard /> : <AdminDashboard />}
+                                </RoleProtectedRoute>
+                              } 
+                            />
+                            
+                            {/* Mobile-specific routes */}
+                            {isMobile && (
                               <>
                                 <Route path="/mobile" element={<MobileIndex />} />
+                                <Route path="/mobile/auth" element={<MobileAuth />} />
                                 <Route path="/mobile/auth/callback" element={<MobileAuthCallback />} />
                               </>
                             )}

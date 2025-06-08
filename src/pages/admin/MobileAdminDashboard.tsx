@@ -2,7 +2,8 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Shield, Activity, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Users, Shield, Activity, AlertTriangle, Settings, Database } from 'lucide-react';
 import { useEngagementTracking } from '@/hooks/useEngagementTracking';
 import { useSessionTracking } from '@/hooks/useSessionTracking';
 import { LocalizedText } from '@/components/LocalizedText';
@@ -42,7 +43,7 @@ export const MobileAdminDashboard = () => {
               <Users className="h-4 w-4 text-blue-500" />
               <div>
                 <p className="text-xs text-gray-500">
-                  <LocalizedText text="Active Users" />
+                  <LocalizedText text="Total Users" />
                 </p>
                 <p className="text-lg font-semibold">1,247</p>
               </div>
@@ -53,17 +54,44 @@ export const MobileAdminDashboard = () => {
         <Card>
           <CardContent className="p-3">
             <div className="flex items-center space-x-2">
-              <Shield className="h-4 w-4 text-green-500" />
+              <Activity className="h-4 w-4 text-green-500" />
               <div>
                 <p className="text-xs text-gray-500">
-                  <LocalizedText text="Security Score" />
+                  <LocalizedText text="Active Now" />
                 </p>
-                <p className="text-lg font-semibold">95%</p>
+                <p className="text-lg font-semibold">89</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">
+            <LocalizedText text="Quick Actions" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button className="w-full justify-start" variant="outline">
+            <Users className="h-4 w-4 mr-2" />
+            <LocalizedText text="Manage Users" />
+          </Button>
+          <Button className="w-full justify-start" variant="outline">
+            <Shield className="h-4 w-4 mr-2" />
+            <LocalizedText text="Security Center" />
+          </Button>
+          <Button className="w-full justify-start" variant="outline">
+            <Database className="h-4 w-4 mr-2" />
+            <LocalizedText text="System Health" />
+          </Button>
+          <Button className="w-full justify-start" variant="outline">
+            <Settings className="h-4 w-4 mr-2" />
+            <LocalizedText text="Platform Settings" />
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* System Status */}
       <Card>
@@ -73,23 +101,26 @@ export const MobileAdminDashboard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm">API Status</span>
-            <Badge variant="secondary" className="bg-green-100 text-green-700">
-              <LocalizedText text="Healthy" />
-            </Badge>
+          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div>
+              <p className="font-medium text-sm">API Services</p>
+              <p className="text-xs text-gray-500">All systems operational</p>
+            </div>
+            <Badge variant="secondary" className="bg-green-100 text-green-700">Online</Badge>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Database</span>
-            <Badge variant="secondary" className="bg-green-100 text-green-700">
-              <LocalizedText text="Operational" />
-            </Badge>
+          <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+            <div>
+              <p className="font-medium text-sm">Database</p>
+              <p className="text-xs text-gray-500">High load detected</p>
+            </div>
+            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">Warning</Badge>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm">CDN</span>
-            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
-              <LocalizedText text="Degraded" />
-            </Badge>
+          <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+            <div>
+              <p className="font-medium text-sm">CDN</p>
+              <p className="text-xs text-gray-500">Performance optimal</p>
+            </div>
+            <Badge variant="secondary" className="bg-blue-100 text-blue-700">Optimal</Badge>
           </div>
         </CardContent>
       </Card>

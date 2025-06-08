@@ -45,7 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const validateSessionSecurity = async (userId: string) => {
     try {
-      // Check basic session security without calling non-existent functions
       const sessionCount = parseInt(sessionStorage.getItem('activeSessionCount') || '0');
       
       if (sessionCount > 5) {
@@ -54,17 +53,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           session_count: sessionCount
         }, 'high');
         
-        // Clear excess sessions
         sessionStorage.setItem('activeSessionCount', '1');
         return false;
       }
       
-      // Increment session counter
       sessionStorage.setItem('activeSessionCount', (sessionCount + 1).toString());
       return true;
     } catch (error) {
       console.error('Session security validation failed:', error);
-      return true; // Allow login to proceed
+      return true;
     }
   };
 
@@ -75,10 +72,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const initializeAuth = async () => {
       try {
-        // Clean up any stale auth state first
         cleanupAuthState();
 
-        // Get initial session
         const { data: { session: initialSession }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -94,17 +89,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(initialSession?.user ?? null);
           
           if (initialSession?.user) {
-            // Validate session security
             const isSecure = await validateSessionSecurity(initialSession.user.id);
             
             if (isSecure) {
-              // Log successful session restoration
               await logAuthEvent('session_restored', {
                 user_id: initialSession.user.id,
                 session_fingerprint: generateSessionFingerprint().slice(0, 8)
               }, 'low');
               
-              // Defer profile creation to avoid blocking
               setTimeout(() => {
                 if (mounted) {
                   ensureProfileExists(
@@ -129,7 +121,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
         if (!mounted) return;
@@ -139,11 +130,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
-        // Enhanced logging for auth events
         if (event === 'SIGNED_IN' && newSession?.user) {
           console.log('AuthProvider: User signed in, ensuring profile exists');
           
-          // Validate session security
           const isSecure = await validateSessionSecurity(newSession.user.id);
           
           if (isSecure) {
@@ -154,7 +143,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               session_fingerprint: generateSessionFingerprint().slice(0, 8)
             }, 'low');
             
-            // Defer to prevent potential deadlocks
             setTimeout(() => {
               if (mounted) {
                 ensureProfileExists(
@@ -168,7 +156,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         if (event === 'SIGNED_OUT') {
-          // Clear session counter
           sessionStorage.removeItem('activeSessionCount');
           await logAuthEvent('user_signed_out', {
             timestamp: new Date().toISOString()
@@ -203,7 +190,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const currentUser = user;
       
-      // Log sign out attempt
       if (currentUser) {
         await logAuthEvent('signout_initiated', {
           user_id: currentUser.id,
@@ -211,13 +197,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }, 'low');
       }
       
-      // Clean up auth state first
       cleanupAuthState();
-      
-      // Clear session counter
       sessionStorage.removeItem('activeSessionCount');
       
-      // Sign out from Supabase
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       if (error) {
         console.error('AuthProvider: Sign out error:', error);
@@ -232,11 +214,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }, 'low');
       }
       
-      // Clear local state
       setSession(null);
       setUser(null);
       
-      // Force redirect to landing page
       window.location.href = '/';
     } catch (error) {
       console.error('AuthProvider: Unexpected sign out error:', error);

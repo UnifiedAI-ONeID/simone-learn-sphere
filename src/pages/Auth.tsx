@@ -1,332 +1,207 @@
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Brain, User, GraduationCap, Linkedin, Eye, EyeOff } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { signUpSchema, signInSchema, SignUpFormData, SignInFormData } from '@/schemas/authSchemas';
-import { LocalizedText } from '@/components/LocalizedText';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
-import { handleAuthError, cleanupAuthState } from '@/utils/authUtils';
+import { handleAuthError, cleanupAuthState, validatePasswordStrength } from '@/utils/authUtils';
+import { Brain, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { LocalizedText } from '@/components/LocalizedText';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [userRole, setUserRole] = useState<'student' | 'educator'>('student');
-  const [signInData, setSignInData] = useState<Partial<SignInFormData>>({});
-  const [signUpData, setSignUpData] = useState<Partial<SignUpFormData>>({});
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [showSignInPassword, setShowSignInPassword] = useState(false);
-  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
-  const { toast } = useToast();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [selectedRole, setSelectedRole] = useState('student');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const { role, loading: roleLoading } = useUserRole();
+  const [searchParams] = useSearchParams();
 
-  const validateSignIn = (data: Partial<SignInFormData>): SignInFormData | null => {
-    try {
-      const validated = signInSchema.parse({
-        email: data.email?.trim() || '',
-        password: data.password || ''
-      });
-      setValidationErrors({});
-      return validated;
-    } catch (error: any) {
-      const errors: Record<string, string> = {};
-      error.errors?.forEach((err: any) => {
-        errors[err.path[0]] = err.message;
-      });
-      setValidationErrors(errors);
-      return null;
+  // Check for auth errors from URL params
+  useEffect(() => {
+    const errorFromUrl = searchParams.get('error');
+    if (errorFromUrl) {
+      setError('Authentication failed. Please try again.');
+      toast.error('Authentication failed. Please try again.');
     }
-  };
+  }, [searchParams]);
 
-  const validateSignUp = (data: Partial<SignUpFormData>): SignUpFormData | null => {
-    try {
-      const validated = signUpSchema.parse({
-        email: data.email?.trim() || '',
-        password: data.password || '',
-        firstName: data.firstName?.trim() || '',
-        lastName: data.lastName?.trim() || '',
-        role: userRole
-      });
-      setValidationErrors({});
-      return validated;
-    } catch (error: any) {
-      const errors: Record<string, string> = {};
-      error.errors?.forEach((err: any) => {
-        errors[err.path[0]] = err.message;
-      });
-      setValidationErrors(errors);
-      return null;
+  // Redirect authenticated users
+  useEffect(() => {
+    if (!authLoading && !roleLoading && user && role) {
+      const redirectRoute = getRoleBasedRoute(role, true);
+      navigate(redirectRoute, { replace: true });
     }
-  };
+  }, [user, role, authLoading, roleLoading, navigate]);
 
-  const handleSignIn = async () => {
-    const validated = validateSignIn(signInData);
-    if (!validated) return;
+  // Validate password strength in real-time
+  useEffect(() => {
+    if (password) {
+      const validation = validatePasswordStrength(password);
+      setPasswordErrors(validation.errors);
+    } else {
+      setPasswordErrors([]);
+    }
+  }, [password]);
 
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    console.log('Starting email signin for:', validated.email);
-    
+    setError('');
+
     try {
-      // Clean up any existing auth state
-      cleanupAuthState();
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: validated.email,
-        password: validated.password,
-      });
-
-      console.log('Email signin response:', { data, error });
-
-      if (error) {
-        const errorMessage = handleAuthError(error);
-        toast({
-          title: "Sign in failed",
-          description: errorMessage,
-          variant: "destructive",
-        });
+      // Validate password
+      const passwordValidation = validatePasswordStrength(password);
+      if (!passwordValidation.isValid) {
+        setError('Password does not meet requirements');
+        setIsLoading(false);
         return;
       }
 
-      if (data.user) {
-        console.log('User signed in successfully:', data.user.id);
-        
-        toast({
-          title: "Success",
-          description: "Welcome back!",
-        });
-        
-        // Get user role and redirect
-        try {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', data.user.id)
-            .single();
-          
-          const userRole = profile?.role || 'student';
-          const redirectRoute = getRoleBasedRoute(userRole, true);
-          console.log('Redirecting to:', redirectRoute);
-          navigate(redirectRoute, { replace: true });
-        } catch (error) {
-          console.error('Error getting user role:', error);
-          navigate('/student-dashboard', { replace: true });
-        }
-      }
-    } catch (error: any) {
-      console.error('Signin error:', error);
-      const errorMessage = handleAuthError(error);
-      toast({
-        title: "Sign in failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignUp = async () => {
-    const validated = validateSignUp(signUpData);
-    if (!validated) return;
-
-    setIsLoading(true);
-    console.log('Starting email signup for:', validated.email, 'with role:', validated.role);
-    
-    try {
       // Clean up any existing auth state
       cleanupAuthState();
-      
+
+      // Store role selection for later use
+      localStorage.setItem('pendingUserRole', selectedRole);
+
       const { data, error } = await supabase.auth.signUp({
-        email: validated.email,
-        password: validated.password,
+        email,
+        password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
-            first_name: validated.firstName,
-            last_name: validated.lastName,
-            role: validated.role,
-          },
-        },
+            first_name: firstName,
+            last_name: lastName,
+            role: selectedRole
+          }
+        }
       });
 
-      console.log('Email signup response:', { data, error });
+      if (error) throw error;
 
-      if (error) {
-        const errorMessage = handleAuthError(error);
-        toast({
-          title: "Sign up failed",
-          description: errorMessage,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (data.user) {
-        console.log('User signed up successfully:', data.user.id);
-        
-        // Check if email confirmation is required
-        if (!data.session) {
-          toast({
-            title: "Account created!",
-            description: "Please check your email for a confirmation link before signing in.",
-          });
-          return;
-        }
-        
-        // If logged in immediately, redirect
-        toast({
-          title: "Success",
-          description: "Account created successfully!",
-        });
-        
-        const redirectRoute = getRoleBasedRoute(validated.role, true);
+      if (data.user && !data.session) {
+        toast.success('Check your email for the confirmation link!');
+        setError('Please check your email and click the confirmation link to complete registration.');
+      } else if (data.session) {
+        toast.success('Account created successfully!');
+        const redirectRoute = getRoleBasedRoute(selectedRole, true);
         navigate(redirectRoute, { replace: true });
       }
     } catch (error: any) {
-      console.error('Signup error:', error);
       const errorMessage = handleAuthError(error);
-      toast({
-        title: "Sign up failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    console.log(`Starting ${provider} OAuth signin`);
-    
+    setError('');
+
     try {
       // Clean up any existing auth state
       cleanupAuthState();
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        toast.success('Welcome back!');
+        // Navigation will be handled by the auth context
+      }
+    } catch (error: any) {
+      const errorMessage = handleAuthError(error);
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      cleanupAuthState();
       
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
+      // Store role selection for OAuth flow
+      localStorage.setItem('pendingUserRole', selectedRole);
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           }
-        },
+        }
       });
 
-      if (error) {
-        const errorMessage = handleAuthError(error, provider);
-        toast({
-          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
-          description: errorMessage,
-          variant: "destructive",
-        });
-      }
-      
+      if (error) throw error;
     } catch (error: any) {
-      const errorMessage = handleAuthError(error, provider);
-      toast({
-        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
+      const errorMessage = handleAuthError(error, 'Google');
+      setError(errorMessage);
+      toast.error(errorMessage);
       setIsLoading(false);
     }
   };
 
-  const handleOAuthSignUp = async (provider: 'google' | 'linkedin_oidc') => {
-    setIsLoading(true);
-    console.log(`Starting ${provider} OAuth signup with role:`, userRole);
-    
-    try {
-      // Store the selected role in localStorage to use after OAuth callback
-      localStorage.setItem('pendingUserRole', userRole);
-      console.log('Stored pendingUserRole in localStorage:', userRole);
-      
-      // Clean up any existing auth state
-      cleanupAuthState();
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
-        },
-      });
-
-      if (error) {
-        localStorage.removeItem('pendingUserRole');
-        const errorMessage = handleAuthError(error, provider);
-        toast({
-          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign up failed`,
-          description: errorMessage,
-          variant: "destructive",
-        });
-      }
-      
-    } catch (error: any) {
-      localStorage.removeItem('pendingUserRole');
-      const errorMessage = handleAuthError(error, provider);
-      toast({
-        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign up failed`,
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const roles = [
-    {
-      id: 'student' as const,
-      title: <LocalizedText text="Student" />,
-      description: <LocalizedText text="Learn with personalized AI-powered experiences" />,
-      icon: GraduationCap,
-      color: 'bg-blue-100 text-blue-800 border-blue-200'
-    },
-    {
-      id: 'educator' as const,
-      title: <LocalizedText text="Educator" />,
-      description: <LocalizedText text="Create and monetize educational content" />,
-      icon: User,
-      color: 'bg-purple-100 text-purple-800 border-purple-200'
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="flex justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-blue-600">
-              <Brain className="h-7 w-7 text-white" />
-            </div>
-          </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            <LocalizedText text="Welcome to SimoneLabs" />
-          </h1>
+  // Show loading state while checking auth
+  if (authLoading || roleLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
           <p className="text-gray-600">
-            <LocalizedText text="Your educational AI platform" />
+            <LocalizedText text="Loading..." />
           </p>
         </div>
+      </div>
+    );
+  }
 
-        {/* Auth Forms */}
-        <Card>
-          <Tabs defaultValue="login" className="w-full">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="flex h-12 w-12 items-center justify-center mx-auto mb-4 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600">
+            <Brain className="h-6 w-6 text-white" />
+          </div>
+          <CardTitle className="text-2xl bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <LocalizedText text="Welcome to SimoneLabs" />
+          </CardTitle>
+          <CardDescription>
+            <LocalizedText text="Your AI-powered learning platform" />
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          <Tabs defaultValue="signin" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">
+              <TabsTrigger value="signin">
                 <LocalizedText text="Sign In" />
               </TabsTrigger>
               <TabsTrigger value="signup">
@@ -334,313 +209,217 @@ const Auth = () => {
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="login">
-              <CardHeader>
-                <CardTitle>
-                  <LocalizedText text="Sign In" />
-                </CardTitle>
-                <CardDescription>
-                  <LocalizedText text="Welcome back! Enter your credentials to continue." />
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* OAuth Buttons */}
-                <div className="space-y-3">
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => handleOAuthSignIn('google')}
-                    disabled={isLoading}
-                  >
-                    <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                      <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    <LocalizedText text="Continue with Google" />
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => handleOAuthSignIn('linkedin_oidc')}
-                    disabled={isLoading}
-                  >
-                    <Linkedin className="w-5 h-5 mr-2" />
-                    <LocalizedText text="Continue with LinkedIn" />
-                  </Button>
-                  
+            {error && (
+              <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-md">
+                <AlertCircle className="h-4 w-4 text-red-500" />
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+
+            <TabsContent value="signin" className="space-y-4">
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="space-y-2">
                   <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">
-                        <LocalizedText text="Or continue with email" />
-                      </span>
-                    </div>
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
                   </div>
                 </div>
 
-                {/* Email/Password Form Fields */}
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">
-                    <LocalizedText text="Email" />
-                  </Label>
-                  <Input 
-                    id="login-email" 
-                    type="email" 
-                    placeholder="Enter your email"
-                    value={signInData.email || ''}
-                    onChange={(e) => setSignInData(prev => ({ ...prev, email: e.target.value }))}
-                    disabled={isLoading}
-                    className={validationErrors.email ? 'border-red-500' : ''}
-                  />
-                  {validationErrors.email && (
-                    <p className="text-sm text-red-600">
-                      <LocalizedText text={validationErrors.email} />
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">
-                    <LocalizedText text="Password" />
-                  </Label>
                   <div className="relative">
-                    <Input 
-                      id="login-password" 
-                      type={showSignInPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={signInData.password || ''}
-                      onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
-                      disabled={isLoading}
-                      className={validationErrors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10"
+                      required
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowSignInPassword(!showSignInPassword)}
+                      onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showSignInPassword ? (
+                      {showPassword ? (
                         <EyeOff className="h-4 w-4 text-gray-400" />
                       ) : (
                         <Eye className="h-4 w-4 text-gray-400" />
                       )}
                     </Button>
                   </div>
-                  {validationErrors.password && (
-                    <p className="text-sm text-red-600">
-                      <LocalizedText text={validationErrors.password} />
-                    </p>
-                  )}
                 </div>
-                <Button 
-                  onClick={handleSignIn}
-                  disabled={isLoading}
-                  className="w-full"
-                >
-                  <LocalizedText text={isLoading ? 'Signing in...' : 'Sign In'} />
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <LocalizedText text="Signing in..." />
+                  ) : (
+                    <LocalizedText text="Sign In" />
+                  )}
                 </Button>
-              </CardContent>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      <LocalizedText text="Or continue with" />
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGoogleAuth}
+                  disabled={isLoading}
+                >
+                  <LocalizedText text="Continue with Google" />
+                </Button>
+              </form>
             </TabsContent>
-            
-            <TabsContent value="signup">
-              {/* Role Selection - Only for Sign Up */}
-              <Card className="mb-4">
-                <CardHeader>
-                  <CardTitle className="text-center text-lg">
-                    <LocalizedText text="Select Your Role" />
-                  </CardTitle>
-                  <CardDescription className="text-center">
-                    <LocalizedText text="This will customize your experience" />
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {roles.map((role) => (
-                    <div
-                      key={role.id}
-                      onClick={() => setUserRole(role.id)}
-                      className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                        userRole === role.id 
-                          ? role.color 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <role.icon className="h-5 w-5" />
-                        <div className="flex-1">
-                          <div className="font-medium">{role.title}</div>
-                          <div className="text-sm text-gray-600">{role.description}</div>
-                        </div>
-                        {userRole === role.id && (
-                          <Badge variant="secondary" className="bg-white text-current">
-                            <LocalizedText text="Selected" />
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
 
-              <CardHeader>
-                <CardTitle>
-                  <LocalizedText text="Create Account" />
-                </CardTitle>
-                <CardDescription>
-                  <LocalizedText text="Choose your role and get started with SimoneLabs." />
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* OAuth Buttons */}
-                <div className="space-y-3">
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => handleOAuthSignUp('google')}
-                    disabled={isLoading}
-                  >
-                    <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                      <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    <LocalizedText text="Sign up with Google" />
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => handleOAuthSignUp('linkedin_oidc')}
-                    disabled={isLoading}
-                  >
-                    <Linkedin className="w-5 h-5 mr-2" />
-                    <LocalizedText text="Sign up with LinkedIn" />
-                  </Button>
-                  
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">
-                        <LocalizedText text="Or sign up with email" />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Name, Email, Password Form Fields */}
+            <TabsContent value="signup" className="space-y-4">
+              <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstname">
-                      <LocalizedText text="First Name" />
-                    </Label>
-                    <Input 
-                      id="firstname" 
-                      placeholder="First name"
-                      value={signUpData.firstName || ''}
-                      onChange={(e) => setSignUpData(prev => ({ ...prev, firstName: e.target.value }))}
-                      disabled={isLoading}
-                      className={validationErrors.firstName ? 'border-red-500' : ''}
-                    />
-                    {validationErrors.firstName && (
-                      <p className="text-xs text-red-600">
-                        <LocalizedText text={validationErrors.firstName} />
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastname">
-                      <LocalizedText text="Last Name" />
-                    </Label>
-                    <Input 
-                      id="lastname" 
-                      placeholder="Last name"
-                      value={signUpData.lastName || ''}
-                      onChange={(e) => setSignUpData(prev => ({ ...prev, lastName: e.target.value }))}
-                      disabled={isLoading}
-                      className={validationErrors.lastName ? 'border-red-500' : ''}
-                    />
-                    {validationErrors.lastName && (
-                      <p className="text-xs text-red-600">
-                        <LocalizedText text={validationErrors.lastName} />
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">
-                    <LocalizedText text="Email" />
-                  </Label>
-                  <Input 
-                    id="signup-email" 
-                    type="email" 
-                    placeholder="Enter your email"
-                    value={signUpData.email || ''}
-                    onChange={(e) => setSignUpData(prev => ({ ...prev, email: e.target.value }))}
-                    disabled={isLoading}
-                    className={validationErrors.email ? 'border-red-500' : ''}
-                  />
-                  {validationErrors.email && (
-                    <p className="text-sm text-red-600">
-                      <LocalizedText text={validationErrors.email} />
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">
-                    <LocalizedText text="Password" />
-                  </Label>
                   <div className="relative">
-                    <Input 
-                      id="signup-password" 
-                      type={showSignUpPassword ? "text" : "password"}
-                      placeholder="Create a password"
-                      value={signUpData.password || ''}
-                      onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
-                      disabled={isLoading}
-                      className={validationErrors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="text"
+                      placeholder="First name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="text"
+                      placeholder="Last name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10"
+                      required
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                      onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showSignUpPassword ? (
+                      {showPassword ? (
                         <EyeOff className="h-4 w-4 text-gray-400" />
                       ) : (
                         <Eye className="h-4 w-4 text-gray-400" />
                       )}
                     </Button>
                   </div>
-                  {validationErrors.password && (
-                    <p className="text-sm text-red-600">
-                      <LocalizedText text={validationErrors.password} />
-                    </p>
+                  {passwordErrors.length > 0 && (
+                    <div className="text-xs text-red-600 space-y-1">
+                      {passwordErrors.map((error, index) => (
+                        <div key={index}>• {error}</div>
+                      ))}
+                    </div>
                   )}
-                  <p className="text-xs text-gray-600">
-                    <LocalizedText text="Must be 8+ characters with uppercase, lowercase, and number" />
-                  </p>
                 </div>
-                <Button 
-                  onClick={handleSignUp}
-                  disabled={isLoading}
-                  className="w-full"
-                >
-                  <LocalizedText text={isLoading ? 'Creating account...' : 'Create Account'} />
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    <LocalizedText text="I want to join as:" />
+                  </label>
+                  <div className="flex gap-2">
+                    <Badge 
+                      variant={selectedRole === 'student' ? 'default' : 'outline'}
+                      className="cursor-pointer"
+                      onClick={() => setSelectedRole('student')}
+                    >
+                      <LocalizedText text="Student" />
+                    </Badge>
+                    <Badge 
+                      variant={selectedRole === 'educator' ? 'default' : 'outline'}
+                      className="cursor-pointer"
+                      onClick={() => setSelectedRole('educator')}
+                    >
+                      <LocalizedText text="Educator" />
+                    </Badge>
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isLoading || passwordErrors.length > 0}>
+                  {isLoading ? (
+                    <LocalizedText text="Creating account..." />
+                  ) : (
+                    <LocalizedText text="Create Account" />
+                  )}
                 </Button>
-              </CardContent>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      <LocalizedText text="Or continue with" />
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGoogleAuth}
+                  disabled={isLoading}
+                >
+                  <LocalizedText text="Continue with Google" />
+                </Button>
+              </form>
             </TabsContent>
           </Tabs>
-        </Card>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
