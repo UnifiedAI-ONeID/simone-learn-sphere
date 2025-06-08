@@ -12,255 +12,263 @@ import {
   Star,
   TrendingUp,
   Play,
-  CheckCircle
+  CheckCircle,
+  Calendar,
+  MessageCircle,
+  Users,
+  Zap,
+  Bell,
+  Award
 } from 'lucide-react';
 import { LocalizedText } from '@/components/LocalizedText';
 
 export const StudentDashboardContent = () => {
   // Mock data - in real app, this would come from hooks
-  let enrolledCourses = 2;
-  let completedLessons = 15;
-  let totalLessons = 45;
-  let streakDays = 7;
-  let badges = 3;
+  const enrolledCourses = [
+    { id: 1, title: 'React Fundamentals', progress: 75, nextLesson: 'Props & State', dueDate: '2025-01-15' },
+    { id: 2, title: 'JavaScript Mastery', progress: 45, nextLesson: 'Async/Await', dueDate: '2025-01-18' }
+  ];
+  
+  const dailyStreak = 7;
+  const xpPoints = 2480;
+  const xpToNextLevel = 520;
+  
+  const badges = [
+    { name: 'Quick Learner', icon: '🚀', earned: true },
+    { name: 'Code Master', icon: '💻', earned: true },
+    { name: 'Consistency King', icon: '👑', earned: false, progress: 80 }
+  ];
 
-  const completionRate = (completedLessons / totalLessons) * 100;
+  const upcomingDeadlines = [
+    { type: 'Quiz', title: 'React Components Quiz', course: 'React Fundamentals', due: '2025-01-15' },
+    { type: 'Project', title: 'Todo App Project', course: 'JavaScript Mastery', due: '2025-01-18' }
+  ];
+
+  const announcements = [
+    { title: 'New AI Tutor Features Released!', time: '2 hours ago', type: 'platform' },
+    { title: 'React Cohort Study Session Tomorrow', time: '1 day ago', type: 'cohort' }
+  ];
+
+  const studyGroups = [
+    { name: 'React Study Group', members: 12, lastActivity: '30 min ago' },
+    { name: 'JavaScript Beginners', members: 8, lastActivity: '2 hours ago' }
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Welcome Message for New Students */}
-      {enrolledCourses === 0 && (
-        <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
-          <CardContent className="p-6">
+      {/* Daily Streak & XP Bar */}
+      <Card className="bg-gradient-to-r from-purple-500 to-blue-600 text-white">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-blue-100 rounded-full">
-                <BookOpen className="h-8 w-8 text-blue-600" />
+              <div className="p-3 bg-white/20 rounded-full">
+                <Zap className="h-8 w-8" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-blue-900">
-                  <LocalizedText text="Welcome to Your Learning Journey!" />
-                </h3>
-                <p className="text-blue-700 mt-1">
-                  <LocalizedText text="Start by exploring our course catalog and enrolling in subjects that interest you." />
-                </p>
-                <Button className="mt-3 bg-blue-600 hover:bg-blue-700">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  <LocalizedText text="Browse Courses" />
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Progress Encouragement */}
-      {enrolledCourses > 0 && completionRate < 50 && (
-        <Card className="border-green-200 bg-green-50">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <Target className="h-5 w-5 text-green-600" />
               <div>
-                <p className="font-medium text-green-800">
-                  <LocalizedText text="Keep Going!" />
-                </p>
-                <p className="text-sm text-green-600">
-                  <LocalizedText text="You're making great progress. Stay consistent to reach your learning goals!" />
-                </p>
+                <h3 className="text-2xl font-bold">{dailyStreak} Day Streak!</h3>
+                <p className="text-white/80">Keep it up! You're on fire! 🔥</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            <div className="text-right">
+              <p className="text-3xl font-bold">{xpPoints} XP</p>
+              <div className="flex items-center space-x-2 mt-2">
+                <Progress value={(xpPoints / (xpPoints + xpToNextLevel)) * 100} className="w-32 h-2" />
+                <span className="text-sm">{xpToNextLevel} to next level</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Enrolled Courses" />
-            </CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{enrolledCourses}</div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Active learning paths" />
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Lessons Completed" />
-            </CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{completedLessons}</div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Out of" /> {totalLessons} <LocalizedText text="total" />
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Learning Streak" />
-            </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{streakDays}</div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Days in a row" />
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Badges Earned" />
-            </CardTitle>
-            <Trophy className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{badges}</div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Achievements unlocked" />
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Current Progress */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* My Courses */}
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              <LocalizedText text="Learning Progress" />
+              <BookOpen className="h-5 w-5" />
+              <LocalizedText text="My Courses" />
             </CardTitle>
-            <CardDescription>
-              <LocalizedText text="Your overall completion rate" />
-            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span><LocalizedText text="Overall Progress" /></span>
-                <span>{Math.round(completionRate)}%</span>
+            {enrolledCourses.map((course) => (
+              <div key={course.id} className="p-4 border rounded-lg">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold">{course.title}</h3>
+                    <p className="text-sm text-gray-600">Next: {course.nextLesson}</p>
+                  </div>
+                  <Button size="sm">
+                    <Play className="h-4 w-4 mr-2" />
+                    Continue
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Progress</span>
+                    <span>{course.progress}%</span>
+                  </div>
+                  <Progress value={course.progress} className="h-2" />
+                </div>
               </div>
-              <Progress value={completionRate} className="h-2" />
-            </div>
+            ))}
             
-            {enrolledCourses > 0 ? (
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>React Fundamentals</span>
-                    <span>75%</span>
-                  </div>
-                  <Progress value={75} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>JavaScript Mastery</span>
-                    <span>45%</span>
-                  </div>
-                  <Progress value={45} className="h-2" />
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-4">
-                <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">
-                  <LocalizedText text="No courses enrolled yet" />
-                </p>
-                <Button className="mt-2" variant="outline">
-                  <LocalizedText text="Start Learning" />
-                </Button>
-              </div>
-            )}
+            <Button variant="outline" className="w-full">
+              <BookOpen className="h-4 w-4 mr-2" />
+              Browse More Courses
+            </Button>
           </CardContent>
         </Card>
 
+        {/* AI Tutor Quick Access */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Star className="h-5 w-5" />
-              <LocalizedText text="Recent Activity" />
+              <LocalizedText text="AI Tutor" />
             </CardTitle>
             <CardDescription>
-              <LocalizedText text="Your latest learning milestones" />
+              <LocalizedText text="Get instant help with your lessons" />
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            {completedLessons > 0 ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <div>
-                    <p className="font-medium text-sm">Completed: React Components</p>
-                    <p className="text-xs text-gray-500">2 hours ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                  <Trophy className="h-4 w-4 text-blue-600" />
-                  <div>
-                    <p className="font-medium text-sm">Earned: Quick Learner Badge</p>
-                    <p className="text-xs text-gray-500">Yesterday</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                  <Play className="h-4 w-4 text-purple-600" />
-                  <div>
-                    <p className="font-medium text-sm">Started: JavaScript Arrays</p>
-                    <p className="text-xs text-gray-500">3 days ago</p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Star className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">
-                  <LocalizedText text="No activity yet" />
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  <LocalizedText text="Start a course to see your progress here" />
-                </p>
-              </div>
-            )}
+          <CardContent className="space-y-4">
+            <div className="p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800 mb-2">💡 Quick Help</p>
+              <p className="text-xs text-blue-600">Ask about React concepts, JavaScript syntax, or any lesson topic!</p>
+            </div>
+            <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Ask AI Tutor
+            </Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Motivational Call to Action */}
-      {enrolledCourses === 0 && (
-        <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50">
-          <CardContent className="p-6 text-center">
-            <Trophy className="h-16 w-16 text-purple-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-purple-900 mb-2">
-              <LocalizedText text="Ready to Start Learning?" />
-            </h3>
-            <p className="text-purple-700 mb-4">
-              <LocalizedText text="Join thousands of students already advancing their skills with our AI-powered platform." />
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button className="bg-purple-600 hover:bg-purple-700">
-                <BookOpen className="h-4 w-4 mr-2" />
-                <LocalizedText text="Explore Courses" />
-              </Button>
-              <Button variant="outline">
-                <Star className="h-4 w-4 mr-2" />
-                <LocalizedText text="View Popular Courses" />
-              </Button>
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Upcoming Deadlines */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              <LocalizedText text="Upcoming Deadlines" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {upcomingDeadlines.map((deadline, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-sm">{deadline.title}</p>
+                  <p className="text-xs text-gray-600">{deadline.course}</p>
+                </div>
+                <div className="text-right">
+                  <Badge variant="outline" className="mb-1">
+                    {deadline.type}
+                  </Badge>
+                  <p className="text-xs text-orange-600">{deadline.due}</p>
+                </div>
+              </div>
+            ))}
+            
+            {upcomingDeadlines.length === 0 && (
+              <div className="text-center py-8">
+                <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">No upcoming deadlines</p>
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
+
+        {/* Badges & Achievements */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5" />
+              <LocalizedText text="Badges & Achievements" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {badges.map((badge, index) => (
+              <div key={index} className={`flex items-center justify-between p-3 rounded-lg ${
+                badge.earned ? 'bg-green-50' : 'bg-gray-50'
+              }`}>
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl">{badge.icon}</span>
+                  <div>
+                    <p className="font-medium text-sm">{badge.name}</p>
+                    {!badge.earned && badge.progress && (
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Progress value={badge.progress} className="w-16 h-1" />
+                        <span className="text-xs text-gray-500">{badge.progress}%</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {badge.earned && <CheckCircle className="h-5 w-5 text-green-600" />}
+              </div>
+            ))}
+            
+            <Button variant="outline" className="w-full">
+              <Award className="h-4 w-4 mr-2" />
+              View All Achievements
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Announcements */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              <LocalizedText text="Announcements" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {announcements.map((announcement, index) => (
+              <div key={index} className="p-3 border-l-4 border-blue-500 bg-blue-50">
+                <p className="font-medium text-sm">{announcement.title}</p>
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-xs text-gray-500">{announcement.time}</span>
+                  <Badge variant="secondary" className="text-xs">
+                    {announcement.type}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Study Groups & Forums */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              <LocalizedText text="Study Groups" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {studyGroups.map((group, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-sm">{group.name}</p>
+                  <p className="text-xs text-gray-600">{group.members} members</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-500">{group.lastActivity}</p>
+                  <Button size="sm" variant="outline" className="mt-1">
+                    Join
+                  </Button>
+                </div>
+              </div>
+            ))}
+            
+            <Button variant="outline" className="w-full">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Browse All Forums
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

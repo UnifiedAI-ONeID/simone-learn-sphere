@@ -12,81 +12,82 @@ import {
   BarChart3,
   Star,
   CheckCircle,
-  Clock
+  Clock,
+  DollarSign,
+  FileText,
+  AlertCircle,
+  MessageCircle,
+  Bot,
+  Download
 } from 'lucide-react';
 import { LocalizedText } from '@/components/LocalizedText';
 
 export const EducatorDashboardContent = () => {
-  // Mock data - in real app, this would come from hooks
-  let activeCourses = 1;
-  let totalStudents = 45;
-  let totalLessons = 12;
-  let engagementRate = 78;
+  const myCourses = [
+    { 
+      id: 1, 
+      title: 'React Fundamentals', 
+      status: 'published', 
+      enrollments: 125, 
+      avgQuizScore: 87, 
+      dropOffRate: 12,
+      revenue: 2450 
+    },
+    { 
+      id: 2, 
+      title: 'Advanced JavaScript', 
+      status: 'draft', 
+      enrollments: 0, 
+      avgQuizScore: 0, 
+      dropOffRate: 0,
+      revenue: 0 
+    },
+    { 
+      id: 3, 
+      title: 'Node.js Basics', 
+      status: 'published', 
+      enrollments: 67, 
+      avgQuizScore: 92, 
+      dropOffRate: 8,
+      revenue: 1340 
+    }
+  ];
+
+  const totalRevenue = 3790;
+  const pendingPayouts = 850;
+  const thisMonthEarnings = 1200;
+
+  const inactiveStudents = [
+    { name: 'Alice Johnson', course: 'React Fundamentals', lastSeen: '5 days ago' },
+    { name: 'Bob Smith', course: 'Node.js Basics', lastSeen: '3 days ago' }
+  ];
+
+  const recentSubmissions = [
+    { student: 'Carol Davis', assignment: 'Todo App Project', course: 'React Fundamentals', submitted: '2 hours ago' },
+    { student: 'David Wilson', assignment: 'API Integration', course: 'Node.js Basics', submitted: '1 day ago' }
+  ];
+
+  const aiSuggestions = [
+    { type: 'content', suggestion: 'Add interactive coding exercises to React Hooks lesson' },
+    { type: 'quiz', suggestion: 'Create assessment for JavaScript closures topic' },
+    { type: 'improvement', suggestion: 'Students struggle with async concepts - consider video explanation' }
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Welcome Message for New Educators */}
-      {activeCourses === 0 && (
-        <Card className="border-green-200 bg-gradient-to-r from-green-50 to-blue-50">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-green-100 rounded-full">
-                <BookOpen className="h-8 w-8 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-green-900">
-                  <LocalizedText text="Welcome, Educator!" />
-                </h3>
-                <p className="text-green-700 mt-1">
-                  <LocalizedText text="Start sharing your knowledge by creating your first course. Our AI tools will help you every step of the way." />
-                </p>
-                <div className="flex gap-3 mt-3">
-                  <Button className="bg-green-600 hover:bg-green-700">
-                    <Plus className="h-4 w-4 mr-2" />
-                    <LocalizedText text="Create Course" />
-                  </Button>
-                  <Button variant="outline">
-                    <LocalizedText text="Course Templates" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Encouragement for Growing */}
-      {activeCourses > 0 && totalStudents < 100 && (
-        <Card className="border-blue-200 bg-blue-50">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="font-medium text-blue-800">
-                  <LocalizedText text="Growing Impact!" />
-                </p>
-                <p className="text-sm text-blue-600">
-                  <LocalizedText text="Your courses are gaining traction. Consider creating more content to reach even more students!" />
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Revenue Tracker */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Active Courses" />
+              <LocalizedText text="Total Revenue" />
             </CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeCourses}</div>
+            <div className="text-2xl font-bold">${totalRevenue}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Published and running" />
+              <LocalizedText text="All time earnings" />
             </p>
           </CardContent>
         </Card>
@@ -94,14 +95,14 @@ export const EducatorDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Total Students" />
+              <LocalizedText text="This Month" />
             </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalStudents}</div>
+            <div className="text-2xl font-bold">${thisMonthEarnings}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Across all courses" />
+              <LocalizedText text="+15% from last month" />
             </p>
           </CardContent>
         </Card>
@@ -109,164 +110,191 @@ export const EducatorDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Total Lessons" />
+              <LocalizedText text="Pending Payouts" />
             </CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalLessons}</div>
+            <div className="text-2xl font-bold">${pendingPayouts}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Created content" />
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Engagement Rate" />
-            </CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{engagementRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Student completion rate" />
+              <LocalizedText text="Available next week" />
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Course Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* My Courses */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              <LocalizedText text="Course Performance" />
-            </CardTitle>
-            <CardDescription>
-              <LocalizedText text="Student engagement and progress" />
-            </CardDescription>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                <LocalizedText text="My Courses" />
+              </CardTitle>
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                New Course
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent>
-            {activeCourses > 0 ? (
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>React Fundamentals</span>
-                    <span>92% completion</span>
+          <CardContent className="space-y-4">
+            {myCourses.map((course) => (
+              <div key={course.id} className="p-4 border rounded-lg">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold">{course.title}</h3>
+                    <Badge variant={course.status === 'published' ? 'default' : 'secondary'} className="mt-1">
+                      {course.status}
+                    </Badge>
                   </div>
-                  <Progress value={92} className="h-2" />
-                  <p className="text-xs text-gray-500 mt-1">25 active students</p>
+                  <Button size="sm" variant="outline">
+                    {course.status === 'published' ? 'Manage' : 'Edit'}
+                  </Button>
                 </div>
                 
-                <div className="p-3 bg-green-50 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-800">
-                      <LocalizedText text="Top Performing Course" />
-                    </span>
+                {course.status === 'published' && (
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600">Enrollments</p>
+                      <p className="font-semibold">{course.enrollments}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Avg Quiz Score</p>
+                      <p className="font-semibold">{course.avgQuizScore}%</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Drop-off Rate</p>
+                      <p className="font-semibold">{course.dropOffRate}%</p>
+                    </div>
                   </div>
-                  <p className="text-xs text-green-600 mt-1">
-                    <LocalizedText text="Students love this course! Consider creating advanced content." />
-                  </p>
-                </div>
+                )}
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-2">
-                  <LocalizedText text="No courses created yet" />
-                </p>
-                <p className="text-sm text-gray-500 mb-4">
-                  <LocalizedText text="Create your first course to see performance metrics here" />
-                </p>
-                <Button className="bg-green-600 hover:bg-green-700">
-                  <Plus className="h-4 w-4 mr-2" />
-                  <LocalizedText text="Create Course" />
-                </Button>
-              </div>
-            )}
+            ))}
           </CardContent>
         </Card>
 
+        {/* AI Suggestions Panel */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              <LocalizedText text="Recent Activity" />
+              <Bot className="h-5 w-5" />
+              <LocalizedText text="AI Suggestions" />
             </CardTitle>
             <CardDescription>
-              <LocalizedText text="Latest updates from your courses" />
+              <LocalizedText text="Improve your courses with AI-powered insights" />
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            {activeCourses > 0 ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                  <Users className="h-4 w-4 text-blue-600" />
-                  <div>
-                    <p className="font-medium text-sm">3 new enrollments</p>
-                    <p className="text-xs text-gray-500">React Fundamentals - 2 hours ago</p>
+          <CardContent className="space-y-4">
+            {aiSuggestions.map((suggestion, index) => (
+              <div key={index} className="p-3 bg-blue-50 rounded-lg">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <Badge variant="outline" className="mb-2 text-xs">
+                      {suggestion.type}
+                    </Badge>
+                    <p className="text-sm">{suggestion.suggestion}</p>
                   </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <div>
-                    <p className="font-medium text-sm">Lesson completed by 5 students</p>
-                    <p className="text-xs text-gray-500">JavaScript Basics - Yesterday</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                  <Star className="h-4 w-4 text-purple-600" />
-                  <div>
-                    <p className="font-medium text-sm">New 5-star review received</p>
-                    <p className="text-xs text-gray-500">React Fundamentals - 2 days ago</p>
-                  </div>
+                  <Button size="sm" variant="outline">
+                    Apply
+                  </Button>
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">
-                  <LocalizedText text="No activity yet" />
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  <LocalizedText text="Course activity will appear here once you start teaching" />
-                </p>
-              </div>
-            )}
+            ))}
+            
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1">
+                <FileText className="h-4 w-4 mr-2" />
+                Generate Lesson
+              </Button>
+              <Button variant="outline" className="flex-1">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Create Quiz
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* AI-Powered Course Creation CTA */}
-      <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-purple-100 rounded-full">
-              <TrendingUp className="h-8 w-8 text-purple-600" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-purple-900">
-                <LocalizedText text="AI-Powered Course Creation" />
-              </h3>
-              <p className="text-purple-700 mt-1">
-                <LocalizedText text="Use our advanced AI tools to generate course outlines, create engaging content, and build interactive assessments in minutes." />
-              </p>
-              <div className="flex gap-3 mt-3">
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  <LocalizedText text="Try AI Course Builder" />
-                </Button>
-                <Button variant="outline">
-                  <LocalizedText text="View Templates" />
-                </Button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Student Engagement Panel */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              <LocalizedText text="Student Engagement" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 bg-orange-50 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium text-sm">Inactive Learners</h4>
+                <AlertCircle className="h-4 w-4 text-orange-500" />
+              </div>
+              <div className="space-y-2">
+                {inactiveStudents.map((student, index) => (
+                  <div key={index} className="flex justify-between items-center text-sm">
+                    <div>
+                      <p className="font-medium">{student.name}</p>
+                      <p className="text-gray-600">{student.course}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-orange-600">{student.lastSeen}</p>
+                      <Button size="sm" variant="outline">
+                        Send Message
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            
+            <Button variant="outline" className="w-full">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              View Engagement Heatmap
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Recent Submissions & Reviews */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              <LocalizedText text="Recent Submissions" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {recentSubmissions.map((submission, index) => (
+              <div key={index} className="p-3 bg-green-50 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-medium text-sm">{submission.assignment}</p>
+                    <p className="text-xs text-gray-600">
+                      by {submission.student} • {submission.course}
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">{submission.submitted}</p>
+                  </div>
+                  <Button size="sm">
+                    Review
+                  </Button>
+                </div>
+              </div>
+            ))}
+            
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1">
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Send Announcement
+              </Button>
+              <Button variant="outline" className="flex-1">
+                <Download className="h-4 w-4 mr-2" />
+                Export Data
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
