@@ -80,11 +80,7 @@ function AppRoutes() {
 }
 
 function App() {
-  useOptimizedPerformance({
-    enableLazyLoading: true,
-    enableCodeSplitting: true,
-    enableImageOptimization: true
-  });
+  useOptimizedPerformance('App');
 
   return (
     <ErrorBoundary>
