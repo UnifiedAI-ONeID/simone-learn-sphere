@@ -84,6 +84,7 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [localizations, setLocalizations] = useState<Record<string, string>>({});
   const [translationError, setTranslationError] = useState<string | null>(null);
   const [translationKey, setTranslationKey] = useState(0);
+  const [retryCount, setRetryCount] = useState<Record<string, number>>({});
 
   const setLanguage = useCallback((language: SupportedLanguage) => {
     console.log('LocalizationProvider: Setting language to:', language.code);
@@ -96,9 +97,8 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
     
     setTranslationError(null);
-    
-    // Clear cache and force re-translation immediately
     setLocalizations({});
+    setRetryCount({});
     setTranslationKey(prev => prev + 1);
     console.log('LocalizationProvider: Cache cleared, translation key incremented');
   }, []);
@@ -106,6 +106,7 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const forceRefresh = useCallback(() => {
     console.log('LocalizationProvider: Force refreshing translations');
     setLocalizations({});
+    setRetryCount({});
     setTranslationKey(prev => prev + 1);
   }, []);
 
@@ -135,12 +136,18 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return localizations[cacheKey];
     }
 
+    const currentRetries = retryCount[cacheKey] || 0;
+    if (currentRetries >= 3) {
+      console.warn('LocalizationProvider: Max retries reached for:', text.substring(0, 30));
+      return text;
+    }
+
     console.log('LocalizationProvider: Starting translation for:', text.substring(0, 30), 'to', target);
     setIsLocalizing(true);
     setTranslationError(null);
     
     try {
-      const { data, error } = await supabase.functions.invoke('localize-text', {
+      const { data, error } = await supabase.functions.invoke('translate-text', {
         body: { 
           text: text.trim(), 
           targetLanguage: target
@@ -150,23 +157,37 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (error) {
         console.error('LocalizationProvider: Translation service error:', error);
         setTranslationError('Translation service temporarily unavailable');
+        
+        // Implement exponential backoff
+        const delay = Math.pow(2, currentRetries) * 1000;
+        setTimeout(() => {
+          setRetryCount(prev => ({ ...prev, [cacheKey]: currentRetries + 1 }));
+        }, delay);
+        
         return text;
       }
 
-      const localizedText = data?.localizedText || text;
-      console.log('LocalizationProvider: Translation result:', localizedText.substring(0, 30));
+      const translatedText = data?.translatedText || text;
+      console.log('LocalizationProvider: Translation result:', translatedText.substring(0, 30));
       
-      // Update cache
-      setLocalizations(prev => ({ ...prev, [cacheKey]: localizedText }));
-      return localizedText;
+      setLocalizations(prev => ({ ...prev, [cacheKey]: translatedText }));
+      setRetryCount(prev => ({ ...prev, [cacheKey]: 0 }));
+      return translatedText;
     } catch (error) {
-      console.error('LocalizationProvider: Localization error:', error);
+      console.error('LocalizationProvider: Translation error:', error);
       setTranslationError('Failed to translate text');
+      
+      // Retry with exponential backoff
+      const delay = Math.pow(2, currentRetries) * 1000;
+      setTimeout(() => {
+        setRetryCount(prev => ({ ...prev, [cacheKey]: currentRetries + 1 }));
+      }, delay);
+      
       return text;
     } finally {
       setIsLocalizing(false);
     }
-  }, [currentLanguage.code, localizations]);
+  }, [currentLanguage.code, localizations, retryCount]);
 
   return (
     <LocalizationContext.Provider

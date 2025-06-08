@@ -1,7 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocalization } from '@/contexts/LocalizationContext';
 import { Loader2 } from 'lucide-react';
+import { TranslationErrorBoundary } from '@/components/TranslationErrorBoundary';
 
 interface LocalizedTextProps {
   text: string;
@@ -12,7 +13,7 @@ interface LocalizedTextProps {
   showLoadingSpinner?: boolean;
 }
 
-export const LocalizedText: React.FC<LocalizedTextProps> = ({
+const LocalizedTextContent: React.FC<LocalizedTextProps> = ({
   text,
   targetLanguage,
   className,
@@ -25,61 +26,37 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
+  const translateText = useCallback(async (textToTranslate: string, target: string) => {
+    if (!textToTranslate || !textToTranslate.trim()) {
+      setLocalizedText('');
+      return;
+    }
+    
+    if (target === 'en') {
+      setLocalizedText(textToTranslate);
+      return;
+    }
+
+    setLocalizedText(textToTranslate);
+    setHasError(false);
+    setIsLoading(true);
+    
+    try {
+      const result = await getTranslation(textToTranslate.trim(), target);
+      setLocalizedText(result);
+    } catch (error) {
+      console.error('LocalizedText: Translation error for:', textToTranslate.substring(0, 30), error);
+      setLocalizedText(textToTranslate);
+      setHasError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getTranslation]);
+
   useEffect(() => {
-    let isMounted = true;
-    
-    const localize = async () => {
-      if (!text || !text.trim()) {
-        if (isMounted) {
-          setLocalizedText('');
-        }
-        return;
-      }
-      
-      const target = targetLanguage || currentLanguage.code;
-      
-      console.log('LocalizedText: Processing text:', text.substring(0, 30), 'to', target);
-      
-      // Always start with original text
-      if (isMounted) {
-        setLocalizedText(text);
-        setHasError(false);
-      }
-      
-      if (target === 'en') {
-        console.log('LocalizedText: Target is English, using original text');
-        return;
-      }
-
-      if (isMounted) {
-        setIsLoading(true);
-      }
-      
-      try {
-        const result = await getTranslation(text.trim(), target);
-        if (isMounted) {
-          console.log('LocalizedText: Translation completed for:', text.substring(0, 30));
-          setLocalizedText(result);
-        }
-      } catch (error) {
-        console.error('LocalizedText: Translation error for:', text.substring(0, 30), error);
-        if (isMounted) {
-          setLocalizedText(text);
-          setHasError(true);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    localize();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [text, currentLanguage.code, targetLanguage, translationKey]); // Removed getTranslation from deps
+    const target = targetLanguage || currentLanguage.code;
+    translateText(text, target);
+  }, [text, targetLanguage, currentLanguage.code, translationKey, translateText]);
 
   if (isLoading && showLoadingSpinner) {
     return (
@@ -98,5 +75,13 @@ export const LocalizedText: React.FC<LocalizedTextProps> = ({
     <Component className={className} title={hasError ? 'Translation failed, showing original text' : undefined}>
       {localizedText}
     </Component>
+  );
+};
+
+export const LocalizedText: React.FC<LocalizedTextProps> = (props) => {
+  return (
+    <TranslationErrorBoundary fallback={<span className="text-red-500 text-xs">[Translation Error]</span>}>
+      <LocalizedTextContent {...props} />
+    </TranslationErrorBoundary>
   );
 };

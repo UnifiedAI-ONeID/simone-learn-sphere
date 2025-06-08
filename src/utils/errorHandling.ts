@@ -4,10 +4,16 @@ interface AuthError {
   code?: string;
 }
 
+interface AppError {
+  message: string;
+  code?: string;
+  context?: string;
+  retryable?: boolean;
+}
+
 export const getAuthErrorMessage = (error: any): string => {
   if (!error) return 'An unexpected error occurred';
 
-  // Supabase auth error messages
   const errorMessage = error.message?.toLowerCase() || '';
 
   if (errorMessage.includes('invalid login credentials')) {
@@ -34,8 +40,61 @@ export const getAuthErrorMessage = (error: any): string => {
     return 'Network error. Please check your connection and try again.';
   }
 
-  // Return a generic message for unknown errors to avoid leaking sensitive information
   return 'Unable to complete the request. Please try again later.';
+};
+
+export const getAppErrorMessage = (error: any, context?: string): AppError => {
+  if (!error) return { message: 'An unexpected error occurred', retryable: true };
+
+  const errorMessage = error.message?.toLowerCase() || '';
+  
+  // Network errors
+  if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('connection')) {
+    return {
+      message: 'Network connection issue. Please check your internet and try again.',
+      code: 'NETWORK_ERROR',
+      context,
+      retryable: true
+    };
+  }
+
+  // Database errors
+  if (errorMessage.includes('relation') || errorMessage.includes('column') || errorMessage.includes('table')) {
+    return {
+      message: 'Database error. Our team has been notified.',
+      code: 'DATABASE_ERROR',
+      context,
+      retryable: false
+    };
+  }
+
+  // Translation errors
+  if (context === 'translation') {
+    return {
+      message: 'Translation service temporarily unavailable.',
+      code: 'TRANSLATION_ERROR',
+      context,
+      retryable: true
+    };
+  }
+
+  // Dashboard data errors
+  if (context === 'dashboard') {
+    return {
+      message: 'Unable to load dashboard data. Please refresh the page.',
+      code: 'DASHBOARD_ERROR',
+      context,
+      retryable: true
+    };
+  }
+
+  // Generic error
+  return {
+    message: 'Something went wrong. Please try again.',
+    code: 'GENERIC_ERROR',
+    context,
+    retryable: true
+  };
 };
 
 export const sanitizeInput = (input: string): string => {
@@ -43,6 +102,57 @@ export const sanitizeInput = (input: string): string => {
   
   return input
     .trim()
-    .replace(/[<>\"']/g, '') // Remove potentially dangerous characters
-    .substring(0, 1000); // Limit length
+    .replace(/[<>\"']/g, '')
+    .substring(0, 1000);
+};
+
+export const logError = (error: any, context?: string, additionalData?: any) => {
+  const errorInfo = {
+    message: error?.message || 'Unknown error',
+    stack: error?.stack,
+    context,
+    timestamp: new Date().toISOString(),
+    userAgent: navigator.userAgent,
+    url: window.location.href,
+    additionalData
+  };
+
+  console.error('Application Error:', errorInfo);
+  
+  // In production, send to error tracking service
+  if (process.env.NODE_ENV === 'production') {
+    // TODO: Integrate with error tracking service (Sentry, etc.)
+  }
+};
+
+export const withRetry = async <T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  delay: number = 1000
+): Promise<T> => {
+  let lastError: any;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error: any) {
+      lastError = error;
+      
+      // Don't retry on certain errors
+      if (
+        error.status === 400 ||
+        error.status === 401 ||
+        error.status === 403 ||
+        error.message?.includes('invalid login credentials')
+      ) {
+        throw error;
+      }
+      
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, delay * attempt));
+      }
+    }
+  }
+  
+  throw lastError;
 };

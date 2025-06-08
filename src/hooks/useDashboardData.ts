@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { getAppErrorMessage, logError, withRetry } from '@/utils/errorHandling';
 
 export interface StudentDashboardData {
   enrolledCourses: number;
@@ -73,81 +73,97 @@ export const useStudentDashboardData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
+        setError(null);
         
-        // Fetch enrolled courses
-        const { data: enrollments, error: enrollmentsError } = await supabase
-          .from('course_enrollments')
-          .select(`
-            *,
-            courses (
-              id,
-              title,
-              thumbnail_url
-            )
-          `)
-          .eq('user_id', user.id);
+        const fetchStudentData = async () => {
+          // Fetch enrolled courses
+          const { data: enrollments, error: enrollmentsError } = await supabase
+            .from('course_enrollments')
+            .select(`
+              *,
+              courses (
+                id,
+                title,
+                thumbnail_url
+              )
+            `)
+            .eq('user_id', user.id);
 
-        if (enrollmentsError) throw enrollmentsError;
+          if (enrollmentsError) throw enrollmentsError;
 
-        // Fetch completed lessons
-        const { data: completions, error: completionsError } = await supabase
-          .from('lesson_completions')
-          .select('*')
-          .eq('user_id', user.id);
+          // Fetch completed lessons
+          const { data: completions, error: completionsError } = await supabase
+            .from('lesson_completions')
+            .select('*')
+            .eq('user_id', user.id);
 
-        if (completionsError) throw completionsError;
+          if (completionsError) throw completionsError;
 
-        // Fetch user streak
-        const { data: streak, error: streakError } = await supabase
-          .from('user_streaks')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
+          // Fetch user streak
+          const { data: streak, error: streakError } = await supabase
+            .from('user_streaks')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
 
-        if (streakError && streakError.code !== 'PGRST116') throw streakError;
+          if (streakError && streakError.code !== 'PGRST116') throw streakError;
 
-        // Fetch user badges
-        const { data: userBadges, error: badgesError } = await supabase
-          .from('user_badges')
-          .select(`
-            *,
-            badges (
-              id,
-              name,
-              icon
-            )
-          `)
-          .eq('user_id', user.id);
+          // Fetch user badges
+          const { data: userBadges, error: badgesError } = await supabase
+            .from('user_badges')
+            .select(`
+              *,
+              badges (
+                id,
+                name,
+                icon
+              )
+            `)
+            .eq('user_id', user.id);
 
-        if (badgesError) throw badgesError;
+          if (badgesError) throw badgesError;
+
+          return {
+            enrollments: enrollments || [],
+            completions: completions || [],
+            streak: streak || null,
+            userBadges: userBadges || []
+          };
+        };
+
+        const result = await withRetry(fetchStudentData, 3, 1000);
 
         const dashboardData: StudentDashboardData = {
-          enrolledCourses: enrollments?.length || 0,
-          completedLessons: completions?.length || 0,
-          currentStreak: streak?.current_streak || 0,
-          totalPoints: (completions?.length || 0) * 10, // 10 points per lesson
-          recentCourses: enrollments?.slice(0, 3).map(enrollment => ({
+          enrolledCourses: result.enrollments.length,
+          completedLessons: result.completions.length,
+          currentStreak: result.streak?.current_streak || 0,
+          totalPoints: result.completions.length * 10,
+          recentCourses: result.enrollments.slice(0, 3).map(enrollment => ({
             id: enrollment.courses?.id || '',
             title: enrollment.courses?.title || '',
             progress: enrollment.progress_percentage || 0,
             lastAccessed: enrollment.last_accessed_at || enrollment.enrolled_at
-          })) || [],
-          badges: userBadges?.map(ub => ({
+          })),
+          badges: result.userBadges.map(ub => ({
             id: ub.badges?.id || '',
             name: ub.badges?.name || '',
             icon: ub.badges?.icon || '',
             earnedAt: ub.earned_at
-          })) || []
+          }))
         };
 
         setData(dashboardData);
       } catch (err) {
-        console.error('Error fetching student dashboard data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch data');
+        const errorInfo = getAppErrorMessage(err, 'dashboard');
+        logError(err, 'student_dashboard', { userId: user.id });
+        setError(errorInfo.message);
       } finally {
         setLoading(false);
       }
@@ -156,7 +172,7 @@ export const useStudentDashboardData = () => {
     fetchData();
   }, [user]);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch: () => window.location.reload() };
 };
 
 export const useEducatorDashboardData = () => {
@@ -167,84 +183,94 @@ export const useEducatorDashboardData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
+        setError(null);
 
-        // Fetch educator's courses
-        const { data: courses, error: coursesError } = await supabase
-          .from('courses')
-          .select('*')
-          .eq('educator_id', user.id);
-
-        if (coursesError) throw coursesError;
-
-        // Fetch enrollments for educator's courses
-        const courseIds = courses?.map(course => course.id) || [];
-        let enrollments: any[] = [];
-        let enrollmentProfiles: any[] = [];
-
-        if (courseIds.length > 0) {
-          const { data: enrollmentData, error: enrollmentError } = await supabase
-            .from('course_enrollments')
+        const fetchEducatorData = async () => {
+          // Fetch educator's courses
+          const { data: courses, error: coursesError } = await supabase
+            .from('courses')
             .select('*')
-            .in('course_id', courseIds);
+            .eq('educator_id', user.id);
 
-          if (enrollmentError) throw enrollmentError;
-          enrollments = enrollmentData || [];
+          if (coursesError) throw coursesError;
 
-          // Fetch profiles for enrolled users
-          const userIds = enrollments.map(enrollment => enrollment.user_id);
-          if (userIds.length > 0) {
-            const { data: profileData, error: profileError } = await supabase
-              .from('profiles')
-              .select('id, first_name, last_name')
-              .in('id', userIds);
+          // Fetch enrollments for educator's courses
+          const courseIds = courses?.map(course => course.id) || [];
+          let enrollments: any[] = [];
+          let enrollmentProfiles: any[] = [];
 
-            if (profileError) throw profileError;
-            enrollmentProfiles = profileData || [];
+          if (courseIds.length > 0) {
+            const { data: enrollmentData, error: enrollmentError } = await supabase
+              .from('course_enrollments')
+              .select('*')
+              .in('course_id', courseIds);
+
+            if (enrollmentError) throw enrollmentError;
+            enrollments = enrollmentData || [];
+
+            // Fetch profiles for enrolled users
+            const userIds = enrollments.map(enrollment => enrollment.user_id);
+            if (userIds.length > 0) {
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('id, first_name, last_name')
+                .in('id', userIds);
+
+              if (profileError) throw profileError;
+              enrollmentProfiles = profileData || [];
+            }
           }
-        }
 
-        const totalStudents = enrollments.length;
+          const totalStudents = enrollments.length;
 
-        // Create recent enrollments with proper student names
-        const recentEnrollments = enrollments
-          .slice(0, 10)
-          .map(enrollment => {
-            const profile = enrollmentProfiles.find(p => p.id === enrollment.user_id);
-            const course = courses?.find(c => c.id === enrollment.course_id);
-            
-            return {
-              studentName: profile 
-                ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Anonymous'
-                : 'Anonymous',
-              courseName: course?.title || 'Unknown Course',
-              enrolledAt: enrollment.enrolled_at
-            };
-          });
+          // Create recent enrollments with proper student names
+          const recentEnrollments = enrollments
+            .slice(0, 10)
+            .map(enrollment => {
+              const profile = enrollmentProfiles.find(p => p.id === enrollment.user_id);
+              const course = courses?.find(c => c.id === enrollment.course_id);
+              
+              return {
+                studentName: profile 
+                  ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Anonymous'
+                  : 'Anonymous',
+                courseName: course?.title || 'Unknown Course',
+                enrolledAt: enrollment.enrolled_at
+              };
+            });
 
-        const dashboardData: EducatorDashboardData = {
-          totalCourses: courses?.length || 0,
-          totalStudents,
-          totalRevenue: 0, // Would calculate from pricing and enrollments
-          avgRating: 4.5, // Would calculate from course ratings
-          courses: courses?.map(course => ({
-            id: course.id,
-            title: course.title,
-            students: enrollments.filter(e => e.course_id === course.id).length,
-            revenue: 0, // Would calculate from pricing
-            rating: 4.5, // Would fetch from ratings
-            published: course.is_published
-          })) || [],
-          recentEnrollments
+          const dashboardData: EducatorDashboardData = {
+            totalCourses: courses?.length || 0,
+            totalStudents,
+            totalRevenue: 0, // Would calculate from pricing and enrollments
+            avgRating: 4.5, // Would calculate from course ratings
+            courses: courses?.map(course => ({
+              id: course.id,
+              title: course.title,
+              students: enrollments.filter(e => e.course_id === course.id).length,
+              revenue: 0, // Would calculate from pricing
+              rating: 4.5, // Would fetch from ratings
+              published: course.is_published
+            })) || [],
+            recentEnrollments
+          };
+
+          setData(dashboardData);
         };
 
-        setData(dashboardData);
+        const result = await withRetry(fetchEducatorData, 3, 1000);
+        setData(result);
       } catch (err) {
-        console.error('Error fetching educator dashboard data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch data');
+        const errorInfo = getAppErrorMessage(err, 'dashboard');
+        logError(err, 'educator_dashboard', { userId: user.id });
+        setError(errorInfo.message);
       } finally {
         setLoading(false);
       }
@@ -253,7 +279,7 @@ export const useEducatorDashboardData = () => {
     fetchData();
   }, [user]);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch: () => window.location.reload() };
 };
 
 export const useAdminDashboardData = () => {
@@ -265,59 +291,66 @@ export const useAdminDashboardData = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        setError(null);
 
-        // Fetch user counts by role
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('role');
+        const fetchAdminData = async () => {
+          // Fetch user counts by role
+          const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('role');
 
-        if (profilesError) throw profilesError;
+          if (profilesError) throw profilesError;
 
-        // Fetch total courses
-        const { data: courses, error: coursesError } = await supabase
-          .from('courses')
-          .select('id');
+          // Fetch total courses
+          const { data: courses, error: coursesError } = await supabase
+            .from('courses')
+            .select('id');
 
-        if (coursesError) throw coursesError;
+          if (coursesError) throw coursesError;
 
-        // Fetch recent security events
-        const { data: securityEvents, error: securityError } = await supabase
-          .from('security_audit_log')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(10);
+          // Fetch recent security events
+          const { data: securityEvents, error: securityError } = await supabase
+            .from('security_audit_log')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(10);
 
-        if (securityError) throw securityError;
+          if (securityError) throw securityError;
 
-        const usersByRole = profiles?.reduce((acc, profile) => {
-          acc[profile.role === 'student' ? 'students' : 
-              profile.role === 'educator' ? 'educators' : 'admins']++;
-          return acc;
-        }, { students: 0, educators: 0, admins: 0 }) || { students: 0, educators: 0, admins: 0 };
+          const usersByRole = profiles?.reduce((acc, profile) => {
+            acc[profile.role === 'student' ? 'students' : 
+                profile.role === 'educator' ? 'educators' : 'admins']++;
+            return acc;
+          }, { students: 0, educators: 0, admins: 0 }) || { students: 0, educators: 0, admins: 0 };
 
-        const dashboardData: AdminDashboardData = {
-          totalUsers: profiles?.length || 0,
-          activeUsers: Math.floor((profiles?.length || 0) * 0.7), // Estimate 70% active
-          totalRevenue: 0, // Would calculate from all transactions
-          totalCourses: courses?.length || 0,
-          usersByRole,
-          recentActivities: securityEvents?.map(event => ({
-            type: event.event_type,
-            message: event.event_type.replace(/_/g, ' '),
-            user: event.user_id || 'System',
-            time: event.created_at
-          })) || [],
-          systemMetrics: [
-            { name: 'API Uptime', value: 99.9, status: 'healthy' },
-            { name: 'Database Performance', value: 95, status: 'healthy' },
-            { name: 'CDN Response Time', value: 85, status: 'warning' }
-          ]
+          const dashboardData: AdminDashboardData = {
+            totalUsers: profiles?.length || 0,
+            activeUsers: Math.floor((profiles?.length || 0) * 0.7), // Estimate 70% active
+            totalRevenue: 0, // Would calculate from all transactions
+            totalCourses: courses?.length || 0,
+            usersByRole,
+            recentActivities: securityEvents?.map(event => ({
+              type: event.event_type,
+              message: event.event_type.replace(/_/g, ' '),
+              user: event.user_id || 'System',
+              time: event.created_at
+            })) || [],
+            systemMetrics: [
+              { name: 'API Uptime', value: 99.9, status: 'healthy' },
+              { name: 'Database Performance', value: 95, status: 'healthy' },
+              { name: 'CDN Response Time', value: 85, status: 'warning' }
+            ]
+          };
+
+          setData(dashboardData);
         };
 
-        setData(dashboardData);
+        const result = await withRetry(fetchAdminData, 3, 1000);
+        setData(result);
       } catch (err) {
-        console.error('Error fetching admin dashboard data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch data');
+        const errorInfo = getAppErrorMessage(err, 'dashboard');
+        logError(err, 'admin_dashboard');
+        setError(errorInfo.message);
       } finally {
         setLoading(false);
       }
@@ -326,5 +359,5 @@ export const useAdminDashboardData = () => {
     fetchData();
   }, []);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch: () => window.location.reload() };
 };
