@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LocalizedText } from '@/components/LocalizedText';
 import { PlatformButton } from '@/components/platform/PlatformButton';
 import { PlatformCard } from '@/components/platform/PlatformCard';
+import { PasskeyAuth } from '@/components/PasskeyAuth';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { handleAuthError, cleanupAuthState, validatePasswordStrength } from '@/utils/authUtils';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
@@ -129,6 +129,39 @@ export const SimpleMobileAuth = () => {
       toast.error(errorMessage);
       setIsLoading(false);
     }
+  };
+
+  const handleLinkedInAuth = async () => {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      cleanupAuthState();
+      localStorage.setItem('pendingUserRole', selectedRole);
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'linkedin_oidc',
+        options: {
+          redirectTo: `${window.location.origin}/mobile/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      const errorMessage = handleAuthError(error, 'LinkedIn');
+      setError(errorMessage);
+      toast.error(errorMessage);
+      setIsLoading(false);
+    }
+  };
+
+  const handlePasskeySuccess = () => {
+    toast.success('Authentication successful!');
+    // Navigation will be handled by auth context
   };
 
   return (
@@ -256,6 +289,14 @@ export const SimpleMobileAuth = () => {
           </div>
         )}
 
+        {email && (
+          <PasskeyAuth
+            email={email}
+            onSuccess={handlePasskeySuccess}
+            isSignUp={isSignUp}
+          />
+        )}
+
         <PlatformButton
           type="submit"
           className="w-full"
@@ -281,15 +322,24 @@ export const SimpleMobileAuth = () => {
           </div>
         </div>
 
-        <PlatformButton
-          type="button"
-          variant="secondary"
-          className="w-full"
-          onClick={handleGoogleAuth}
-          disabled={isLoading}
-        >
-          <LocalizedText text="Continue with Google" />
-        </PlatformButton>
+        <div className="grid grid-cols-2 gap-2">
+          <PlatformButton
+            type="button"
+            variant="secondary"
+            onClick={handleGoogleAuth}
+            disabled={isLoading}
+          >
+            <LocalizedText text="Google" />
+          </PlatformButton>
+          <PlatformButton
+            type="button"
+            variant="secondary"
+            onClick={handleLinkedInAuth}
+            disabled={isLoading}
+          >
+            <LocalizedText text="LinkedIn" />
+          </PlatformButton>
+        </div>
 
         <div className="text-center">
           <PlatformButton

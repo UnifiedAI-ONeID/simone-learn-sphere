@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 import { handleAuthError, cleanupAuthState, validatePasswordStrength } from '@/utils/authUtils';
 import { Brain, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { PasskeyAuth } from '@/components/PasskeyAuth';
 import toast from 'react-hot-toast';
 import { LocalizedText } from '@/components/LocalizedText';
 
@@ -25,6 +25,7 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState('signin');
   
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -169,6 +170,39 @@ const Auth = () => {
     }
   };
 
+  const handleLinkedInAuth = async () => {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      cleanupAuthState();
+      localStorage.setItem('pendingUserRole', selectedRole);
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'linkedin_oidc',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      const errorMessage = handleAuthError(error, 'LinkedIn');
+      setError(errorMessage);
+      toast.error(errorMessage);
+      setIsLoading(false);
+    }
+  };
+
+  const handlePasskeySuccess = () => {
+    toast.success('Authentication successful!');
+    // Navigation will be handled by auth context
+  };
+
   // Show loading state while checking auth
   if (authLoading || roleLoading) {
     return (
@@ -199,7 +233,7 @@ const Auth = () => {
         </CardHeader>
         
         <CardContent>
-          <Tabs defaultValue="signin" className="space-y-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">
                 <LocalizedText text="Sign In" />
@@ -267,6 +301,14 @@ const Auth = () => {
                   )}
                 </Button>
 
+                {email && (
+                  <PasskeyAuth
+                    email={email}
+                    onSuccess={handlePasskeySuccess}
+                    isSignUp={false}
+                  />
+                )}
+
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t" />
@@ -278,15 +320,24 @@ const Auth = () => {
                   </div>
                 </div>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleGoogleAuth}
-                  disabled={isLoading}
-                >
-                  <LocalizedText text="Continue with Google" />
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGoogleAuth}
+                    disabled={isLoading}
+                  >
+                    <LocalizedText text="Google" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleLinkedInAuth}
+                    disabled={isLoading}
+                  >
+                    <LocalizedText text="LinkedIn" />
+                  </Button>
+                </div>
               </form>
             </TabsContent>
 
@@ -395,6 +446,14 @@ const Auth = () => {
                   )}
                 </Button>
 
+                {email && (
+                  <PasskeyAuth
+                    email={email}
+                    onSuccess={handlePasskeySuccess}
+                    isSignUp={true}
+                  />
+                )}
+
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t" />
@@ -406,15 +465,24 @@ const Auth = () => {
                   </div>
                 </div>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleGoogleAuth}
-                  disabled={isLoading}
-                >
-                  <LocalizedText text="Continue with Google" />
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGoogleAuth}
+                    disabled={isLoading}
+                  >
+                    <LocalizedText text="Google" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleLinkedInAuth}
+                    disabled={isLoading}
+                  >
+                    <LocalizedText text="LinkedIn" />
+                  </Button>
+                </div>
               </form>
             </TabsContent>
           </Tabs>
