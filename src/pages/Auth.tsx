@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
-import { handleAuthError, cleanupAuthState, validatePasswordStrength } from '@/utils/authUtils';
+import { handleAuthError, cleanupAuthState } from '@/utils/authUtils';
 import { Brain, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { PasskeyAuth } from '@/components/PasskeyAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -25,7 +26,6 @@ const Auth = () => {
   const [selectedRole, setSelectedRole] = useState('student');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('signin');
   
   const navigate = useNavigate();
@@ -50,26 +50,21 @@ const Auth = () => {
     }
   }, [user, role, authLoading, roleLoading, navigate]);
 
-  // Validate password strength in real-time
-  useEffect(() => {
-    if (password) {
-      const validation = validatePasswordStrength(password);
-      setPasswordErrors(validation.errors);
-    } else {
-      setPasswordErrors([]);
-    }
-  }, [password]);
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      // Validate password
-      const passwordValidation = validatePasswordStrength(password);
-      if (!passwordValidation.isValid) {
-        setError('Password does not meet requirements');
+      // Basic validation
+      if (!email || !password || !firstName || !lastName) {
+        setError('Please fill in all required fields');
+        setIsLoading(false);
+        return;
+      }
+
+      if (password.length < 8) {
+        setError('Password must be at least 8 characters long');
         setIsLoading(false);
         return;
       }
@@ -104,6 +99,7 @@ const Auth = () => {
         navigate(redirectRoute, { replace: true });
       }
     } catch (error: any) {
+      console.error('Sign up error:', error);
       const errorMessage = handleAuthError(error);
       setError(errorMessage);
       toast.error(errorMessage);
@@ -118,6 +114,13 @@ const Auth = () => {
     setError('');
 
     try {
+      // Basic validation
+      if (!email || !password) {
+        setError('Please enter both email and password');
+        setIsLoading(false);
+        return;
+      }
+
       // Clean up any existing auth state
       cleanupAuthState();
 
@@ -133,6 +136,7 @@ const Auth = () => {
         // Navigation will be handled by the auth context
       }
     } catch (error: any) {
+      console.error('Sign in error:', error);
       const errorMessage = handleAuthError(error);
       setError(errorMessage);
       toast.error(errorMessage);
@@ -164,6 +168,7 @@ const Auth = () => {
 
       if (error) throw error;
     } catch (error: any) {
+      console.error('Google auth error:', error);
       const errorMessage = handleAuthError(error, 'Google');
       setError(errorMessage);
       toast.error(errorMessage);
@@ -192,6 +197,7 @@ const Auth = () => {
 
       if (error) throw error;
     } catch (error: any) {
+      console.error('LinkedIn auth error:', error);
       const errorMessage = handleAuthError(error, 'LinkedIn');
       setError(errorMessage);
       toast.error(errorMessage);
@@ -395,11 +401,12 @@ const Auth = () => {
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Password"
+                      placeholder="Password (min 8 characters)"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 pr-10 bg-background border-input text-foreground"
                       required
+                      minLength={8}
                     />
                     <Button
                       type="button"
@@ -415,13 +422,6 @@ const Auth = () => {
                       )}
                     </Button>
                   </div>
-                  {passwordErrors.length > 0 && (
-                    <div className="text-xs text-destructive space-y-1">
-                      {passwordErrors.map((error, index) => (
-                        <div key={index}>• {error}</div>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -446,7 +446,7 @@ const Auth = () => {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading || passwordErrors.length > 0}>
+                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
                   {isLoading ? (
                     <LocalizedText text="Creating account..." />
                   ) : (
