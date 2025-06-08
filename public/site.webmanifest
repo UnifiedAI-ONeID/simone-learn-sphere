@@ -1,24 +1,36 @@
 
 {
-  "name": "SimoneLabs",
+  "name": "SimoneLabs Mobile",
   "short_name": "SimoneLabs",
   "description": "AI-powered learning platform for indie educators",
   "icons": [
     {
       "src": "/favicon-light.svg",
-      "sizes": "any",
+      "sizes": "192x192",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "/favicon-dark.svg",
-      "sizes": "any", 
+      "src": "/favicon-light.svg",
+      "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ],
-  "theme_color": "#7C3AED",
-  "background_color": "#ffffff",
+  "start_url": "/",
   "display": "standalone",
-  "start_url": "/"
+  "theme_color": "#7C3AED",
+  "background_color": "#FFFFFF",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["education", "learning", "ai"],
+  "screenshots": [
+    {
+      "src": "/lovable-uploads/7a68d4b0-5778-4fc6-bd9d-8d45d0d83da0.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
 }
