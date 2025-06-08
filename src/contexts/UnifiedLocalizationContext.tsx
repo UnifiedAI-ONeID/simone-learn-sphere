@@ -66,39 +66,68 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
 const detectUserLanguage = (): SupportedLanguage => {
-  const browserLanguage = navigator.language || navigator.languages?.[0] || 'en';
+  // Always default to English first
+  const defaultLanguage = SUPPORTED_LANGUAGES[0]; // English
   
-  let detectedLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code === browserLanguage);
-  
-  if (!detectedLanguage) {
-    const mainLanguageCode = browserLanguage.split('-')[0];
-    detectedLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code.split('-')[0] === mainLanguageCode);
+  try {
+    // Get browser language preferences
+    const browserLanguages = navigator.languages || [navigator.language || 'en'];
+    console.log('UnifiedLocalization: Browser languages detected:', browserLanguages);
+    
+    // Try to find exact match first
+    for (const browserLang of browserLanguages) {
+      const exactMatch = SUPPORTED_LANGUAGES.find(lang => 
+        lang.code.toLowerCase() === browserLang.toLowerCase()
+      );
+      if (exactMatch) {
+        console.log('UnifiedLocalization: Exact language match found:', exactMatch.code);
+        return exactMatch;
+      }
+    }
+    
+    // Try to find language family match (e.g., 'en-US' -> 'en')
+    for (const browserLang of browserLanguages) {
+      const mainLanguageCode = browserLang.split('-')[0].toLowerCase();
+      const familyMatch = SUPPORTED_LANGUAGES.find(lang => 
+        lang.code.split('-')[0].toLowerCase() === mainLanguageCode
+      );
+      if (familyMatch) {
+        console.log('UnifiedLocalization: Language family match found:', familyMatch.code);
+        return familyMatch;
+      }
+    }
+    
+    console.log('UnifiedLocalization: No language match found, using default English');
+    return defaultLanguage;
+  } catch (error) {
+    console.warn('UnifiedLocalization: Error detecting language, using default English:', error);
+    return defaultLanguage;
   }
-  
-  return detectedLanguage || SUPPORTED_LANGUAGES[0];
 };
 
 const getInitialLanguage = (): SupportedLanguage => {
   try {
+    // First check if user has saved a language preference
     const savedLanguage = localStorage.getItem('selectedLanguage');
     if (savedLanguage) {
       const language = SUPPORTED_LANGUAGES.find(lang => lang.code === savedLanguage);
       if (language) {
-        console.log('UnifiedLocalization: Loaded saved language:', language.code);
+        console.log('UnifiedLocalization: Loaded saved language preference:', language.code);
         return language;
       }
     }
   } catch (error) {
-    console.warn('UnifiedLocalization: Error reading from localStorage:', error);
+    console.warn('UnifiedLocalization: Error reading saved language preference:', error);
   }
   
+  // If no saved preference, detect from browser
   const detectedLanguage = detectUserLanguage();
   console.log('UnifiedLocalization: Using detected language:', detectedLanguage.code);
   return detectedLanguage;
 };
 
 export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(getInitialLanguage);
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(() => getInitialLanguage());
   const [translationKey, setTranslationKey] = useState(0);
   const [translationCache, setTranslationCache] = useState<TranslationCache>({});
   const [offlineTranslations, setOfflineTranslations] = useState<OfflineTranslations>({});
@@ -133,6 +162,19 @@ export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }
       }
     }
   }, []);
+
+  // Re-detect language on component mount for dynamic detection
+  useEffect(() => {
+    const detectedLanguage = detectUserLanguage();
+    const savedLanguage = localStorage.getItem('selectedLanguage');
+    
+    // Only update if no saved preference exists and detected language is different
+    if (!savedLanguage && detectedLanguage.code !== currentLanguage.code) {
+      console.log('UnifiedLocalization: Updating to newly detected language:', detectedLanguage.code);
+      setCurrentLanguage(detectedLanguage);
+      setTranslationKey(prev => prev + 1);
+    }
+  }, [currentLanguage.code]);
 
   const saveLanguagePreference = useCallback((language: SupportedLanguage) => {
     console.log('UnifiedLocalization: Setting language to:', language.code);
