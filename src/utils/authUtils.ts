@@ -6,11 +6,12 @@ export const cleanupAuthState = () => {
   
   // Remove auth tokens
   localStorage.removeItem('supabase.auth.token');
-  localStorage.removeItem('pendingUserRole');
   
-  // Remove all Supabase auth keys
+  // Note: Don't remove pendingUserRole here as it's needed for signup
+  
+  // Remove all Supabase auth keys except pendingUserRole
   Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+    if ((key.startsWith('supabase.auth.') || key.includes('sb-')) && key !== 'pendingUserRole') {
       localStorage.removeItem(key);
     }
   });
@@ -40,6 +41,8 @@ export const handleAuthError = (error: any, provider?: string) => {
     errorMessage = 'An account with this email already exists. Please sign in instead.';
   } else if (error.message?.includes('Password should be at least')) {
     errorMessage = 'Password must be at least 6 characters long.';
+  } else if (error.message?.includes('Only an email address or phone number')) {
+    errorMessage = 'Please enter a valid email address.';
   }
   
   return errorMessage;
@@ -58,7 +61,7 @@ export const validatePasswordStrength = (password: string) => {
 
 export const ensureProfileExists = async (userId: string, userData: any, selectedRole?: string) => {
   try {
-    console.log('Ensuring profile exists for user:', userId);
+    console.log('Ensuring profile exists for user:', userId, 'with role:', selectedRole);
     
     const roleToAssign = selectedRole || userData.user_metadata?.role || 'student';
     
@@ -77,18 +80,42 @@ export const ensureProfileExists = async (userId: string, userData: any, selecte
       role: roleToAssign
     };
     
-    const { error } = await supabase
+    console.log('Profile data to ensure:', profileData);
+    
+    const { data, error } = await supabase
       .from('profiles')
       .upsert(profileData, { 
         onConflict: 'id',
         ignoreDuplicates: false 
-      });
+      })
+      .select()
+      .single();
     
     if (error) {
       console.error('Error creating/updating profile:', error);
+      
+      // Retry mechanism for critical operations
+      if (roleToAssign === 'educator') {
+        console.log('Retrying educator profile creation...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const { error: retryError } = await supabase
+          .from('profiles')
+          .upsert(profileData, { 
+            onConflict: 'id',
+            ignoreDuplicates: false 
+          });
+        
+        if (retryError) {
+          console.error('Educator profile retry failed:', retryError);
+        } else {
+          console.log('Educator profile created on retry');
+        }
+      }
+    } else {
+      console.log('Profile ensured successfully:', data);
     }
     
-    console.log('Profile created/updated successfully with role:', roleToAssign);
     return roleToAssign;
   } catch (error) {
     console.error('Failed to ensure profile exists:', error);

@@ -1,16 +1,18 @@
+
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 import { LocalizedText } from '@/components/LocalizedText';
 import { PlatformButton } from '@/components/platform/PlatformButton';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { PasskeyAuth } from '@/components/PasskeyAuth';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { handleAuthError, cleanupAuthState, validatePasswordStrength } from '@/utils/authUtils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 import toast from 'react-hot-toast';
 
@@ -28,6 +30,7 @@ export const SimpleMobileAuth = () => {
   
   const navigate = useNavigate();
   const { platform } = usePlatformTheme();
+  const isMobile = useIsMobile();
 
   // Validate password in real-time for signup
   React.useEffect(() => {
@@ -56,13 +59,22 @@ export const SimpleMobileAuth = () => {
           return;
         }
 
+        // Store role in localStorage before signup
+        console.log('Storing pending role for signup:', selectedRole);
         localStorage.setItem('pendingUserRole', selectedRole);
+
+        // Determine redirect URL based on platform
+        const redirectUrl = isMobile 
+          ? `${window.location.origin}/mobile/auth/callback`
+          : `${window.location.origin}/auth/callback`;
+
+        console.log('Starting signup with redirect:', redirectUrl);
 
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/mobile/auth/callback`,
+            emailRedirectTo: redirectUrl,
             data: {
               first_name: firstName,
               last_name: lastName,
@@ -77,11 +89,19 @@ export const SimpleMobileAuth = () => {
           toast.success('Check your email for the confirmation link!');
           setError('Please check your email and click the confirmation link to complete registration.');
         } else if (data.session) {
-          toast.success('Account created successfully!');
-          const redirectRoute = getRoleBasedRoute(selectedRole, true);
+          console.log('Immediate signup success, navigating...');
+          toast.success(`Account created successfully! Welcome, ${selectedRole}!`);
+          
+          // Navigate based on role and platform
+          const redirectRoute = isMobile 
+            ? getMobileRoleBasedRoute(selectedRole as any, true)
+            : getRoleBasedRoute(selectedRole, true);
+          
+          console.log('Navigating to:', redirectRoute);
           navigate(redirectRoute, { replace: true });
         }
       } else {
+        console.log('Starting sign in...');
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -90,11 +110,13 @@ export const SimpleMobileAuth = () => {
         if (error) throw error;
 
         if (data.user) {
+          console.log('Sign in successful');
           toast.success('Welcome back!');
           // Navigation will be handled by auth context
         }
       }
     } catch (error: any) {
+      console.error('Auth error:', error);
       const errorMessage = handleAuthError(error);
       setError(errorMessage);
       toast.error(errorMessage);
@@ -109,12 +131,22 @@ export const SimpleMobileAuth = () => {
 
     try {
       cleanupAuthState();
+      
+      // Store role for OAuth signup
+      console.log('Storing pending role for Google OAuth:', selectedRole);
       localStorage.setItem('pendingUserRole', selectedRole);
+
+      // Determine redirect URL based on platform
+      const redirectUrl = isMobile 
+        ? `${window.location.origin}/mobile/auth/callback`
+        : `${window.location.origin}/auth/callback`;
+
+      console.log('Starting Google OAuth with redirect:', redirectUrl);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/mobile/auth/callback`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -124,6 +156,7 @@ export const SimpleMobileAuth = () => {
 
       if (error) throw error;
     } catch (error: any) {
+      console.error('Google auth error:', error);
       const errorMessage = handleAuthError(error, 'Google');
       setError(errorMessage);
       toast.error(errorMessage);
@@ -137,12 +170,22 @@ export const SimpleMobileAuth = () => {
 
     try {
       cleanupAuthState();
+      
+      // Store role for OAuth signup
+      console.log('Storing pending role for LinkedIn OAuth:', selectedRole);
       localStorage.setItem('pendingUserRole', selectedRole);
+
+      // Determine redirect URL based on platform
+      const redirectUrl = isMobile 
+        ? `${window.location.origin}/mobile/auth/callback`
+        : `${window.location.origin}/auth/callback`;
+
+      console.log('Starting LinkedIn OAuth with redirect:', redirectUrl);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'linkedin_oidc',
         options: {
-          redirectTo: `${window.location.origin}/mobile/auth/callback`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -152,6 +195,7 @@ export const SimpleMobileAuth = () => {
 
       if (error) throw error;
     } catch (error: any) {
+      console.error('LinkedIn auth error:', error);
       const errorMessage = handleAuthError(error, 'LinkedIn');
       setError(errorMessage);
       toast.error(errorMessage);

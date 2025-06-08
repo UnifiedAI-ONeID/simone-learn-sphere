@@ -32,14 +32,34 @@ export const MobileAuthCallback = () => {
           
           // Get pending role and clean up
           const pendingUserRole = localStorage.getItem('pendingUserRole');
+          console.log('MobileAuthCallback: Found pending role:', pendingUserRole);
+          
           if (pendingUserRole) {
             localStorage.removeItem('pendingUserRole');
           }
           
-          // Determine role
-          const userRole = pendingUserRole || data.session.user.user_metadata?.role || 'student';
-          console.log('MobileAuthCallback: User role determined as:', userRole);
+          // Determine role with priority for educator
+          let userRole = pendingUserRole || data.session.user.user_metadata?.role || 'student';
+          console.log('MobileAuthCallback: Initial role determination:', userRole);
           
+          // Wait a moment for profile creation to complete
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Verify role in database
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.session.user.id)
+            .single();
+          
+          if (profileData && !profileError) {
+            userRole = profileData.role;
+            console.log('MobileAuthCallback: Role verified from database:', userRole);
+          } else {
+            console.error('MobileAuthCallback: Profile verification failed:', profileError);
+          }
+          
+          // Show success message with role
           toast.success(`Welcome! Successfully signed in as ${userRole}.`);
           
           // Use mobile-specific routing

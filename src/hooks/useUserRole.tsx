@@ -17,15 +17,9 @@ export const useUserRole = () => {
       }
 
       try {
-        // First try user metadata
-        const metadataRole = user.user_metadata?.role;
-        if (metadataRole) {
-          setRole(metadataRole);
-          setLoading(false);
-          return;
-        }
-
-        // Then try database
+        console.log('useUserRole: Fetching role for user:', user.id);
+        
+        // Try database first for most accurate role
         const { data, error } = await supabase
           .from('profiles')
           .select('role')
@@ -34,9 +28,13 @@ export const useUserRole = () => {
 
         if (error) {
           console.error('useUserRole: Database error:', error);
-          // Default to student
-          setRole('student');
+          
+          // Fallback to user metadata
+          const metadataRole = user.user_metadata?.role;
+          console.log('useUserRole: Using metadata role as fallback:', metadataRole);
+          setRole(metadataRole || 'student');
         } else {
+          console.log('useUserRole: Found role in database:', data.role);
           setRole(data?.role || 'student');
         }
       } catch (error) {

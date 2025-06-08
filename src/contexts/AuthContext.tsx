@@ -24,7 +24,19 @@ export const useAuth = () => {
 
 const createUserProfile = async (user: User, selectedRole?: string) => {
   try {
-    const role = selectedRole || user.user_metadata?.role || 'student';
+    console.log('Creating profile for user:', user.id, 'with role:', selectedRole);
+    
+    // Get role from multiple sources with priority
+    const pendingRole = localStorage.getItem('pendingUserRole');
+    const metadataRole = user.user_metadata?.role;
+    const role = selectedRole || pendingRole || metadataRole || 'student';
+    
+    console.log('Role determination:', {
+      selectedRole,
+      pendingRole,
+      metadataRole,
+      finalRole: role
+    });
     
     const firstName = user.user_metadata?.first_name || 
                       user.user_metadata?.full_name?.split(' ')[0] || 
@@ -40,17 +52,57 @@ const createUserProfile = async (user: User, selectedRole?: string) => {
       role: role
     };
     
-    const { error } = await supabase
+    console.log('Profile data to insert:', profileData);
+    
+    const { data, error } = await supabase
       .from('profiles')
       .upsert(profileData, { 
         onConflict: 'id',
         ignoreDuplicates: false 
-      });
+      })
+      .select()
+      .single();
     
     if (error) {
       console.error('Error creating profile:', error);
+      // Retry with student role as fallback
+      if (role !== 'student') {
+        console.log('Retrying profile creation with student role');
+        const fallbackData = { ...profileData, role: 'student' };
+        const { error: retryError } = await supabase
+          .from('profiles')
+          .upsert(fallbackData, { 
+            onConflict: 'id',
+            ignoreDuplicates: false 
+          });
+        
+        if (retryError) {
+          console.error('Fallback profile creation also failed:', retryError);
+        } else {
+          console.log('Fallback profile created successfully');
+        }
+      }
     } else {
-      console.log('Profile created/updated successfully:', role);
+      console.log('Profile created/updated successfully:', data);
+      
+      // Verify the profile was created with correct role
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      if (verifyData) {
+        console.log('Profile verification - stored role:', verifyData.role);
+      } else {
+        console.error('Profile verification failed:', verifyError);
+      }
+    }
+    
+    // Clean up pending role regardless of success/failure
+    if (pendingRole) {
+      localStorage.removeItem('pendingUserRole');
+      console.log('Cleaned up pendingUserRole from localStorage');
     }
     
     return role;
@@ -80,6 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const initializeAuth = async () => {
       try {
+        console.log('Initializing auth...');
         const { data: { session: initialSession }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -92,11 +145,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           // Create profile immediately if user exists
           if (initialSession?.user) {
+            console.log('Found existing session, creating/updating profile');
             const pendingRole = localStorage.getItem('pendingUserRole');
             await createUserProfile(initialSession.user, pendingRole || undefined);
-            if (pendingRole) {
-              localStorage.removeItem('pendingUserRole');
-            }
           }
         }
       } catch (error) {
@@ -112,7 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       async (event, newSession) => {
         if (!mounted) return;
 
-        console.log('Auth state changed:', event);
+        console.log('Auth state changed:', event, newSession?.user?.id);
         
         setSession(newSession);
         setUser(newSession?.user ?? null);
@@ -120,12 +171,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (event === 'SIGNED_IN' && newSession?.user) {
           console.log('User signed in, creating profile');
           
-          // Create profile immediately on sign in
+          // Get pending role before profile creation
           const pendingRole = localStorage.getItem('pendingUserRole');
+          console.log('Found pending role during sign in:', pendingRole);
+          
+          // Create profile with role information
           await createUserProfile(newSession.user, pendingRole || undefined);
-          if (pendingRole) {
-            localStorage.removeItem('pendingUserRole');
-          }
         }
 
         if (mounted && !loading) {
