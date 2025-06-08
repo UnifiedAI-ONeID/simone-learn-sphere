@@ -5,7 +5,7 @@ import { PlatformLayout } from '@/components/platform/PlatformLayout';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Progress } from '@/components/ui/progress';
 import { Users, Eye, CheckCircle, TrendingUp } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const CourseAnalytics = () => {
   const { id } = useParams();
@@ -15,10 +15,10 @@ export const CourseAnalytics = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">
-            <LocalizedText text="Course Analytics" />
+            <UnifiedLocalizedText text="Course Analytics" />
           </h1>
           <p className="text-muted-foreground">
-            <LocalizedText text="Track student engagement and course performance" />
+            <UnifiedLocalizedText text="Track student engagement and course performance" />
           </p>
         </div>
 

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Brain } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { SimpleMobileAuth } from '@/components/SimpleMobileAuth';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -39,7 +39,7 @@ export const MobileAuth = () => {
             <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
           <p className="text-muted-foreground">
-            <LocalizedText text="Loading..." />
+            <UnifiedLocalizedText text="Loading..." />
           </p>
         </div>
       </PlatformLayout>
@@ -81,10 +81,10 @@ export const MobileAuth = () => {
             <Brain className="h-8 w-8 text-primary-foreground" />
           </div>
           <h1 className={getHeadingStyles()}>
-            <LocalizedText text="Welcome Back" />
+            <UnifiedLocalizedText text="Welcome Back" />
           </h1>
           <p className="text-muted-foreground mt-2">
-            <LocalizedText text="Sign in to continue learning" />
+            <UnifiedLocalizedText text="Sign in to continue learning" />
           </p>
         </div>
 
