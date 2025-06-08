@@ -1,4 +1,6 @@
+
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,26 +12,22 @@ import {
   Plus,
   BarChart3,
   Star,
-  CheckCircle,
-  Clock,
   DollarSign,
-  FileText,
-  AlertCircle,
   MessageCircle,
   Bot,
-  Download,
-  Eye,
-  Edit,
-  Send,
   Lightbulb,
   Sparkles,
   Rocket,
   Heart,
-  Zap
+  Edit,
+  Eye,
+  Calendar
 } from 'lucide-react';
 import { LocalizedText } from '@/components/LocalizedText';
 
 export const EducatorDashboardContent = () => {
+  const navigate = useNavigate();
+  
   // Simulate checking if educator has created any courses
   const hasCreatedCourses = false; // This should be determined by actual user data
   const totalRevenue = 0;
@@ -56,7 +54,11 @@ export const EducatorDashboardContent = () => {
             <p className="text-muted-foreground">
               <LocalizedText text="Share your knowledge and passion with students worldwide" />
             </p>
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button 
+              size="lg" 
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={() => navigate('/educator/course/create')}
+            >
               <Plus className="h-5 w-5 mr-2" />
               <LocalizedText text="Create Your First Course" />
             </Button>
@@ -87,7 +89,12 @@ export const EducatorDashboardContent = () => {
                   <p className="text-sm text-muted-foreground mt-1">
                     <LocalizedText text="Use our AI Course Planner to structure your curriculum and learning objectives" />
                   </p>
-                  <Button variant="outline" size="sm" className="mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => navigate('/educator/ai-planner')}
+                  >
                     <Bot className="h-4 w-4 mr-2" />
                     <LocalizedText text="Try AI Planner" />
                   </Button>
@@ -105,7 +112,12 @@ export const EducatorDashboardContent = () => {
                   <p className="text-sm text-muted-foreground mt-1">
                     <LocalizedText text="Build engaging lessons with our AI Content Generator or create from scratch" />
                   </p>
-                  <Button variant="outline" size="sm" className="mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => navigate('/educator/ai-content')}
+                  >
                     <Sparkles className="h-4 w-4 mr-2" />
                     <LocalizedText text="Generate Content" />
                   </Button>
@@ -123,7 +135,12 @@ export const EducatorDashboardContent = () => {
                   <p className="text-sm text-muted-foreground mt-1">
                     <LocalizedText text="Launch your course and start making an impact on students' lives" />
                   </p>
-                  <Button variant="outline" size="sm" className="mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => navigate('/educator/course/create')}
+                  >
                     <BookOpen className="h-4 w-4 mr-2" />
                     <LocalizedText text="Course Builder" />
                   </Button>
@@ -245,12 +262,249 @@ export const EducatorDashboardContent = () => {
     );
   }
 
-  // Keep existing code for educators with courses
-  // ... keep existing code (for educators who have created courses)
+  // Active educator dashboard with courses
+  const activeCourses = [
+    { 
+      id: 1, 
+      title: 'React for Beginners', 
+      students: 234, 
+      revenue: 2340, 
+      rating: 4.8, 
+      status: 'published',
+      lastUpdated: '2 days ago'
+    },
+    { 
+      id: 2, 
+      title: 'Advanced JavaScript', 
+      students: 89, 
+      revenue: 890, 
+      rating: 4.6, 
+      status: 'draft',
+      lastUpdated: '1 week ago'
+    }
+  ];
+
+  const recentActivity = [
+    { type: 'enrollment', message: '5 new students enrolled in React for Beginners', time: '2 hours ago' },
+    { type: 'review', message: 'New 5-star review on Advanced JavaScript', time: '1 day ago' },
+    { type: 'message', message: '3 new student questions in course forums', time: '2 days ago' }
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Existing dashboard content for active educators */}
-      {/* ... keep existing code */}
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-card text-card-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <LocalizedText text="Total Students" />
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">323</div>
+            <p className="text-xs text-muted-foreground">
+              <LocalizedText text="+12 this week" />
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card text-card-foreground cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate('/educator/revenue')}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <LocalizedText text="Total Revenue" />
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">$3,230</div>
+            <p className="text-xs text-muted-foreground">
+              <LocalizedText text="+$420 this month" />
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card text-card-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <LocalizedText text="Active Courses" />
+            </CardTitle>
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">5</div>
+            <p className="text-xs text-muted-foreground">
+              <LocalizedText text="2 published" />
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card text-card-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <LocalizedText text="Avg Rating" />
+            </CardTitle>
+            <Star className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">4.7</div>
+            <p className="text-xs text-muted-foreground">
+              <LocalizedText text="Based on 89 reviews" />
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* My Courses */}
+        <Card className="bg-card text-card-foreground">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <BookOpen className="h-5 w-5" />
+                <LocalizedText text="My Courses" />
+              </CardTitle>
+              <Button size="sm" onClick={() => navigate('/educator/course/create')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create New
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {activeCourses.map((course) => (
+              <div key={course.id} className="p-4 border border-border rounded-lg bg-background">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-foreground">{course.title}</h3>
+                    <Badge variant={course.status === 'published' ? 'default' : 'secondary'} className="mt-1">
+                      {course.status}
+                    </Badge>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => navigate(`/educator/course/${course.id}/analytics`)}>
+                      <BarChart3 className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => navigate(`/educator/course/${course.id}/editor`)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Students</p>
+                    <p className="font-semibold">{course.students}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Revenue</p>
+                    <p className="font-semibold">${course.revenue}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Rating</p>
+                    <p className="font-semibold flex items-center">
+                      <Star className="h-3 w-3 mr-1 fill-yellow-400 text-yellow-400" />
+                      {course.rating}
+                    </p>
+                  </div>
+                </div>
+                
+                <p className="text-xs text-muted-foreground mt-2">
+                  Last updated {course.lastUpdated}
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card className="bg-card text-card-foreground">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <TrendingUp className="h-5 w-5" />
+              <LocalizedText text="Recent Activity" />
+            </CardTitle>
+            <CardDescription>
+              <LocalizedText text="Latest updates from your courses" />
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {recentActivity.map((activity, index) => (
+              <div key={index} className="flex items-start space-x-3 p-3 bg-background rounded-lg">
+                <div className="flex-1">
+                  <p className="text-sm text-foreground">{activity.message}</p>
+                  <p className="text-xs text-muted-foreground">{activity.time}</p>
+                </div>
+              </div>
+            ))}
+            
+            <Button variant="outline" className="w-full" onClick={() => navigate('/educator/activity')}>
+              <Eye className="h-4 w-4 mr-2" />
+              View All Activity
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-card text-card-foreground cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate('/educator/ai-assistant')}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Bot className="h-5 w-5" />
+              <LocalizedText text="AI Assistant" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              <LocalizedText text="Generate quizzes, lesson plans, and content" />
+            </p>
+            <Button className="w-full">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Open Assistant
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card text-card-foreground cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate('/educator/announcements')}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <MessageCircle className="h-5 w-5" />
+              <LocalizedText text="Announcements" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              <LocalizedText text="Communicate with your students" />
+            </p>
+            <Button variant="outline" className="w-full">
+              <Calendar className="h-4 w-4 mr-2" />
+              Create Announcement
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card text-card-foreground cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate('/educator/students')}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Users className="h-5 w-5" />
+              <LocalizedText text="Student Insights" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              <LocalizedText text="Track engagement and progress" />
+            </p>
+            <Button variant="outline" className="w-full">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              View Analytics
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

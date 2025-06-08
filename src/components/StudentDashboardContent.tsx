@@ -1,4 +1,6 @@
+
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +29,8 @@ import {
 import { LocalizedText } from '@/components/LocalizedText';
 
 export const StudentDashboardContent = () => {
+  const navigate = useNavigate();
+  
   // Simulate checking if user has any data - in real app this would come from props/hooks
   const hasAnyActivity = false; // This should be determined by actual user data
   const totalXP = 0;
@@ -56,16 +60,21 @@ export const StudentDashboardContent = () => {
             <p className="text-muted-foreground">
               <LocalizedText text="Start by exploring our course catalog and enrolling in your first course" />
             </p>
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button 
+              size="lg" 
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={() => navigate('/student/courses')}
+            >
               <BookOpen className="h-5 w-5 mr-2" />
               <LocalizedText text="Browse Courses" />
             </Button>
           </CardContent>
         </Card>
 
-        {/* Getting Started Cards */}
+        {/* Quick Action Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="bg-card text-card-foreground hover:shadow-lg transition-shadow">
+          <Card className="bg-card text-card-foreground hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => navigate('/student/courses')}>
             <CardHeader>
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
@@ -73,25 +82,23 @@ export const StudentDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <LocalizedText text="Choose Your Path" />
+                    <LocalizedText text="Browse Courses" />
                   </CardTitle>
                   <CardDescription>
-                    <LocalizedText text="Explore courses tailored to your interests" />
+                    <LocalizedText text="Find your perfect learning path" />
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                <LocalizedText text="Browse through hundreds of courses across different subjects and skill levels" />
+              <p className="text-sm text-muted-foreground">
+                <LocalizedText text="Explore hundreds of courses across different subjects and skill levels" />
               </p>
-              <Button variant="outline" size="sm" className="w-full">
-                <LocalizedText text="Explore Catalog" />
-              </Button>
             </CardContent>
           </Card>
 
-          <Card className="bg-card text-card-foreground hover:shadow-lg transition-shadow">
+          <Card className="bg-card text-card-foreground hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => navigate('/student/ai-tutor')}>
             <CardHeader>
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
@@ -108,16 +115,14 @@ export const StudentDashboardContent = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                <LocalizedText text="Our AI tutor is ready to help you understand complex concepts and answer questions" />
+              <p className="text-sm text-muted-foreground">
+                <LocalizedText text="Ask questions and get instant, personalized learning support" />
               </p>
-              <Button variant="outline" size="sm" className="w-full">
-                <LocalizedText text="Meet Your AI Tutor" />
-              </Button>
             </CardContent>
           </Card>
 
-          <Card className="bg-card text-card-foreground hover:shadow-lg transition-shadow">
+          <Card className="bg-card text-card-foreground hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => navigate('/student/study-groups')}>
             <CardHeader>
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
@@ -125,21 +130,18 @@ export const StudentDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <LocalizedText text="Join the Community" />
+                    <LocalizedText text="Study Groups" />
                   </CardTitle>
                   <CardDescription>
-                    <LocalizedText text="Connect with fellow learners" />
+                    <LocalizedText text="Learn with peers" />
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                <LocalizedText text="Participate in study groups, forums, and collaborative learning experiences" />
+              <p className="text-sm text-muted-foreground">
+                <LocalizedText text="Join study groups and collaborate with fellow learners" />
               </p>
-              <Button variant="outline" size="sm" className="w-full">
-                <LocalizedText text="Find Study Groups" />
-              </Button>
             </CardContent>
           </Card>
         </div>
@@ -209,71 +211,32 @@ export const StudentDashboardContent = () => {
     );
   }
 
-  // Keep existing code for users with activity data
+  // Active user dashboard with data
   const myLearningData = [
     { id: 1, title: 'React Fundamentals', progress: 75, totalLessons: 24, completedLessons: 18, nextDeadline: '2 days', status: 'active' },
     { id: 2, title: 'JavaScript ES6+', progress: 45, totalLessons: 18, completedLessons: 8, nextDeadline: '5 days', status: 'active' },
-    { id: 3, title: 'CSS Grid & Flexbox', progress: 90, totalLessons: 12, completedLessons: 11, nextDeadline: 'Completed', status: 'completed' },
-    { id: 4, title: 'Node.js Basics', progress: 20, totalLessons: 16, completedLessons: 3, nextDeadline: '1 week', status: 'active' }
+    { id: 3, title: 'CSS Grid & Flexbox', progress: 90, totalLessons: 12, completedLessons: 11, nextDeadline: 'Completed', status: 'completed' }
   ];
 
   const upcomingDeadlines = [
-    { title: 'React State Management Quiz', course: 'React Fundamentals', dueDate: 'Tomorrow', type: 'quiz' },
-    { title: 'Portfolio Project Submission', course: 'JavaScript ES6+', dueDate: 'Friday', type: 'project' },
-    { title: 'CSS Animation Challenge', course: 'CSS Grid & Flexbox', dueDate: 'Next Monday', type: 'assignment' }
+    { title: 'React State Management Quiz', course: 'React Fundamentals', dueDate: 'Tomorrow', type: 'quiz', courseId: 1 },
+    { title: 'Portfolio Project Submission', course: 'JavaScript ES6+', dueDate: 'Friday', type: 'project', courseId: 2 }
   ];
-
-  const achievements = [
-    { name: 'First Course Completed', description: 'Complete your first course', earned: true, icon: '🎓', date: '2 days ago' },
-    { name: '7-Day Streak', description: 'Learn for 7 consecutive days', earned: true, icon: '🔥', date: 'Today' },
-    { name: 'Quiz Master', description: 'Score 90%+ on 5 quizzes', earned: true, icon: '🧠', date: '1 week ago' },
-    { name: 'Community Helper', description: 'Help 10 fellow students', earned: false, icon: '🤝', progress: 60 },
-    { name: 'Speed Learner', description: 'Complete 3 lessons in one day', earned: false, icon: '⚡', progress: 33 }
-  ];
-
-  const studyGroups = [
-    { name: 'React Study Group', members: 12, lastActivity: '30 min ago', topic: 'Hooks Deep Dive' },
-    { name: 'JavaScript Beginners', members: 8, lastActivity: '2 hours ago', topic: 'Async/Await Help' },
-    { name: 'CSS Masters', members: 15, lastActivity: '1 day ago', topic: 'Grid vs Flexbox' }
-  ];
-
-  const personalStats = {
-    totalXP: 1250,
-    currentStreak: 7,
-    level: 5,
-    totalLessonsCompleted: 40,
-    averageQuizScore: 87,
-    timeSpentLearning: '45 hours'
-  };
 
   return (
     <div className="space-y-6">
-      {/* Personal Stats Cards */}
+      {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-card text-card-foreground">
+        <Card className="bg-card text-card-foreground cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate('/student/streak')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Total XP" />
-            </CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{personalStats.totalXP}</div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text={`Level ${personalStats.level}`} />
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card text-card-foreground">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Study Streak" />
+              <LocalizedText text="Daily Streak" />
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{personalStats.currentStreak} days</div>
+            <div className="text-2xl font-bold text-foreground">7 days</div>
             <p className="text-xs text-muted-foreground">
               <LocalizedText text="Keep it going!" />
             </p>
@@ -283,14 +246,14 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Lessons Completed" />
+              <LocalizedText text="Total XP" />
             </CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
+            <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{personalStats.totalLessonsCompleted}</div>
+            <div className="text-2xl font-bold text-foreground">1,250</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Total lessons" />
+              <LocalizedText text="Level 5" />
             </p>
           </CardContent>
         </Card>
@@ -298,14 +261,30 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Avg Quiz Score" />
+              <LocalizedText text="Courses Active" />
+            </CardTitle>
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">3</div>
+            <p className="text-xs text-muted-foreground">
+              <LocalizedText text="2 in progress" />
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card text-card-foreground cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate('/student/badges')}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <LocalizedText text="Badges Earned" />
             </CardTitle>
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{personalStats.averageQuizScore}%</div>
+            <div className="text-2xl font-bold text-foreground">12</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Excellent work!" />
+              <LocalizedText text="3 this week" />
             </p>
           </CardContent>
         </Card>
@@ -320,15 +299,16 @@ export const StudentDashboardContent = () => {
                 <BookOpen className="h-5 w-5" />
                 <LocalizedText text="My Courses" />
               </CardTitle>
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button size="sm" onClick={() => navigate('/student/courses')}>
                 <Plus className="h-4 w-4 mr-2" />
-                Browse Courses
+                Browse More
               </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {myLearningData.map((course) => (
-              <div key={course.id} className="p-4 border border-border rounded-lg bg-background">
+              <div key={course.id} className="p-4 border border-border rounded-lg bg-background cursor-pointer hover:bg-accent transition-colors"
+                   onClick={() => navigate(`/student/course/${course.id}`)}>
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="font-semibold text-foreground">{course.title}</h3>
@@ -336,7 +316,7 @@ export const StudentDashboardContent = () => {
                       {course.status}
                     </Badge>
                   </div>
-                  <Button size="sm" variant="outline" className="border-border text-foreground hover:bg-accent">
+                  <Button size="sm" variant="outline">
                     {course.status === 'completed' ? 'Review' : 'Continue'}
                   </Button>
                 </div>
@@ -362,13 +342,14 @@ export const StudentDashboardContent = () => {
               <Calendar className="h-5 w-5" />
               <LocalizedText text="Upcoming Deadlines" />
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardDescription>
               <LocalizedText text="Stay on track with your assignments" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {upcomingDeadlines.map((deadline, index) => (
-              <div key={index} className="p-3 border border-border rounded-lg bg-background">
+              <div key={index} className="p-3 border border-border rounded-lg bg-background cursor-pointer hover:bg-accent transition-colors"
+                   onClick={() => navigate(`/student/course/${deadline.courseId}/assignments`)}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h4 className="font-medium text-foreground">{deadline.title}</h4>
@@ -384,7 +365,7 @@ export const StudentDashboardContent = () => {
               </div>
             ))}
             
-            <Button variant="outline" className="w-full border-border text-foreground hover:bg-accent">
+            <Button variant="outline" className="w-full" onClick={() => navigate('/student/assignments')}>
               <Activity className="h-4 w-4 mr-2" />
               View All Deadlines
             </Button>
@@ -392,109 +373,60 @@ export const StudentDashboardContent = () => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Badges & Achievements */}
-        <Card className="bg-card text-card-foreground">
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-card text-card-foreground cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate('/student/ai-tutor')}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
-              <Award className="h-5 w-5" />
-              <LocalizedText text="Badges & Achievements" />
+              <Brain className="h-5 w-5" />
+              <LocalizedText text="Ask AI Tutor" />
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              <LocalizedText text="Track your learning milestones" />
-            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {achievements.slice(0, 4).map((achievement, index) => (
-              <div key={index} className={`p-3 rounded-lg border border-border ${achievement.earned ? 'bg-primary/10' : 'bg-background'}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-2xl">{achievement.icon}</div>
-                    <div>
-                      <h4 className="font-medium text-foreground">{achievement.name}</h4>
-                      <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                      {achievement.earned && achievement.date && (
-                        <p className="text-xs text-primary">Earned {achievement.date}</p>
-                      )}
-                    </div>
-                  </div>
-                  {achievement.earned ? (
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                  ) : (
-                    <div className="text-right">
-                      <div className="text-xs text-muted-foreground mb-1">{achievement.progress}%</div>
-                      <Progress value={achievement.progress} className="w-16 h-2" />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-            
-            <Button variant="outline" className="w-full border-border text-foreground hover:bg-accent">
-              <Trophy className="h-4 w-4 mr-2" />
-              View All Achievements
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              <LocalizedText text="Get instant help with your studies" />
+            </p>
+            <Button className="w-full">
+              <Zap className="h-4 w-4 mr-2" />
+              Start Chat
             </Button>
           </CardContent>
         </Card>
 
-        {/* AI Tutor & Study Groups */}
-        <Card className="bg-card text-card-foreground">
+        <Card className="bg-card text-card-foreground cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate('/student/leaderboard')}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
-              <Users className="h-5 w-5" />
-              <LocalizedText text="Community & Support" />
+              <Trophy className="h-5 w-5" />
+              <LocalizedText text="Leaderboard" />
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              <LocalizedText text="Get help and connect with peers" />
-            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* AI Tutor Quick Access */}
-            <div className="p-4 border border-border rounded-lg bg-gradient-to-r from-primary/10 to-primary/5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-3">
-                  <Brain className="h-8 w-8 text-primary" />
-                  <div>
-                    <h4 className="font-medium text-foreground">AI Tutor</h4>
-                    <p className="text-sm text-muted-foreground">Get instant help</p>
-                  </div>
-                </div>
-                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  <Zap className="h-4 w-4 mr-2" />
-                  Ask Question
-                </Button>
-              </div>
-            </div>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              <LocalizedText text="See how you rank among peers" />
+            </p>
+            <Button variant="outline" className="w-full">
+              View Rankings
+            </Button>
+          </CardContent>
+        </Card>
 
-            {/* Study Groups */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-foreground">Active Study Groups</h4>
-              {studyGroups.slice(0, 2).map((group, index) => (
-                <div key={index} className="p-3 border border-border rounded-lg bg-background">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h5 className="font-medium text-foreground">{group.name}</h5>
-                      <p className="text-sm text-muted-foreground">{group.topic}</p>
-                      <p className="text-xs text-muted-foreground">{group.members} members • {group.lastActivity}</p>
-                    </div>
-                    <Button size="sm" variant="outline" className="border-border text-foreground hover:bg-accent">
-                      Join
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 border-border text-foreground hover:bg-accent">
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Forums
-              </Button>
-              <Button variant="outline" className="flex-1 border-border text-foreground hover:bg-accent">
-                <Users className="h-4 w-4 mr-2" />
-                Find Study Buddy
-              </Button>
-            </div>
+        <Card className="bg-card text-card-foreground cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate('/student/forums')}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <MessageCircle className="h-5 w-5" />
+              <LocalizedText text="Forums" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              <LocalizedText text="Join discussions with classmates" />
+            </p>
+            <Button variant="outline" className="w-full">
+              Browse Forums
+            </Button>
           </CardContent>
         </Card>
       </div>
