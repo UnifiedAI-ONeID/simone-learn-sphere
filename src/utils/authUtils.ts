@@ -45,6 +45,17 @@ export const handleAuthError = (error: any, provider?: string) => {
   return errorMessage;
 };
 
+export const validatePasswordStrength = (password: string) => {
+  const errors: string[] = [];
+  const isValid = password.length >= 8;
+  
+  if (password.length < 8) {
+    errors.push('Password must be at least 8 characters long');
+  }
+  
+  return { isValid, errors };
+};
+
 export const ensureProfileExists = async (userId: string, userData: any, selectedRole?: string) => {
   try {
     console.log('Ensuring profile exists for user:', userId);
