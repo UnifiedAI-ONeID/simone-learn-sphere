@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bell, Brain } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -21,10 +21,10 @@ export const MobileAppHeader = () => {
           </div>
           <div>
             <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-              <LocalizedText text="SimoneLabs" />
+              <UnifiedLocalizedText text="SimoneLabs" />
             </h1>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Mobile Learning" />
+              <UnifiedLocalizedText text="Mobile Learning" />
             </p>
           </div>
         </div>
