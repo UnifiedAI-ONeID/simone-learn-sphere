@@ -32,6 +32,34 @@ import CourseBuilder from '@/pages/CourseBuilder';
 import ProfileSettings from '@/pages/ProfileSettings';
 import NotFound from '@/pages/NotFound';
 
+// Student Flow Pages
+import { CourseOverview } from '@/pages/student/CourseOverview';
+import { LessonView } from '@/pages/student/LessonView';
+import { Assignments } from '@/pages/student/Assignments';
+import { QuizView } from '@/pages/student/QuizView';
+import { AITutor } from '@/pages/student/AITutor';
+import { ProfileBadges } from '@/pages/student/ProfileBadges';
+import { Leaderboard } from '@/pages/student/Leaderboard';
+import { Forums } from '@/pages/student/Forums';
+import { StudyGroups } from '@/pages/student/StudyGroups';
+
+// Educator Flow Pages
+import { CourseCreate } from '@/pages/educator/CourseCreate';
+import { CourseEditor } from '@/pages/educator/CourseEditor';
+import { CourseAnalytics } from '@/pages/educator/CourseAnalytics';
+import { StudentInsights } from '@/pages/educator/StudentInsights';
+import { RevenueAnalytics } from '@/pages/educator/RevenueAnalytics';
+import { Announcements } from '@/pages/educator/Announcements';
+
+// Admin Flow Pages
+import { PlatformAnalytics } from '@/pages/admin/PlatformAnalytics';
+import { UserManagement } from '@/pages/admin/UserManagement';
+import { UserProfile } from '@/pages/admin/UserProfile';
+import { PayoutsRevenue } from '@/pages/admin/PayoutsRevenue';
+import { AIAuditTrail } from '@/pages/admin/AIAuditTrail';
+import { ModerationReports } from '@/pages/admin/ModerationReports';
+import { SystemSettings } from '@/pages/admin/SystemSettings';
+
 import '@/App.css';
 
 const queryClient = new QueryClient({
@@ -68,9 +96,39 @@ function AppRoutes() {
       <Route path="/" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      
+      {/* Student Routes */}
       <Route path="/student" element={<StudentDashboard />} />
+      <Route path="/course/:id/overview" element={<CourseOverview />} />
+      <Route path="/course/:id/module/:moduleId/lesson/:lessonId" element={<LessonView />} />
+      <Route path="/course/:id/assignments" element={<Assignments />} />
+      <Route path="/course/:id/quiz/:quizId" element={<QuizView />} />
+      <Route path="/ai-tutor" element={<AITutor />} />
+      <Route path="/profile/badges" element={<ProfileBadges />} />
+      <Route path="/leaderboard" element={<Leaderboard />} />
+      <Route path="/forums/:courseId" element={<Forums />} />
+      <Route path="/study-groups/:groupId/live" element={<StudyGroups />} />
+      
+      {/* Educator Routes */}
       <Route path="/educator" element={<EducatorDashboard />} />
+      <Route path="/educator/course/create" element={<CourseCreate />} />
+      <Route path="/educator/course/:id/editor" element={<CourseEditor />} />
+      <Route path="/educator/course/:id/analytics" element={<CourseAnalytics />} />
+      <Route path="/educator/course/:id/students" element={<StudentInsights />} />
+      <Route path="/educator/course/:id/student/:userId/insights" element={<StudentInsights />} />
+      <Route path="/educator/revenue" element={<RevenueAnalytics />} />
+      <Route path="/educator/announcements" element={<Announcements />} />
+      
+      {/* Admin Routes */}
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/analytics" element={<PlatformAnalytics />} />
+      <Route path="/admin/users" element={<UserManagement />} />
+      <Route path="/admin/user/:userId" element={<UserProfile />} />
+      <Route path="/admin/payouts" element={<PayoutsRevenue />} />
+      <Route path="/admin/ai-logs" element={<AIAuditTrail />} />
+      <Route path="/admin/reports" element={<ModerationReports />} />
+      <Route path="/admin/settings" element={<SystemSettings />} />
+      
       <Route path="/course-builder" element={<CourseBuilder />} />
       <Route path="/profile" element={<ProfileSettings />} />
       <Route path="/404" element={<NotFound />} />
