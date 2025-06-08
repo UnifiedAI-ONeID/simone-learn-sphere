@@ -11,6 +11,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { useContentReadyState } from '@/hooks/useContentReadyState';
+import { Founders } from '@/components/Founders';
 
 // Lazy load heavy components
 const AccessibilityControls = lazy(() => import('@/components/accessibility/AccessibilityControls').then(m => ({ default: m.AccessibilityControls })));
@@ -159,6 +160,9 @@ const Index = () => {
           </Suspense>
         </div>
       </main>
+
+      {/* Founders Section */}
+      <Founders />
 
       {/* Footer */}
       <footer className="mt-24 border-t border-border/50 py-12 bg-card/30 backdrop-blur-sm" role="contentinfo">
