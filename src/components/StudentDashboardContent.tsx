@@ -18,11 +18,11 @@ import { LocalizedText } from '@/components/LocalizedText';
 
 export const StudentDashboardContent = () => {
   // Mock data - in real app, this would come from hooks
-  const enrolledCourses = 2;
-  const completedLessons = 15;
-  const totalLessons = 45;
-  const streakDays = 7;
-  const badges = 3;
+  let enrolledCourses = 2;
+  let completedLessons = 15;
+  let totalLessons = 45;
+  let streakDays = 7;
+  let badges = 3;
 
   const completionRate = (completedLessons / totalLessons) * 100;
 

@@ -16,7 +16,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader />
+      <DashboardHeader 
+        title={title}
+        subtitle={subtitle || ''}
+      />
       <main className="container mx-auto px-4 py-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">{title}</h1>

@@ -18,10 +18,10 @@ import { LocalizedText } from '@/components/LocalizedText';
 
 export const EducatorDashboardContent = () => {
   // Mock data - in real app, this would come from hooks
-  const activeCourses = 1;
-  const totalStudents = 45;
-  const totalLessons = 12;
-  const engagementRate = 78;
+  let activeCourses = 1;
+  let totalStudents = 45;
+  let totalLessons = 12;
+  let engagementRate = 78;
 
   return (
     <div className="space-y-6">
