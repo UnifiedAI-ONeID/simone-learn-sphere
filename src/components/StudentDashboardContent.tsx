@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,11 +20,198 @@ import {
   Award,
   Timer,
   BookMarked,
-  Activity
+  Activity,
+  Heart,
+  Sparkles
 } from 'lucide-react';
 import { LocalizedText } from '@/components/LocalizedText';
 
 export const StudentDashboardContent = () => {
+  // Simulate checking if user has any data - in real app this would come from props/hooks
+  const hasAnyActivity = false; // This should be determined by actual user data
+  const totalXP = 0;
+  const currentStreak = 0;
+  const totalLessonsCompleted = 0;
+  const averageQuizScore = 0;
+  const enrolledCourses = [];
+  const upcomingDeadlines = [];
+  const achievements = [];
+
+  // Show encouraging empty states for new users
+  if (!hasAnyActivity && enrolledCourses.length === 0) {
+    return (
+      <div className="space-y-6">
+        {/* Welcome Message */}
+        <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4">
+              <Sparkles className="h-16 w-16 text-primary" />
+            </div>
+            <CardTitle className="text-2xl text-foreground">
+              <LocalizedText text="Welcome to Your Learning Journey!" />
+            </CardTitle>
+            <CardDescription className="text-lg text-muted-foreground">
+              <LocalizedText text="You're about to embark on an amazing adventure of knowledge and growth" />
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-muted-foreground">
+              <LocalizedText text="Start by exploring our course catalog and enrolling in your first course" />
+            </p>
+            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <BookOpen className="h-5 w-5 mr-2" />
+              <LocalizedText text="Browse Courses" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Getting Started Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="bg-card text-card-foreground hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                  <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg text-foreground">
+                    <LocalizedText text="Choose Your Path" />
+                  </CardTitle>
+                  <CardDescription>
+                    <LocalizedText text="Explore courses tailored to your interests" />
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                <LocalizedText text="Browse through hundreds of courses across different subjects and skill levels" />
+              </p>
+              <Button variant="outline" size="sm" className="w-full">
+                <LocalizedText text="Explore Catalog" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card text-card-foreground hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                  <Brain className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg text-foreground">
+                    <LocalizedText text="AI Study Assistant" />
+                  </CardTitle>
+                  <CardDescription>
+                    <LocalizedText text="Get personalized help anytime" />
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                <LocalizedText text="Our AI tutor is ready to help you understand complex concepts and answer questions" />
+              </p>
+              <Button variant="outline" size="sm" className="w-full">
+                <LocalizedText text="Meet Your AI Tutor" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card text-card-foreground hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                  <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg text-foreground">
+                    <LocalizedText text="Join the Community" />
+                  </CardTitle>
+                  <CardDescription>
+                    <LocalizedText text="Connect with fellow learners" />
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                <LocalizedText text="Participate in study groups, forums, and collaborative learning experiences" />
+              </p>
+              <Button variant="outline" size="sm" className="w-full">
+                <LocalizedText text="Find Study Groups" />
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Motivation Section */}
+        <Card className="bg-card text-card-foreground">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Heart className="h-5 w-5 text-red-500" />
+              <LocalizedText text="Why Learning Matters" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <Trophy className="h-5 w-5 text-yellow-500 mt-1" />
+                  <div>
+                    <h4 className="font-medium text-foreground">
+                      <LocalizedText text="Build Confidence" />
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      <LocalizedText text="Every lesson completed is a step towards mastering new skills" />
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <TrendingUp className="h-5 w-5 text-green-500 mt-1" />
+                  <div>
+                    <h4 className="font-medium text-foreground">
+                      <LocalizedText text="Advance Your Career" />
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      <LocalizedText text="Gain valuable skills that employers are looking for" />
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <Zap className="h-5 w-5 text-blue-500 mt-1" />
+                  <div>
+                    <h4 className="font-medium text-foreground">
+                      <LocalizedText text="Learn at Your Pace" />
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      <LocalizedText text="Flexible learning that fits your schedule and lifestyle" />
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <Star className="h-5 w-5 text-purple-500 mt-1" />
+                  <div>
+                    <h4 className="font-medium text-foreground">
+                      <LocalizedText text="Achieve Your Goals" />
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      <LocalizedText text="Transform your aspirations into reality with structured learning" />
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Keep existing code for users with activity data
   const myLearningData = [
     { id: 1, title: 'React Fundamentals', progress: 75, totalLessons: 24, completedLessons: 18, nextDeadline: '2 days', status: 'active' },
     { id: 2, title: 'JavaScript ES6+', progress: 45, totalLessons: 18, completedLessons: 8, nextDeadline: '5 days', status: 'active' },
