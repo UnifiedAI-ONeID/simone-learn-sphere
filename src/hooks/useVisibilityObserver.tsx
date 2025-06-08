@@ -11,10 +11,10 @@ export const useVisibilityObserver = (options: UseVisibilityObserverOptions = {}
   const { threshold = 0.1, rootMargin = '50px', triggerOnce = true } = options;
   const [isVisible, setIsVisible] = useState(false);
   const [hasBeenVisible, setHasBeenVisible] = useState(false);
-  const elementRef = useRef<HTMLElement>(null);
+  const elementRef = useRef<Element>(null);
   const observerRef = useRef<IntersectionObserver>();
 
-  const setRef = useCallback((element: HTMLElement | null) => {
+  const setRef = useCallback((element: Element | null) => {
     if (elementRef.current && observerRef.current) {
       observerRef.current.unobserve(elementRef.current);
     }

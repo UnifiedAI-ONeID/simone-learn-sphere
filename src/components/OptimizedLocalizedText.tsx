@@ -114,58 +114,52 @@ export const OptimizedLocalizedText: React.FC<OptimizedLocalizedTextProps> = ({
     setIsLoading(false);
   }, [translationKey, text]);
 
-  const setElementRef = useCallback((element: HTMLElement | null) => {
-    if (lazy) {
+  // Create a proper ref callback that handles both HTML and SVG elements
+  const setElementRef = useCallback((element: Element | null) => {
+    if (lazy && element instanceof HTMLElement) {
       visibilityRef(element);
     }
   }, [lazy, visibilityRef]);
 
   if (isLoading && showLoadingSpinner) {
-    return (
-      <Component ref={setElementRef} className={cn(className, "inline-flex items-center space-x-1")}>
-        {fallback || (
-          <>
-            <Loader2 className="h-3 w-3 animate-spin" />
-            <span>{text}</span>
-          </>
-        )}
-      </Component>
-    );
+    return React.createElement(Component, {
+      ref: setElementRef,
+      className: cn(className, "inline-flex items-center space-x-1")
+    }, fallback || [
+      React.createElement(Loader2, { key: "loader", className: "h-3 w-3 animate-spin" }),
+      React.createElement("span", { key: "text" }, text)
+    ]);
   }
 
   if (hasError || translationError) {
-    return (
-      <Component 
-        ref={setElementRef}
-        className={cn(className, "inline-flex items-center space-x-1")} 
-        title={hasError ? 'Translation failed, showing original text' : translationError || undefined}
-      >
-        <span className={hasError ? "text-orange-600" : undefined}>
-          {localizedText}
-        </span>
-        {showRetryButton && retryCount < maxRetries && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleRetry}
-            className="h-4 w-4 p-0 ml-1"
-            title="Retry translation"
-          >
-            <RefreshCw className="h-3 w-3" />
-          </Button>
-        )}
-        {hasError && (
-          <AlertTriangle className="h-3 w-3 text-orange-500" />
-        )}
-      </Component>
-    );
+    return React.createElement(Component, {
+      ref: setElementRef,
+      className: cn(className, "inline-flex items-center space-x-1"),
+      title: hasError ? 'Translation failed, showing original text' : translationError || undefined
+    }, [
+      React.createElement("span", { 
+        key: "text",
+        className: hasError ? "text-orange-600" : undefined 
+      }, localizedText),
+      showRetryButton && retryCount < maxRetries && React.createElement(Button, {
+        key: "retry",
+        variant: "ghost",
+        size: "sm",
+        onClick: handleRetry,
+        className: "h-4 w-4 p-0 ml-1",
+        title: "Retry translation"
+      }, React.createElement(RefreshCw, { className: "h-3 w-3" })),
+      hasError && React.createElement(AlertTriangle, { 
+        key: "error", 
+        className: "h-3 w-3 text-orange-500" 
+      })
+    ]);
   }
 
-  return (
-    <Component ref={setElementRef} className={className}>
-      {localizedText}
-    </Component>
-  );
+  return React.createElement(Component, {
+    ref: setElementRef,
+    className
+  }, localizedText);
 };
 
 // Export with legacy names for compatibility
