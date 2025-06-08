@@ -15,6 +15,8 @@ import {
 import { LocalizedText } from '@/components/LocalizedText';
 
 export const PlatformOverview = () => {
+  console.log('PlatformOverview: Component rendering');
+
   const coreFeatures = [
     {
       icon: Brain,
@@ -54,6 +56,8 @@ export const PlatformOverview = () => {
       description: "Building innovative AI-powered solutions for the future of learning"
     }
   ];
+
+  console.log('PlatformOverview: Co-founders data:', coFounders);
 
   return (
     <div className="space-y-16">
@@ -110,6 +114,7 @@ export const PlatformOverview = () => {
 
       {/* Co-Founders Section */}
       <section className="space-y-12">
+        {console.log('PlatformOverview: Rendering Co-Founders section')}
         <div className="text-center space-y-4">
           <h2 className="text-4xl font-bold text-foreground">
             <LocalizedText text="Meet Our Co-Founders" />
@@ -120,29 +125,32 @@ export const PlatformOverview = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto">
-          {coFounders.map((founder, index) => (
-            <Card key={index} className="text-center group hover:shadow-2xl hover:scale-105 transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm">
-              <CardContent className="p-10 space-y-6">
-                <Avatar className="h-32 w-32 mx-auto ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
-                  <AvatarImage src={founder.avatarUrl} alt={founder.name} />
-                  <AvatarFallback className="text-2xl bg-gradient-to-br from-primary to-secondary text-primary-foreground font-semibold">
-                    {founder.avatar}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-bold text-foreground">
-                    <LocalizedText text={founder.name} />
-                  </h3>
-                  <p className="text-lg font-semibold text-primary">
-                    <LocalizedText text={founder.role} />
-                  </p>
-                  <p className="landing-card-description leading-relaxed">
-                    <LocalizedText text={founder.description} />
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {coFounders.map((founder, index) => {
+            console.log('PlatformOverview: Rendering founder:', founder.name);
+            return (
+              <Card key={index} className="text-center group hover:shadow-2xl hover:scale-105 transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm">
+                <CardContent className="p-10 space-y-6">
+                  <Avatar className="h-32 w-32 mx-auto ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
+                    <AvatarImage src={founder.avatarUrl} alt={founder.name} />
+                    <AvatarFallback className="text-2xl bg-gradient-to-br from-primary to-secondary text-primary-foreground font-semibold">
+                      {founder.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="space-y-3">
+                    <h3 className="text-2xl font-bold text-foreground">
+                      <LocalizedText text={founder.name} />
+                    </h3>
+                    <p className="text-lg font-semibold text-primary">
+                      <LocalizedText text={founder.role} />
+                    </p>
+                    <p className="landing-card-description leading-relaxed">
+                      <LocalizedText text={founder.description} />
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </section>
 
