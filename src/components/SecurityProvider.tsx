@@ -1,43 +1,76 @@
 
-import React, { createContext, useContext, ReactNode } from 'react';
-import { SecurityAlert } from '@/components/SecurityAlert';
-import { SessionTimeoutWarning } from '@/components/SessionTimeoutWarning';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useEnhancedSessionSecurity } from '@/hooks/useEnhancedSessionSecurity';
-import { useImpersonationSecurity } from '@/hooks/useImpersonationSecurity';
+import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
+import { useSessionTracking } from '@/hooks/useSessionTracking';
 
 interface SecurityContextType {
-  sessionSecurity: ReturnType<typeof useEnhancedSessionSecurity>;
-  impersonationSecurity: ReturnType<typeof useImpersonationSecurity>;
+  isSecure: boolean;
+  threatLevel: 'low' | 'medium' | 'high';
+  sessionValid: boolean;
 }
 
 const SecurityContext = createContext<SecurityContextType | undefined>(undefined);
 
 export const useSecurity = () => {
   const context = useContext(SecurityContext);
-  if (context === undefined) {
-    throw new Error('useSecurity must be used within a SecurityProvider');
+  if (!context) {
+    // Return safe defaults instead of throwing
+    return {
+      isSecure: true,
+      threatLevel: 'low' as const,
+      sessionValid: true,
+    };
   }
   return context;
 };
 
 interface SecurityProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
-  const sessionSecurity = useEnhancedSessionSecurity();
-  const impersonationSecurity = useImpersonationSecurity();
+  const { user } = useAuth();
+  const [isSecure, setIsSecure] = useState(true);
+  const [threatLevel, setThreatLevel] = useState<'low' | 'medium' | 'high'>('low');
+  const [sessionValid, setSessionValid] = useState(true);
+
+  // Only use security hooks if user is authenticated
+  const shouldUseSecurityHooks = !!user;
+
+  const sessionSecurity = shouldUseSecurityHooks ? useEnhancedSessionSecurity() : null;
+  const securityMonitor = shouldUseSecurityHooks ? useSecurityMonitor() : null;
+  const sessionTracking = shouldUseSecurityHooks ? useSessionTracking() : null;
+
+  useEffect(() => {
+    if (!shouldUseSecurityHooks) {
+      setIsSecure(true);
+      setThreatLevel('low');
+      setSessionValid(true);
+      return;
+    }
+
+    // Update security state based on hooks
+    if (sessionSecurity) {
+      setSessionValid(sessionSecurity.isSessionValid);
+    }
+
+    if (securityMonitor) {
+      setThreatLevel(securityMonitor.threatLevel || 'low');
+      setIsSecure(!securityMonitor.hasActiveThreats);
+    }
+  }, [shouldUseSecurityHooks, sessionSecurity, securityMonitor]);
 
   const value = {
-    sessionSecurity,
-    impersonationSecurity
+    isSecure,
+    threatLevel,
+    sessionValid,
   };
 
   return (
     <SecurityContext.Provider value={value}>
       {children}
-      <SecurityAlert />
-      <SessionTimeoutWarning />
     </SecurityContext.Provider>
   );
 };
