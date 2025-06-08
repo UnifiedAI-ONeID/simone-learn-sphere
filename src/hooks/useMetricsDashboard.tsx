@@ -28,42 +28,46 @@ export const useMetricsDashboard = () => {
     try {
       setLoading(true);
 
-      // Get calculated metrics from database functions
+      // Get basic counts with proper error handling
       const [
-        { data: avgResponseTime },
-        { data: concurrentUsers },
-        { data: weeklyCompletion },
-        { data: educatorCreation }
-      ] = await Promise.all([
+        usersResult,
+        coursesResult,
+        lessonsResult
+      ] = await Promise.allSettled([
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('courses').select('*', { count: 'exact', head: true }),
+        supabase.from('lessons').select('*', { count: 'exact', head: true })
+      ]);
+
+      const totalUsers = usersResult.status === 'fulfilled' ? usersResult.value.count || 0 : 0;
+      const totalCourses = coursesResult.status === 'fulfilled' ? coursesResult.value.count || 0 : 0;
+      const totalLessons = lessonsResult.status === 'fulfilled' ? lessonsResult.value.count || 0 : 0;
+
+      // Try to get calculated metrics from database functions with fallbacks
+      const [
+        avgResponseTimeResult,
+        concurrentUsersResult,
+        weeklyCompletionResult,
+        educatorCreationResult
+      ] = await Promise.allSettled([
         supabase.rpc('get_average_response_time'),
         supabase.rpc('get_concurrent_users'),
         supabase.rpc('get_weekly_completion_rate'),
         supabase.rpc('get_educator_creation_rate')
       ]);
 
-      // Get basic counts
-      const [
-        { count: totalUsers },
-        { count: totalCourses },
-        { count: totalLessons }
-      ] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('courses').select('*', { count: 'exact', head: true }),
-        supabase.from('lessons').select('*', { count: 'exact', head: true })
-      ]);
-
       setMetrics({
-        averageResponseTime: avgResponseTime || 150,
-        concurrentUsers: concurrentUsers || 23,
-        weeklyCompletionRate: weeklyCompletion || 78,
-        educatorCreationRate: educatorCreation || 65,
-        totalUsers: totalUsers || 1247,
-        totalCourses: totalCourses || 85,
-        totalLessons: totalLessons || 432
+        averageResponseTime: avgResponseTimeResult.status === 'fulfilled' ? (avgResponseTimeResult.value.data || 150) : 150,
+        concurrentUsers: concurrentUsersResult.status === 'fulfilled' ? (concurrentUsersResult.value.data || 23) : 23,
+        weeklyCompletionRate: weeklyCompletionResult.status === 'fulfilled' ? (weeklyCompletionResult.value.data || 78) : 78,
+        educatorCreationRate: educatorCreationResult.status === 'fulfilled' ? (educatorCreationResult.value.data || 65) : 65,
+        totalUsers,
+        totalCourses,
+        totalLessons
       });
     } catch (error) {
       console.error('Failed to fetch metrics:', error);
-      // Set mock data for demo purposes
+      // Set fallback data for demo purposes
       setMetrics({
         averageResponseTime: 150,
         concurrentUsers: 23,
