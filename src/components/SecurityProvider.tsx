@@ -52,13 +52,15 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
     }
 
     // Update security state based on hooks
-    if (sessionSecurity) {
-      setSessionValid(sessionSecurity.isSessionValid);
+    if (sessionSecurity?.securityState) {
+      // Session is valid if not showing warning and has recent activity
+      setSessionValid(!sessionSecurity.securityState.sessionWarning);
     }
 
     if (securityMonitor) {
       setThreatLevel(securityMonitor.threatLevel || 'low');
-      setIsSecure(!securityMonitor.hasActiveThreats);
+      // Security is compromised if there are active threats
+      setIsSecure(securityMonitor.activeThreats.length === 0);
     }
   }, [shouldUseSecurityHooks, sessionSecurity, securityMonitor]);
 
