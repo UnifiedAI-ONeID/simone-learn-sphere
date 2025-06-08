@@ -34,8 +34,6 @@ export const StudentDashboardContent = () => {
   const totalLessonsCompleted = 0;
   const averageQuizScore = 0;
   const enrolledCourses = [];
-  const upcomingDeadlines = [];
-  const achievements = [];
 
   // Show encouraging empty states for new users
   if (!hasAnyActivity && enrolledCourses.length === 0) {
