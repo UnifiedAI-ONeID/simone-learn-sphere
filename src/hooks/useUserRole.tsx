@@ -11,25 +11,21 @@ export const useUserRole = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       if (!user) {
-        console.log('useUserRole: No user, setting role to null');
         setRole(null);
         setLoading(false);
         return;
       }
 
-      console.log('useUserRole: Fetching role for user:', user.id);
-
       try {
-        // Try user metadata first for speed
+        // First try user metadata
         const metadataRole = user.user_metadata?.role;
         if (metadataRole) {
-          console.log('useUserRole: Found role in metadata:', metadataRole);
           setRole(metadataRole);
           setLoading(false);
           return;
         }
 
-        // Fetch from database
+        // Then try database
         const { data, error } = await supabase
           .from('profiles')
           .select('role')
@@ -38,38 +34,14 @@ export const useUserRole = () => {
 
         if (error) {
           console.error('useUserRole: Database error:', error);
-          
-          // If profile doesn't exist, use default and try to create it
-          if (error.code === 'PGRST116') {
-            const defaultRole = 'student';
-            console.log('useUserRole: Profile not found, using default role:', defaultRole);
-            setRole(defaultRole);
-            
-            // Try to create profile asynchronously
-            setTimeout(async () => {
-              try {
-                await supabase.from('profiles').insert({
-                  id: user.id,
-                  email: user.email,
-                  first_name: user.user_metadata?.first_name || '',
-                  last_name: user.user_metadata?.last_name || '',
-                  role: defaultRole
-                });
-                console.log('useUserRole: Created profile with default role');
-              } catch (insertError) {
-                console.error('useUserRole: Failed to create profile:', insertError);
-              }
-            }, 100);
-          } else {
-            setRole('student'); // Fallback
-          }
+          // Default to student
+          setRole('student');
         } else {
-          console.log('useUserRole: Found role in database:', data?.role);
           setRole(data?.role || 'student');
         }
       } catch (error) {
         console.error('useUserRole: Unexpected error:', error);
-        setRole('student'); // Fallback
+        setRole('student');
       } finally {
         setLoading(false);
       }
@@ -78,14 +50,12 @@ export const useUserRole = () => {
     fetchUserRole();
   }, [user]);
 
-  // Helper function to check if user has a specific role
   const hasRole = (targetRole: string): boolean => {
     if (!role) return false;
-    if (role === 'admin') return true; // Admin has all roles
+    if (role === 'admin') return true;
     return role.split('+').includes(targetRole);
   };
 
-  // Helper function to get all user roles as array
   const getAllRoles = (): string[] => {
     if (!role) return [];
     if (role === 'admin') return ['admin', 'educator', 'student'];

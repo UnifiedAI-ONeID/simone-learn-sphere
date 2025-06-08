@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
-import { ensureProfileExists } from '@/utils/authUtils';
 import { useToast } from '@/hooks/use-toast';
 
 const AuthCallback = () => {
@@ -15,7 +14,6 @@ const AuthCallback = () => {
       try {
         console.log('AuthCallback: Processing OAuth callback');
         
-        // Get the session from the URL hash/params
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -32,24 +30,15 @@ const AuthCallback = () => {
         if (data.session?.user) {
           console.log('AuthCallback: User authenticated:', data.session.user.id);
           
-          // Check for pending role selection from OAuth flow
+          // Get pending role and clean up
           const pendingUserRole = localStorage.getItem('pendingUserRole');
-          console.log('AuthCallback: Pending user role:', pendingUserRole);
-          
-          // Ensure profile exists - this will handle creation/updating
-          const userRole = await ensureProfileExists(
-            data.session.user.id, 
-            data.session.user, 
-            pendingUserRole
-          );
-          
-          // Clean up the pending role from localStorage
           if (pendingUserRole) {
             localStorage.removeItem('pendingUserRole');
-            console.log('AuthCallback: Cleared pending user role from localStorage');
           }
           
-          // Show success message
+          // Determine role
+          const userRole = pendingUserRole || data.session.user.user_metadata?.role || 'student';
+          
           toast({
             title: "Welcome!",
             description: `Successfully signed in as ${userRole}.`,
@@ -88,7 +77,6 @@ const AuthCallback = () => {
       <div className="text-center space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
         <p className="text-muted-foreground">Completing sign in...</p>
-        <p className="text-sm text-muted-foreground">Setting up your profile...</p>
       </div>
     </div>
   );

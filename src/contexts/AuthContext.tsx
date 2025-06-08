@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { cleanupAuthState, ensureProfileExists, logAuthEvent } from '@/utils/authUtils';
+import { cleanupAuthState } from '@/utils/authUtils';
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +22,44 @@ export const useAuth = () => {
   return context;
 };
 
+const createUserProfile = async (user: User, selectedRole?: string) => {
+  try {
+    const role = selectedRole || user.user_metadata?.role || 'student';
+    
+    const firstName = user.user_metadata?.first_name || 
+                      user.user_metadata?.full_name?.split(' ')[0] || 
+                      user.email?.split('@')[0] || 'User';
+    const lastName = user.user_metadata?.last_name || 
+                     user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '';
+
+    const profileData = {
+      id: user.id,
+      email: user.email || '',
+      first_name: firstName,
+      last_name: lastName,
+      role: role
+    };
+    
+    const { error } = await supabase
+      .from('profiles')
+      .upsert(profileData, { 
+        onConflict: 'id',
+        ignoreDuplicates: false 
+      });
+    
+    if (error) {
+      console.error('Error creating profile:', error);
+    } else {
+      console.log('Profile created/updated successfully:', role);
+    }
+    
+    return role;
+  } catch (error) {
+    console.error('Failed to create profile:', error);
+    return selectedRole || user.user_metadata?.role || 'student';
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -29,89 +67,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshProfile = async () => {
     if (!user) return;
-
+    
     try {
-      console.log('AuthProvider: Refreshing profile for user:', user.id);
-      await ensureProfileExists(user.id, user, user.user_metadata?.role);
+      await createUserProfile(user, user.user_metadata?.role);
     } catch (error) {
-      console.error('AuthProvider: Error refreshing profile:', error);
-      await logAuthEvent('profile_refresh_failed', {
-        user_id: user.id,
-        error: error.message
-      }, 'medium');
-    }
-  };
-
-  const validateSessionSecurity = async (userId: string) => {
-    try {
-      const sessionCount = parseInt(sessionStorage.getItem('activeSessionCount') || '0');
-      
-      if (sessionCount > 10) { // Increased from 5 to 10 for less restrictive validation
-        await logAuthEvent('excessive_sessions_detected', {
-          user_id: userId,
-          session_count: sessionCount
-        }, 'medium'); // Reduced from 'high' to 'medium'
-        
-        sessionStorage.setItem('activeSessionCount', '1');
-        return true; // Changed to return true instead of false to be less restrictive
-      }
-      
-      sessionStorage.setItem('activeSessionCount', (sessionCount + 1).toString());
-      return true;
-    } catch (error) {
-      console.error('Session security validation failed:', error);
-      return true; // Always return true to avoid blocking authentication
+      console.error('Error refreshing profile:', error);
     }
   };
 
   useEffect(() => {
-    console.log('AuthProvider: Initializing auth state');
-    
     let mounted = true;
 
     const initializeAuth = async () => {
       try {
-        // Clean up auth state but don't be too aggressive
-        localStorage.removeItem('pendingUserRole');
-
         const { data: { session: initialSession }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('AuthProvider: Error getting initial session:', error);
-          // Don't log this as it's often not critical
+          console.error('Error getting initial session:', error);
         }
 
         if (mounted) {
-          console.log('AuthProvider: Initial session:', initialSession ? 'exists' : 'none');
           setSession(initialSession);
           setUser(initialSession?.user ?? null);
           
+          // Create profile immediately if user exists
           if (initialSession?.user) {
-            const isSecure = await validateSessionSecurity(initialSession.user.id);
-            
-            if (isSecure) {
-              await logAuthEvent('session_restored', {
-                user_id: initialSession.user.id
-              }, 'low');
-              
-              // Defer profile creation to avoid blocking
-              setTimeout(() => {
-                if (mounted) {
-                  ensureProfileExists(
-                    initialSession.user.id, 
-                    initialSession.user, 
-                    initialSession.user.user_metadata?.role
-                  ).catch(error => {
-                    console.warn('Profile creation deferred failed:', error);
-                  });
-                }
-              }, 100);
+            const pendingRole = localStorage.getItem('pendingUserRole');
+            await createUserProfile(initialSession.user, pendingRole || undefined);
+            if (pendingRole) {
+              localStorage.removeItem('pendingUserRole');
             }
           }
         }
       } catch (error) {
-        console.error('AuthProvider: Error in initializeAuth:', error);
-        // Don't block authentication for initialization errors
+        console.error('Error in initializeAuth:', error);
       } finally {
         if (mounted) {
           setLoading(false);
@@ -123,50 +112,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       async (event, newSession) => {
         if (!mounted) return;
 
-        console.log('AuthProvider: Auth state changed:', event, newSession ? 'session exists' : 'no session');
+        console.log('Auth state changed:', event);
         
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
         if (event === 'SIGNED_IN' && newSession?.user) {
-          console.log('AuthProvider: User signed in, ensuring profile exists');
+          console.log('User signed in, creating profile');
           
-          const isSecure = await validateSessionSecurity(newSession.user.id);
-          
-          if (isSecure) {
-            await logAuthEvent('user_signed_in', {
-              user_id: newSession.user.id,
-              email: newSession.user.email,
-              provider: newSession.user.app_metadata?.provider
-            }, 'low');
-            
-            // Defer profile creation to avoid blocking the auth flow
-            setTimeout(() => {
-              if (mounted) {
-                ensureProfileExists(
-                  newSession.user.id, 
-                  newSession.user, 
-                  newSession.user.user_metadata?.role
-                ).catch(error => {
-                  console.warn('Profile creation failed, but user is still authenticated:', error);
-                });
-              }
-            }, 100);
+          // Create profile immediately on sign in
+          const pendingRole = localStorage.getItem('pendingUserRole');
+          await createUserProfile(newSession.user, pendingRole || undefined);
+          if (pendingRole) {
+            localStorage.removeItem('pendingUserRole');
           }
-        }
-
-        if (event === 'SIGNED_OUT') {
-          sessionStorage.removeItem('activeSessionCount');
-          await logAuthEvent('user_signed_out', {
-            timestamp: new Date().toISOString()
-          }, 'low');
-        }
-
-        if (event === 'TOKEN_REFRESHED' && newSession?.user) {
-          await logAuthEvent('token_refreshed', {
-            user_id: newSession.user.id,
-            timestamp: new Date().toISOString()
-          }, 'low');
         }
 
         if (mounted && !loading) {
@@ -185,33 +144,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      console.log('AuthProvider: Starting sign out process');
+      console.log('Starting sign out process');
       setLoading(true);
       
-      const currentUser = user;
-      
-      if (currentUser) {
-        await logAuthEvent('signout_initiated', {
-          user_id: currentUser.id,
-          timestamp: new Date().toISOString()
-        }, 'low');
-      }
-      
       cleanupAuthState();
-      sessionStorage.removeItem('activeSessionCount');
       
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       if (error) {
-        console.error('AuthProvider: Sign out error:', error);
-        await logAuthEvent('signout_failed', {
-          error: error.message,
-          user_id: currentUser?.id
-        }, 'medium');
-      } else {
-        await logAuthEvent('signout_completed', {
-          user_id: currentUser?.id,
-          timestamp: new Date().toISOString()
-        }, 'low');
+        console.error('Sign out error:', error);
       }
       
       setSession(null);
@@ -219,11 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       window.location.href = '/';
     } catch (error) {
-      console.error('AuthProvider: Unexpected sign out error:', error);
-      await logAuthEvent('signout_error', {
-        error: error.message,
-        user_id: user?.id
-      }, 'medium'); // Reduced from 'high' to 'medium'
+      console.error('Unexpected sign out error:', error);
     } finally {
       setLoading(false);
     }

@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
-import { handleAuthError, cleanupAuthState } from '@/utils/authUtils';
+import { cleanupAuthState } from '@/utils/authUtils';
 import { Brain, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { PasskeyAuth } from '@/components/PasskeyAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -56,23 +56,18 @@ const Auth = () => {
     setError('');
 
     try {
-      // Basic validation
+      // Simple validation
       if (!email || !password || !firstName || !lastName) {
         setError('Please fill in all required fields');
-        setIsLoading(false);
         return;
       }
 
-      if (password.length < 8) {
-        setError('Password must be at least 8 characters long');
-        setIsLoading(false);
+      if (password.length < 6) {
+        setError('Password must be at least 6 characters long');
         return;
       }
 
-      // Clean up any existing auth state
       cleanupAuthState();
-
-      // Store role selection for later use
       localStorage.setItem('pendingUserRole', selectedRole);
 
       const { data, error } = await supabase.auth.signUp({
@@ -88,7 +83,9 @@ const Auth = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       if (data.user && !data.session) {
         toast.success('Check your email for the confirmation link!');
@@ -100,7 +97,7 @@ const Auth = () => {
       }
     } catch (error: any) {
       console.error('Sign up error:', error);
-      const errorMessage = handleAuthError(error);
+      const errorMessage = error.message || 'Failed to create account. Please try again.';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -114,14 +111,11 @@ const Auth = () => {
     setError('');
 
     try {
-      // Basic validation
       if (!email || !password) {
         setError('Please enter both email and password');
-        setIsLoading(false);
         return;
       }
 
-      // Clean up any existing auth state
       cleanupAuthState();
 
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -129,7 +123,9 @@ const Auth = () => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       if (data.user) {
         toast.success('Welcome back!');
@@ -137,7 +133,7 @@ const Auth = () => {
       }
     } catch (error: any) {
       console.error('Sign in error:', error);
-      const errorMessage = handleAuthError(error);
+      const errorMessage = error.message || 'Failed to sign in. Please check your credentials.';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -151,25 +147,21 @@ const Auth = () => {
 
     try {
       cleanupAuthState();
-      
-      // Store role selection for OAuth flow
       localStorage.setItem('pendingUserRole', selectedRole);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
     } catch (error: any) {
       console.error('Google auth error:', error);
-      const errorMessage = handleAuthError(error, 'Google');
+      const errorMessage = 'Google authentication failed. Please try again.';
       setError(errorMessage);
       toast.error(errorMessage);
       setIsLoading(false);
@@ -188,17 +180,15 @@ const Auth = () => {
         provider: 'linkedin_oidc',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
     } catch (error: any) {
       console.error('LinkedIn auth error:', error);
-      const errorMessage = handleAuthError(error, 'LinkedIn');
+      const errorMessage = 'LinkedIn authentication failed. Please try again.';
       setError(errorMessage);
       toast.error(errorMessage);
       setIsLoading(false);
@@ -207,7 +197,6 @@ const Auth = () => {
 
   const handlePasskeySuccess = () => {
     toast.success('Authentication successful!');
-    // Navigation will be handled by auth context
   };
 
   // Show loading state while checking auth
@@ -226,7 +215,6 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 transition-colors duration-300">
-      {/* Theme Toggle - Positioned absolutely */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
@@ -401,12 +389,12 @@ const Auth = () => {
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Password (min 8 characters)"
+                      placeholder="Password (min 6 characters)"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 pr-10 bg-background border-input text-foreground"
                       required
-                      minLength={8}
+                      minLength={6}
                     />
                     <Button
                       type="button"
