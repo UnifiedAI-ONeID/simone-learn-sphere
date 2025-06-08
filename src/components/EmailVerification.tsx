@@ -1,9 +1,9 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -87,10 +87,10 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-center">
           <Mail className="h-5 w-5" />
-          <UnifiedLocalizedText text="Verify Your Email" />
+          Verify Your Email
         </CardTitle>
         <CardDescription className="text-center">
-          <UnifiedLocalizedText text="We've sent a verification code to your email address" />
+          We've sent a verification code to your email address
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -119,7 +119,7 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
             </InputOTP>
           </div>
           <p className="text-sm text-muted-foreground text-center">
-            <UnifiedLocalizedText text="Enter the 6-digit code from your email" />
+            Enter the 6-digit code from your email
           </p>
         </div>
 
@@ -130,11 +130,11 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
             className="w-full"
           >
             {isLoading ? (
-              <UnifiedLocalizedText text="Verifying..." />
+              "Verifying..."
             ) : (
               <>
                 <CheckCircle className="h-4 w-4 mr-2" />
-                <UnifiedLocalizedText text="Verify Email" />
+                Verify Email
               </>
             )}
           </Button>
@@ -147,7 +147,7 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
               className="flex-1"
             >
               <Mail className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text={isResending ? "Sending..." : "Resend Code"} />
+              {isResending ? "Sending..." : "Resend Code"}
             </Button>
             {onBack && (
               <Button
@@ -156,14 +156,14 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
                 disabled={isLoading || isResending}
                 className="flex-1"
               >
-                <UnifiedLocalizedText text="Back" />
+                Back
               </Button>
             )}
           </div>
         </div>
 
         <div className="text-center text-sm text-muted-foreground">
-          <UnifiedLocalizedText text="Didn't receive the email? Check your spam folder or try resending." />
+          Didn't receive the email? Check your spam folder or try resending.
         </div>
       </CardContent>
     </Card>

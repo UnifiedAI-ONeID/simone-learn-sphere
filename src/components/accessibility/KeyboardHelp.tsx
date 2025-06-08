@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -11,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Keyboard, HelpCircle } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export const KeyboardHelp: React.FC = () => {
@@ -91,10 +91,10 @@ export const KeyboardHelp: React.FC = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Keyboard className="h-5 w-5" />
-            <UnifiedLocalizedText text="Keyboard Shortcuts" />
+            Keyboard Shortcuts
           </DialogTitle>
           <DialogDescription>
-            <UnifiedLocalizedText text="Use these keyboard shortcuts to navigate the application more efficiently." />
+            Use these keyboard shortcuts to navigate the application more efficiently.
           </DialogDescription>
         </DialogHeader>
         
@@ -102,14 +102,14 @@ export const KeyboardHelp: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                <UnifiedLocalizedText text="Navigation Shortcuts" />
+                Navigation Shortcuts
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {shortcuts.map((shortcut, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-sm">
-                    <UnifiedLocalizedText text={shortcut.description} />
+                    {shortcut.description}
                   </span>
                   <Badge variant="outline" className="font-mono">
                     {formatShortcut(shortcut)}
@@ -122,33 +122,23 @@ export const KeyboardHelp: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                <UnifiedLocalizedText text="Accessibility Features" />
+                Accessibility Features
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="space-y-2 text-sm">
-                <p>
-                  <UnifiedLocalizedText text="• All interactive elements are keyboard accessible" />
-                </p>
-                <p>
-                  <UnifiedLocalizedText text="• Screen reader compatible with proper ARIA labels" />
-                </p>
-                <p>
-                  <UnifiedLocalizedText text="• High contrast mode available in accessibility settings" />
-                </p>
-                <p>
-                  <UnifiedLocalizedText text="• Font size controls for better readability" />
-                </p>
-                <p>
-                  <UnifiedLocalizedText text="• Reduced motion options for users with vestibular disorders" />
-                </p>
+                <p>• All interactive elements are keyboard accessible</p>
+                <p>• Screen reader compatible with proper ARIA labels</p>
+                <p>• High contrast mode available in accessibility settings</p>
+                <p>• Font size controls for better readability</p>
+                <p>• Reduced motion options for users with vestibular disorders</p>
               </div>
             </CardContent>
           </Card>
 
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <HelpCircle className="h-4 w-4" />
-            <UnifiedLocalizedText text="Press ? anywhere to open this help dialog" />
+            Press ? anywhere to open this help dialog
           </div>
         </div>
       </DialogContent>

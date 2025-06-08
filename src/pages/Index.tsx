@@ -9,7 +9,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
-import { useContentReadyState } from '@/hooks/useContentReadyState';
 import { Founders } from '@/components/Founders';
 
 // Lazy load heavy components
@@ -26,9 +25,17 @@ const Index = () => {
   const { role, loading: roleLoading } = useUserRole();
   const { isDarkMode, toggleDarkMode } = usePlatformTheme();
   const [componentsLoaded, setComponentsLoaded] = useState(false);
-  const { isContentReady } = useContentReadyState({ delay: 300, waitForImages: true });
+  const [isContentReady, setIsContentReady] = useState(false);
 
   console.log('Index: Rendering with user:', !!user, 'role:', role, 'authLoading:', authLoading, 'roleLoading:', roleLoading, 'contentReady:', isContentReady);
+
+  // Simple content ready state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsContentReady(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Redirect authenticated users to their dashboard
   useEffect(() => {

@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bot, Send, User, Loader2 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface LandingPageAssistantProps {
   className?: string;
@@ -54,10 +54,10 @@ export const LandingPageAssistant: React.FC<LandingPageAssistantProps> = ({ clas
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
-          <UnifiedLocalizedText text="AI Assistant" />
+          AI Assistant
         </CardTitle>
         <CardDescription>
-          <UnifiedLocalizedText text="Your personal guide to our platform" />
+          Your personal guide to our platform
         </CardDescription>
       </CardHeader>
       <CardContent className="h-[400px] flex flex-col">
@@ -104,7 +104,7 @@ export const LandingPageAssistant: React.FC<LandingPageAssistantProps> = ({ clas
           />
           <Button onClick={handleSend} disabled={isLoading}>
             <Send className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Send" />
+            Send
           </Button>
         </div>
       </CardContent>

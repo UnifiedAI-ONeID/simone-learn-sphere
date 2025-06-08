@@ -2,7 +2,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { GraduationCap, Users } from 'lucide-react';
 
 interface RoleSelectorProps {
@@ -31,7 +30,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({ value, onValueChange
   return (
     <div className="space-y-3">
       <Label className="text-sm font-medium">
-        <UnifiedLocalizedText text="Select your role" />
+        Select your role
       </Label>
       <div className="grid gap-3">
         {roleOptions.map((role) => {
@@ -47,10 +46,10 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({ value, onValueChange
               <IconComponent className={`h-5 w-5 mr-3 flex-shrink-0 ${value === role.value ? 'text-primary-foreground' : role.color}`} />
               <div>
                 <div className="font-medium">
-                  <UnifiedLocalizedText text={role.label} />
+                  {role.label}
                 </div>
                 <div className={`text-sm ${value === role.value ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
-                  <UnifiedLocalizedText text={role.description} />
+                  {role.description}
                 </div>
               </div>
             </Button>

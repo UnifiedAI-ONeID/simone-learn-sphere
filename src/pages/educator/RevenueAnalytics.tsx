@@ -1,10 +1,10 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { DollarSign, TrendingUp, BarChart3, Download } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const RevenueAnalytics = () => {
   const revenueData = {
@@ -18,10 +18,10 @@ export const RevenueAnalytics = () => {
     <div className="container mx-auto px-4 py-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">
-          <UnifiedLocalizedText text="Revenue Analytics" />
+          Revenue Analytics
         </h1>
         <p className="text-muted-foreground">
-          <UnifiedLocalizedText text="Track your earnings and performance" />
+          Track your earnings and performance
         </p>
       </div>
 
@@ -30,10 +30,10 @@ export const RevenueAnalytics = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                <UnifiedLocalizedText text="Total Revenue" />
+                Total Revenue
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Overall earnings from your courses" />
+                Overall earnings from your courses
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -43,7 +43,7 @@ export const RevenueAnalytics = () => {
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
                 <span className="text-sm text-green-500">
-                  +{revenueData.monthlyGrowth}% <UnifiedLocalizedText text="Monthly growth" />
+                  +{revenueData.monthlyGrowth}% Monthly growth
                 </span>
               </div>
             </CardContent>
@@ -52,10 +52,10 @@ export const RevenueAnalytics = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                <UnifiedLocalizedText text="Top Performing Course" />
+                Top Performing Course
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Your most popular course" />
+                Your most popular course
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -63,7 +63,7 @@ export const RevenueAnalytics = () => {
               <div className="flex items-center mt-2">
                 <BarChart3 className="h-4 w-4 text-blue-500 mr-1" />
                 <span className="text-sm text-blue-500">
-                  <UnifiedLocalizedText text="View detailed analytics" />
+                  View detailed analytics
                 </span>
               </div>
             </CardContent>
@@ -74,10 +74,10 @@ export const RevenueAnalytics = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                <UnifiedLocalizedText text="Downloads" />
+                Downloads
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Total downloads of course materials" />
+                Total downloads of course materials
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -85,7 +85,7 @@ export const RevenueAnalytics = () => {
               <div className="flex items-center mt-2">
                 <Download className="h-4 w-4 text-gray-500 mr-1" />
                 <span className="text-sm text-gray-500">
-                  <UnifiedLocalizedText text="Track download trends" />
+                  Track download trends
                 </span>
               </div>
             </CardContent>
@@ -94,10 +94,10 @@ export const RevenueAnalytics = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                <UnifiedLocalizedText text="Earnings Breakdown" />
+                Earnings Breakdown
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Revenue distribution by course" />
+                Revenue distribution by course
               </CardDescription>
             </CardHeader>
             <CardContent>
