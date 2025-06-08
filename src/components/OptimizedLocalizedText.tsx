@@ -127,60 +127,59 @@ export const OptimizedLocalizedText: React.FC<OptimizedLocalizedTextProps> = ({
 
   // Render loading state
   if (isLoading && showLoadingSpinner) {
-    const props: any = {
-      className: cn(className, "inline-flex items-center space-x-1")
-    };
-    if (lazy) props.ref = setElementRef;
-
-    const children = fallback || [
-      React.createElement(Loader2, { key: "loader", className: "h-3 w-3 animate-spin" }),
-      React.createElement("span", { key: "text" }, text)
-    ];
-
-    return React.createElement(Component, props, children);
+    return (
+      <Component 
+        className={cn(className, "inline-flex items-center space-x-1")}
+        ref={lazy ? setElementRef : undefined}
+      >
+        {fallback || (
+          <>
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>{text}</span>
+          </>
+        )}
+      </Component>
+    );
   }
 
   // Render error state
   if (hasError || translationError) {
-    const props: any = {
-      className: cn(className, "inline-flex items-center space-x-1"),
-      title: hasError ? 'Translation failed, showing original text' : translationError || undefined
-    };
-    if (lazy) props.ref = setElementRef;
-
-    const children = [
-      React.createElement("span", { 
-        key: "text",
-        className: hasError ? "text-orange-600" : undefined 
-      }, localizedText)
-    ];
-
-    if (showRetryButton && retryCount < maxRetries) {
-      children.push(React.createElement(Button, {
-        key: "retry",
-        variant: "ghost",
-        size: "sm",
-        onClick: handleRetry,
-        className: "h-4 w-4 p-0 ml-1",
-        title: "Retry translation"
-      }, React.createElement(RefreshCw, { className: "h-3 w-3" })));
-    }
-
-    if (hasError) {
-      children.push(React.createElement(AlertTriangle, { 
-        key: "error", 
-        className: "h-3 w-3 text-orange-500" 
-      }));
-    }
-
-    return React.createElement(Component, props, children);
+    return (
+      <Component 
+        className={cn(className, "inline-flex items-center space-x-1")}
+        title={hasError ? 'Translation failed, showing original text' : translationError || undefined}
+        ref={lazy ? setElementRef : undefined}
+      >
+        <span className={hasError ? "text-orange-600" : undefined}>
+          {localizedText}
+        </span>
+        {showRetryButton && retryCount < maxRetries && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRetry}
+            className="h-4 w-4 p-0 ml-1"
+            title="Retry translation"
+          >
+            <RefreshCw className="h-3 w-3" />
+          </Button>
+        )}
+        {hasError && (
+          <AlertTriangle className="h-3 w-3 text-orange-500" />
+        )}
+      </Component>
+    );
   }
 
   // Render normal state
-  const props: any = { className };
-  if (lazy) props.ref = setElementRef;
-
-  return React.createElement(Component, props, localizedText);
+  return (
+    <Component 
+      className={className}
+      ref={lazy ? setElementRef : undefined}
+    >
+      {localizedText}
+    </Component>
+  );
 };
 
 // Export with legacy names for compatibility
