@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { useEnhancedAuthentication } from '@/hooks/useEnhancedAuthentication';
 import { RoleSelector } from './RoleSelector';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { 
   Eye, 
   EyeOff, 
@@ -95,10 +95,10 @@ export const EnhancedAuthForm: React.FC = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">
-            <UnifiedLocalizedText text="Welcome to SimoneLabs" />
+            Welcome to SimoneLabs
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Sign in to your account or create a new one" />
+            Sign in to your account or create a new one
           </CardDescription>
         </CardHeader>
         
@@ -124,7 +124,7 @@ export const EnhancedAuthForm: React.FC = () => {
             <Alert className="mb-4">
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                <UnifiedLocalizedText text="Try signing in with Google or LinkedIn for faster access" />
+                Try signing in with Google or LinkedIn for faster access
               </AlertDescription>
             </Alert>
           )}
@@ -133,7 +133,7 @@ export const EnhancedAuthForm: React.FC = () => {
             <Alert className="mb-4">
               <Mail className="h-4 w-4" />
               <AlertDescription>
-                <UnifiedLocalizedText text={`Verification email sent to ${authState.pendingVerificationEmail}. Please check your inbox.`} />
+                {`Verification email sent to ${authState.pendingVerificationEmail}. Please check your inbox.`}
               </AlertDescription>
             </Alert>
           )}
@@ -147,7 +147,7 @@ export const EnhancedAuthForm: React.FC = () => {
               className="w-full"
             >
               <Chrome className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text="Google" />
+              Google
             </Button>
             <Button
               variant="outline"
@@ -156,7 +156,7 @@ export const EnhancedAuthForm: React.FC = () => {
               className="w-full"
             >
               <Linkedin className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text="LinkedIn" />
+              LinkedIn
             </Button>
           </div>
 
@@ -166,7 +166,7 @@ export const EnhancedAuthForm: React.FC = () => {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                <UnifiedLocalizedText text="Or continue with email" />
+                Or continue with email
               </span>
             </div>
           </div>
@@ -174,10 +174,10 @@ export const EnhancedAuthForm: React.FC = () => {
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">
-                <UnifiedLocalizedText text="Sign In" />
+                Sign In
               </TabsTrigger>
               <TabsTrigger value="signup">
-                <UnifiedLocalizedText text="Sign Up" />
+                Sign Up
               </TabsTrigger>
             </TabsList>
 
@@ -185,7 +185,7 @@ export const EnhancedAuthForm: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">
-                    <UnifiedLocalizedText text="Email" />
+                    Email
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -203,7 +203,7 @@ export const EnhancedAuthForm: React.FC = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="signin-password">
-                    <UnifiedLocalizedText text="Password" />
+                    Password
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -232,7 +232,7 @@ export const EnhancedAuthForm: React.FC = () => {
                   {isLoading ? (
                     <LoadingSpinner size="sm" />
                   ) : (
-                    <UnifiedLocalizedText text="Sign In" />
+                    'Sign In'
                   )}
                 </Button>
 
@@ -243,7 +243,7 @@ export const EnhancedAuthForm: React.FC = () => {
                   onClick={handlePasswordReset}
                   disabled={!formData.email}
                 >
-                  <UnifiedLocalizedText text="Forgot your password?" />
+                  Forgot your password?
                 </Button>
               </form>
             </TabsContent>
@@ -258,7 +258,7 @@ export const EnhancedAuthForm: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="first-name">
-                      <UnifiedLocalizedText text="First Name" />
+                      First Name
                     </Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -275,7 +275,7 @@ export const EnhancedAuthForm: React.FC = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="last-name">
-                      <UnifiedLocalizedText text="Last Name" />
+                      Last Name
                     </Label>
                     <Input
                       id="last-name"
@@ -289,7 +289,7 @@ export const EnhancedAuthForm: React.FC = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">
-                    <UnifiedLocalizedText text="Email" />
+                    Email
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -307,7 +307,7 @@ export const EnhancedAuthForm: React.FC = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">
-                    <UnifiedLocalizedText text="Password" />
+                    Password
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -331,7 +331,7 @@ export const EnhancedAuthForm: React.FC = () => {
                     </Button>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    <UnifiedLocalizedText text="Password must contain 8+ characters with uppercase, lowercase, numbers, and symbols" />
+                    Password must contain 8+ characters with uppercase, lowercase, numbers, and symbols
                   </div>
                 </div>
 
@@ -343,7 +343,7 @@ export const EnhancedAuthForm: React.FC = () => {
                   {isLoading ? (
                     <LoadingSpinner size="sm" />
                   ) : (
-                    <UnifiedLocalizedText text="Create Account" />
+                    'Create Account'
                   )}
                 </Button>
               </form>
@@ -353,7 +353,7 @@ export const EnhancedAuthForm: React.FC = () => {
           {authState.retryCount > 0 && (
             <div className="mt-4 text-center">
               <Badge variant="outline">
-                <UnifiedLocalizedText text={`Retry attempt: ${authState.retryCount}`} />
+                {`Retry attempt: ${authState.retryCount}`}
               </Badge>
             </div>
           )}

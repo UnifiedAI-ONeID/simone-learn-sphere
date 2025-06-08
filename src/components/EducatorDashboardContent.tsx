@@ -22,7 +22,6 @@ import {
   Brain,
   BarChart3
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useEducatorDashboardData } from '@/hooks/useDashboardData';
 
 export const EducatorDashboardContent = () => {
@@ -42,10 +41,10 @@ export const EducatorDashboardContent = () => {
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          <UnifiedLocalizedText text="Failed to load educator data. Please try again." />
+          Failed to load educator data. Please try again.
           <Button variant="outline" size="sm" onClick={refetch} className="ml-2">
             <RefreshCw className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Retry" />
+            Retry
           </Button>
         </AlertDescription>
       </Alert>
@@ -61,15 +60,15 @@ export const EducatorDashboardContent = () => {
               <BookOpen className="h-16 w-16 text-green-600" />
             </div>
             <CardTitle className="text-2xl">
-              <UnifiedLocalizedText text="Welcome to Your Teaching Journey!" />
+              Welcome to Your Teaching Journey!
             </CardTitle>
             <CardDescription className="text-lg">
-              <UnifiedLocalizedText text="Start creating courses and sharing your knowledge with the world" />
+              Start creating courses and sharing your knowledge with the world
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              <UnifiedLocalizedText text="Create your first course to begin your journey as an educator on our platform" />
+              Create your first course to begin your journey as an educator on our platform
             </p>
             <div className="flex justify-center space-x-4">
               <Button 
@@ -77,11 +76,11 @@ export const EducatorDashboardContent = () => {
                 onClick={() => navigate('/educator/course/create')}
               >
                 <PlusCircle className="h-5 w-5 mr-2" />
-                <UnifiedLocalizedText text="Create Your First Course" />
+                Create Your First Course
               </Button>
               <Button variant="outline" onClick={() => navigate('/educator/ai-planner')}>
                 <Brain className="h-5 w-5 mr-2" />
-                <UnifiedLocalizedText text="Use AI Course Planner" />
+                Use AI Course Planner
               </Button>
             </div>
           </CardContent>
@@ -97,17 +96,17 @@ export const EducatorDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg">
-                    <UnifiedLocalizedText text="AI Course Builder" />
+                    AI Course Builder
                   </CardTitle>
                   <CardDescription>
-                    <UnifiedLocalizedText text="Let AI help you create courses" />
+                    Let AI help you create courses
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <UnifiedLocalizedText text="Use our AI to generate course outlines, lesson plans, and quizzes from your expertise" />
+                Use our AI to generate course outlines, lesson plans, and quizzes from your expertise
               </p>
             </CardContent>
           </Card>
@@ -120,17 +119,17 @@ export const EducatorDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg">
-                    <UnifiedLocalizedText text="Student Engagement" />
+                    Student Engagement
                   </CardTitle>
                   <CardDescription>
-                    <UnifiedLocalizedText text="Build an engaged community" />
+                    Build an engaged community
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <UnifiedLocalizedText text="Connect with students through discussions, Q&A, and personalized feedback" />
+                Connect with students through discussions, Q&A, and personalized feedback
               </p>
             </CardContent>
           </Card>
@@ -143,17 +142,17 @@ export const EducatorDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg">
-                    <UnifiedLocalizedText text="Earn Revenue" />
+                    Earn Revenue
                   </CardTitle>
                   <CardDescription>
-                    <UnifiedLocalizedText text="Monetize your expertise" />
+                    Monetize your expertise
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <UnifiedLocalizedText text="Set your course prices and earn revenue from students around the world" />
+                Set your course prices and earn revenue from students around the world
               </p>
             </CardContent>
           </Card>
@@ -168,20 +167,20 @@ export const EducatorDashboardContent = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">
-            <UnifiedLocalizedText text="Educator Dashboard" />
+            Educator Dashboard
           </h1>
           <p className="text-muted-foreground">
-            <UnifiedLocalizedText text="Manage your courses and track student progress" />
+            Manage your courses and track student progress
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={refetch}>
             <RefreshCw className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Refresh" />
+            Refresh
           </Button>
           <Button onClick={() => navigate('/educator/course/create')}>
             <PlusCircle className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Create Course" />
+            Create Course
           </Button>
         </div>
       </div>
@@ -191,14 +190,14 @@ export const EducatorDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Total Courses" />
+              Total Courses
             </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{educatorData.totalCourses}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Published courses" />
+              Published courses
             </p>
           </CardContent>
         </Card>
@@ -206,14 +205,14 @@ export const EducatorDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Total Students" />
+              Total Students
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{educatorData.totalStudents}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Enrolled students" />
+              Enrolled students
             </p>
           </CardContent>
         </Card>
@@ -221,14 +220,14 @@ export const EducatorDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Total Revenue" />
+              Total Revenue
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${educatorData.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Lifetime earnings" />
+              Lifetime earnings
             </p>
           </CardContent>
         </Card>
@@ -236,14 +235,14 @@ export const EducatorDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Average Rating" />
+              Average Rating
             </CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{educatorData.avgRating.toFixed(1)}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Course rating" />
+              Course rating
             </p>
           </CardContent>
         </Card>
@@ -255,10 +254,10 @@ export const EducatorDashboardContent = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle>
-                <UnifiedLocalizedText text="My Courses" />
+                My Courses
               </CardTitle>
               <Button size="sm" onClick={() => navigate('/educator/courses')}>
-                <UnifiedLocalizedText text="View All" />
+                View All
               </Button>
             </div>
           </CardHeader>
@@ -276,7 +275,7 @@ export const EducatorDashboardContent = () => {
                     </div>
                     <Button size="sm" variant="outline">
                       <BarChart3 className="h-4 w-4 mr-2" />
-                      <UnifiedLocalizedText text="Analytics" />
+                      Analytics
                     </Button>
                   </div>
                   
@@ -297,10 +296,10 @@ export const EducatorDashboardContent = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="Recent Enrollments" />
+              Recent Enrollments
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Latest students who joined your courses" />
+              Latest students who joined your courses
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -308,7 +307,7 @@ export const EducatorDashboardContent = () => {
               <div className="text-center py-8">
                 <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  <UnifiedLocalizedText text="No recent enrollments. Promote your courses to attract more students!" />
+                  No recent enrollments. Promote your courses to attract more students!
                 </p>
               </div>
             ) : (

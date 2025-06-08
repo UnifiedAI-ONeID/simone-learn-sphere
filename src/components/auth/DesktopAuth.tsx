@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { RoleSelector } from './RoleSelector';
 import { useEnhancedAuthentication } from '@/hooks/useEnhancedAuthentication';
 import { 
@@ -93,10 +93,10 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
         <CardHeader className="text-center">
           <CardTitle className="flex items-center gap-2 justify-center text-2xl">
             <Brain className="h-6 w-6" />
-            <UnifiedLocalizedText text="Welcome to SimoneLabs" />
+            Welcome to SimoneLabs
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Sign in to your account or create a new one" />
+            Sign in to your account or create a new one
           </CardDescription>
         </CardHeader>
         
@@ -111,7 +111,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
           {authState.suggestOAuth && (
             <Alert>
               <AlertDescription>
-                <UnifiedLocalizedText text="Try signing in with Google or LinkedIn for a faster experience!" />
+                Try signing in with Google or LinkedIn for a faster experience!
               </AlertDescription>
             </Alert>
           )}
@@ -125,7 +125,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
               className="w-full"
             >
               <Chrome className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text="Continue with Google" />
+              Continue with Google
             </Button>
             <Button
               variant="outline"
@@ -134,7 +134,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
               className="w-full"
             >
               <Linkedin className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text="Continue with LinkedIn" />
+              Continue with LinkedIn
             </Button>
           </div>
 
@@ -144,7 +144,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                <UnifiedLocalizedText text="Or continue with email" />
+                Or continue with email
               </span>
             </div>
           </div>
@@ -152,10 +152,10 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">
-                <UnifiedLocalizedText text="Sign In" />
+                Sign In
               </TabsTrigger>
               <TabsTrigger value="signup">
-                <UnifiedLocalizedText text="Sign Up" />
+                Sign Up
               </TabsTrigger>
             </TabsList>
 
@@ -163,7 +163,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">
-                    <UnifiedLocalizedText text="Email" />
+                    Email
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -181,7 +181,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
 
                 <div className="space-y-2">
                   <Label htmlFor="signin-password">
-                    <UnifiedLocalizedText text="Password" />
+                    Password
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -207,7 +207,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Signing in...' : <UnifiedLocalizedText text="Sign In" />}
+                  {isLoading ? 'Signing in...' : 'Sign In'}
                 </Button>
               </form>
             </TabsContent>
@@ -222,7 +222,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="first-name">
-                      <UnifiedLocalizedText text="First Name" />
+                      First Name
                     </Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -239,7 +239,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
 
                   <div className="space-y-2">
                     <Label htmlFor="last-name">
-                      <UnifiedLocalizedText text="Last Name" />
+                      Last Name
                     </Label>
                     <Input
                       id="last-name"
@@ -253,7 +253,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
 
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">
-                    <UnifiedLocalizedText text="Email" />
+                    Email
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -271,7 +271,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
 
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">
-                    <UnifiedLocalizedText text="Password" />
+                    Password
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -295,7 +295,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
                     </Button>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    <UnifiedLocalizedText text="8+ characters with uppercase, lowercase, numbers, and symbols" />
+                    8+ characters with uppercase, lowercase, numbers, and symbols
                   </div>
                 </div>
 
@@ -304,7 +304,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
                   className="w-full" 
                   disabled={isLoading || !selectedRole}
                 >
-                  {isLoading ? 'Creating account...' : <UnifiedLocalizedText text="Create Account" />}
+                  {isLoading ? 'Creating account...' : 'Create Account'}
                 </Button>
               </form>
             </TabsContent>
@@ -316,7 +316,7 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
               onClick={onClose}
               className="text-muted-foreground hover:text-foreground"
             >
-              <UnifiedLocalizedText text="Back to home" />
+              Back to home
             </Button>
           </div>
         </CardContent>

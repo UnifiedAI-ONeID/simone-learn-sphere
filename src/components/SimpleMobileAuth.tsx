@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useEnhancedAuthentication } from '@/hooks/useEnhancedAuthentication';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { 
   Eye, 
   EyeOff, 
@@ -106,10 +106,10 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
     <Card className="w-full max-w-sm mx-auto bg-card/80 backdrop-blur-sm border-border/50">
       <CardHeader className="text-center pb-4">
         <CardTitle className="text-xl">
-          <UnifiedLocalizedText text="Welcome to SimoneLabs" />
+          Welcome to SimoneLabs
         </CardTitle>
         <CardDescription>
-          <UnifiedLocalizedText text="Sign in to your account or create a new one" />
+          Sign in to your account or create a new one
         </CardDescription>
       </CardHeader>
       
@@ -124,7 +124,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
         {authState.suggestOAuth && (
           <Alert>
             <AlertDescription>
-              <UnifiedLocalizedText text="Try signing in with Google or LinkedIn for a faster experience!" />
+              Try signing in with Google or LinkedIn for a faster experience!
             </AlertDescription>
           </Alert>
         )}
@@ -138,7 +138,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
             className="w-full"
           >
             <Chrome className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Continue with Google" />
+            Continue with Google
           </Button>
           <Button
             variant="outline"
@@ -147,7 +147,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
             className="w-full"
           >
             <Linkedin className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Continue with LinkedIn" />
+            Continue with LinkedIn
           </Button>
         </div>
 
@@ -157,7 +157,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-card px-2 text-muted-foreground">
-              <UnifiedLocalizedText text="Or continue with email" />
+              Or continue with email
             </span>
           </div>
         </div>
@@ -165,10 +165,10 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">
-              <UnifiedLocalizedText text="Sign In" />
+              Sign In
             </TabsTrigger>
             <TabsTrigger value="signup">
-              <UnifiedLocalizedText text="Sign Up" />
+              Sign Up
             </TabsTrigger>
           </TabsList>
 
@@ -176,7 +176,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="space-y-2">
                 <Label htmlFor="signin-email" className="text-sm">
-                  <UnifiedLocalizedText text="Email" />
+                  Email
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -194,7 +194,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
 
               <div className="space-y-2">
                 <Label htmlFor="signin-password" className="text-sm">
-                  <UnifiedLocalizedText text="Password" />
+                  Password
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -220,7 +220,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : <UnifiedLocalizedText text="Sign In" />}
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
           </TabsContent>
@@ -230,7 +230,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
               {/* Role Selection */}
               <div className="space-y-2">
                 <Label className="text-sm">
-                  <UnifiedLocalizedText text="I am a..." />
+                  I am a...
                 </Label>
                 <div className="grid gap-2">
                   {roleOptions.map((role) => {
@@ -257,7 +257,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <Label htmlFor="first-name" className="text-sm">
-                    <UnifiedLocalizedText text="First Name" />
+                    First Name
                   </Label>
                   <Input
                     id="first-name"
@@ -269,7 +269,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="last-name" className="text-sm">
-                    <UnifiedLocalizedText text="Last Name" />
+                    Last Name
                   </Label>
                   <Input
                     id="last-name"
@@ -283,7 +283,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
 
               <div className="space-y-2">
                 <Label htmlFor="signup-email" className="text-sm">
-                  <UnifiedLocalizedText text="Email" />
+                  Email
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -301,7 +301,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
 
               <div className="space-y-2">
                 <Label htmlFor="signup-password" className="text-sm">
-                  <UnifiedLocalizedText text="Password" />
+                  Password
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -325,7 +325,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
                   </Button>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  <UnifiedLocalizedText text="8+ characters with uppercase, lowercase, numbers, and symbols" />
+                  8+ characters with uppercase, lowercase, numbers, and symbols
                 </div>
               </div>
 
@@ -334,7 +334,7 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
                 className="w-full" 
                 disabled={isLoading || !selectedRole}
               >
-                {isLoading ? 'Creating account...' : <UnifiedLocalizedText text="Create Account" />}
+                {isLoading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
           </TabsContent>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,7 +28,6 @@ import {
   RefreshCw,
   AlertTriangle
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useStudentDashboardData } from '@/hooks/useDashboardData';
 
 export const StudentDashboardContent = () => {
@@ -49,10 +47,10 @@ export const StudentDashboardContent = () => {
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          <UnifiedLocalizedText text="Failed to load your dashboard data. Please try again." />
+          Failed to load your dashboard data. Please try again.
           <Button variant="outline" size="sm" onClick={refetch} className="ml-2">
             <RefreshCw className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Retry" />
+            Retry
           </Button>
         </AlertDescription>
       </Alert>
@@ -70,15 +68,15 @@ export const StudentDashboardContent = () => {
               <Sparkles className="h-16 w-16 text-primary" />
             </div>
             <CardTitle className="text-2xl text-foreground">
-              <UnifiedLocalizedText text="Welcome to Your Learning Journey!" />
+              Welcome to Your Learning Journey!
             </CardTitle>
             <CardDescription className="text-lg text-muted-foreground">
-              <UnifiedLocalizedText text="You're about to embark on an amazing adventure of knowledge and growth" />
+              You're about to embark on an amazing adventure of knowledge and growth
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              <UnifiedLocalizedText text="Start by exploring our course catalog and enrolling in your first course" />
+              Start by exploring our course catalog and enrolling in your first course
             </p>
             <Button 
               size="lg" 
@@ -86,7 +84,7 @@ export const StudentDashboardContent = () => {
               onClick={() => navigate('/student/courses')}
             >
               <BookOpen className="h-5 w-5 mr-2" />
-              <UnifiedLocalizedText text="Browse Courses" />
+              Browse Courses
             </Button>
           </CardContent>
         </Card>
@@ -102,17 +100,17 @@ export const StudentDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <UnifiedLocalizedText text="Browse Courses" />
+                    Browse Courses
                   </CardTitle>
                   <CardDescription>
-                    <UnifiedLocalizedText text="Find your perfect learning path" />
+                    Find your perfect learning path
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <UnifiedLocalizedText text="Explore hundreds of courses across different subjects and skill levels" />
+                Explore hundreds of courses across different subjects and skill levels
               </p>
             </CardContent>
           </Card>
@@ -126,17 +124,17 @@ export const StudentDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <UnifiedLocalizedText text="AI Study Assistant" />
+                    AI Study Assistant
                   </CardTitle>
                   <CardDescription>
-                    <UnifiedLocalizedText text="Get personalized help anytime" />
+                    Get personalized help anytime
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <UnifiedLocalizedText text="Ask questions and get instant, personalized learning support" />
+                Ask questions and get instant, personalized learning support
               </p>
             </CardContent>
           </Card>
@@ -150,17 +148,17 @@ export const StudentDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <UnifiedLocalizedText text="Study Groups" />
+                    Study Groups
                   </CardTitle>
                   <CardDescription>
-                    <UnifiedLocalizedText text="Learn with peers" />
+                    Learn with peers
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <UnifiedLocalizedText text="Join study groups and collaborate with fellow learners" />
+                Join study groups and collaborate with fellow learners
               </p>
             </CardContent>
           </Card>
@@ -171,7 +169,7 @@ export const StudentDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Heart className="h-5 w-5 text-red-500" />
-              <UnifiedLocalizedText text="Why Learning Matters" />
+              Why Learning Matters
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -181,10 +179,10 @@ export const StudentDashboardContent = () => {
                   <Trophy className="h-5 w-5 text-yellow-500 mt-1" />
                   <div>
                     <h4 className="font-medium text-foreground">
-                      <UnifiedLocalizedText text="Build Confidence" />
+                      Build Confidence
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      <UnifiedLocalizedText text="Every lesson completed is a step towards mastering new skills" />
+                      Every lesson completed is a step towards mastering new skills
                     </p>
                   </div>
                 </div>
@@ -192,10 +190,10 @@ export const StudentDashboardContent = () => {
                   <TrendingUp className="h-5 w-5 text-green-500 mt-1" />
                   <div>
                     <h4 className="font-medium text-foreground">
-                      <UnifiedLocalizedText text="Advance Your Career" />
+                      Advance Your Career
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      <UnifiedLocalizedText text="Gain valuable skills that employers are looking for" />
+                      Gain valuable skills that employers are looking for
                     </p>
                   </div>
                 </div>
@@ -205,10 +203,10 @@ export const StudentDashboardContent = () => {
                   <Zap className="h-5 w-5 text-blue-500 mt-1" />
                   <div>
                     <h4 className="font-medium text-foreground">
-                      <UnifiedLocalizedText text="Learn at Your Pace" />
+                      Learn at Your Pace
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      <UnifiedLocalizedText text="Flexible learning that fits your schedule and lifestyle" />
+                      Flexible learning that fits your schedule and lifestyle
                     </p>
                   </div>
                 </div>
@@ -216,10 +214,10 @@ export const StudentDashboardContent = () => {
                   <Star className="h-5 w-5 text-purple-500 mt-1" />
                   <div>
                     <h4 className="font-medium text-foreground">
-                      <UnifiedLocalizedText text="Achieve Your Goals" />
+                      Achieve Your Goals
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      <UnifiedLocalizedText text="Transform your aspirations into reality with structured learning" />
+                      Transform your aspirations into reality with structured learning
                     </p>
                   </div>
                 </div>
@@ -240,14 +238,14 @@ export const StudentDashboardContent = () => {
               onClick={() => navigate('/student/streak')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Current Streak" />
+              Current Streak
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">{studentData.currentStreak} days</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Keep it going!" />
+              Keep it going!
             </p>
           </CardContent>
         </Card>
@@ -255,14 +253,14 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Total Points" />
+              Total Points
             </CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">{studentData.totalPoints}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Learning points earned" />
+              Learning points earned
             </p>
           </CardContent>
         </Card>
@@ -270,14 +268,14 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Enrolled Courses" />
+              Enrolled Courses
             </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">{studentData.enrolledCourses}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Active courses" />
+              Active courses
             </p>
           </CardContent>
         </Card>
@@ -286,14 +284,14 @@ export const StudentDashboardContent = () => {
               onClick={() => navigate('/student/badges')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Badges Earned" />
+              Badges Earned
             </CardTitle>
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">{studentData.badges.length}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Achievements unlocked" />
+              Achievements unlocked
             </p>
           </CardContent>
         </Card>
@@ -304,43 +302,40 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <BookOpen className="h-5 w-5" />
-                <UnifiedLocalizedText text="Continue Learning" />
+              <CardTitle className="text-foreground">
+                Continue Learning
               </CardTitle>
-              <Button size="sm" onClick={() => navigate('/student/courses')}>
-                <UnifiedLocalizedText text="View All" />
+              <Button size="sm" variant="outline" onClick={() => navigate('/student/courses')}>
+                View All
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {studentData.recentCourses.map((course) => (
-              <div key={course.id} className="p-4 border border-border rounded-lg bg-background cursor-pointer hover:bg-accent transition-colors"
-                   onClick={() => navigate(`/student/course/${course.id}`)}>
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="font-semibold text-foreground">{course.title}</h3>
-                    <Badge variant="secondary" className="mt-1">
-                      In Progress
-                    </Badge>
+          <CardContent>
+            <div className="space-y-4">
+              {studentData.recentCourses.map((course) => (
+                <div key={course.id} className="p-4 border rounded-lg hover:bg-accent transition-colors cursor-pointer"
+                     onClick={() => navigate(`/student/course/${course.id}`)}>
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-semibold text-foreground">{course.title}</h3>
+                      <p className="text-sm text-muted-foreground">{course.instructor}</p>
+                    </div>
+                    <Button size="sm" variant="outline">
+                      <Play className="h-4 w-4 mr-2" />
+                      Continue
+                    </Button>
                   </div>
-                  <Button size="sm" variant="outline">
-                    <Play className="h-4 w-4 mr-2" />
-                    Continue
-                  </Button>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Progress</span>
+                      <span className="text-foreground">{course.progress}% complete</span>
+                    </div>
+                    <Progress value={course.progress} className="h-2" />
+                  </div>
                 </div>
-                
-                <Progress value={course.progress} className="mb-3" />
-                
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{course.progress}% complete</span>
-                  <span className="flex items-center">
-                    <Clock className="h-3 w-3 mr-1" />
-                    {new Date(course.lastAccessed).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -348,11 +343,11 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
-              <Trophy className="h-5 w-5" />
-              <UnifiedLocalizedText text="Recent Achievements" />
+              <Trophy className="h-5 w-5 text-yellow-500" />
+              Recent Achievements
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Your latest badges and milestones" />
+              Your latest badges and milestones
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -360,27 +355,25 @@ export const StudentDashboardContent = () => {
               <div className="text-center py-8">
                 <Trophy className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  <UnifiedLocalizedText text="Start learning to earn your first badge!" />
+                  No achievements yet. Keep learning to unlock your first badge!
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
-                {studentData.badges.slice(0, 3).map((badge) => (
-                  <div key={badge.id} className="flex items-center space-x-3 p-3 border rounded-lg bg-background">
-                    <div className="text-2xl">{badge.icon}</div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-foreground">{badge.name}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Earned {new Date(badge.earnedAt).toLocaleDateString()}
-                      </p>
+                {studentData.badges.slice(0, 3).map((achievement, index) => (
+                  <div key={index} className="flex items-center space-x-3 p-3 bg-accent/50 rounded-lg">
+                    <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                      <Trophy className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
                     </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{achievement.title}</p>
+                      <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                    </div>
+                    <Badge variant="secondary">
+                      {achievement.earnedAt}
+                    </Badge>
                   </div>
                 ))}
-                
-                <Button variant="outline" className="w-full" onClick={() => navigate('/student/badges')}>
-                  <Award className="h-4 w-4 mr-2" />
-                  View All Badges
-                </Button>
               </div>
             )}
           </CardContent>
@@ -394,12 +387,12 @@ export const StudentDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Brain className="h-5 w-5" />
-              <UnifiedLocalizedText text="AI Study Assistant" />
+              AI Study Assistant
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              <UnifiedLocalizedText text="Get instant help with your studies" />
+              Get instant help with your studies
             </p>
             <Button className="w-full">
               <Zap className="h-4 w-4 mr-2" />
@@ -413,12 +406,12 @@ export const StudentDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Trophy className="h-5 w-5" />
-              <UnifiedLocalizedText text="Leaderboard" />
+              Leaderboard
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              <UnifiedLocalizedText text="See how you rank among peers" />
+              See how you rank among peers
             </p>
             <Button variant="outline" className="w-full">
               View Rankings
@@ -431,12 +424,12 @@ export const StudentDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <MessageSquare className="h-5 w-5" />
-              <UnifiedLocalizedText text="Forums" />
+              Forums
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              <UnifiedLocalizedText text="Join discussions with classmates" />
+              Join discussions with classmates
             </p>
             <Button variant="outline" className="w-full">
               Browse Forums
