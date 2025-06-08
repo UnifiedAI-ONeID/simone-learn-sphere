@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { validateSecureInput, sanitizeHtmlContent } from './enhancedSecurityHeaders';
 
 export const cleanupAuthState = () => {
   console.log('Cleaning up auth state...');
@@ -23,6 +24,10 @@ export const cleanupAuthState = () => {
       }
     });
   }
+
+  // Clear security tracking
+  sessionStorage.removeItem('securityRequestCount');
+  sessionStorage.removeItem('lastSecurityCheck');
 };
 
 export const handleAuthError = (error: any, provider?: string) => {
@@ -45,7 +50,7 @@ export const handleAuthError = (error: any, provider?: string) => {
   } else if (error.message?.includes('rate limit')) {
     errorMessage = 'Too many attempts. Please wait a few minutes and try again.';
   } else if (error.message?.includes('Password should be at least')) {
-    errorMessage = 'Password must be at least 6 characters long.';
+    errorMessage = 'Password must be at least 8 characters long with uppercase, lowercase, number, and special character.';
   }
   
   return errorMessage;
@@ -57,13 +62,37 @@ export const ensureProfileExists = async (userId: string, userData: any, selecte
     
     const roleToAssign = selectedRole || userData.user_metadata?.role || 'student';
     
+    // Validate input data
+    const emailValidation = validateSecureInput(userData.email || '', 'email');
+    if (!emailValidation.isValid) {
+      throw new Error('Invalid email format');
+    }
+
+    const firstName = userData.user_metadata?.first_name || 
+                      userData.user_metadata?.full_name?.split(' ')[0] || '';
+    const lastName = userData.user_metadata?.last_name || 
+                     userData.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '';
+
+    // Validate names if provided
+    if (firstName) {
+      const firstNameValidation = validateSecureInput(firstName, 'name');
+      if (!firstNameValidation.isValid) {
+        throw new Error('Invalid first name format');
+      }
+    }
+
+    if (lastName) {
+      const lastNameValidation = validateSecureInput(lastName, 'name');
+      if (!lastNameValidation.isValid) {
+        throw new Error('Invalid last name format');
+      }
+    }
+
     const profileData = {
       id: userId,
       email: userData.email,
-      first_name: userData.user_metadata?.first_name || 
-                  userData.user_metadata?.full_name?.split(' ')[0] || '',
-      last_name: userData.user_metadata?.last_name || 
-                 userData.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+      first_name: firstName,
+      last_name: lastName,
       role: roleToAssign
     };
     
@@ -92,10 +121,54 @@ export const ensureProfileExists = async (userId: string, userData: any, selecte
       throw error;
     }
     
+    // Log successful profile creation
+    await supabase.rpc('log_enhanced_security_event', {
+      event_type: 'profile_created',
+      event_details: {
+        user_id: userId,
+        role: roleToAssign,
+        email_domain: userData.email.split('@')[1]
+      },
+      severity: 'low'
+    });
+    
     console.log('Profile created/updated successfully with role:', roleToAssign);
     return roleToAssign;
   } catch (error) {
     console.error('Failed to ensure profile exists:', error);
+    
+    // Log security event for profile creation failure
+    await supabase.rpc('log_enhanced_security_event', {
+      event_type: 'profile_creation_failed',
+      event_details: {
+        user_id: userId,
+        error: error.message,
+        email: userData.email
+      },
+      severity: 'medium'
+    });
+    
     throw error;
+  }
+};
+
+export const validatePasswordStrength = (password: string): { isValid: boolean; errors: string[] } => {
+  const validation = validateSecureInput(password, 'password');
+  return validation;
+};
+
+export const sanitizeUserInput = (input: string): string => {
+  return sanitizeHtmlContent(input);
+};
+
+export const logAuthEvent = async (eventType: string, details: any, severity: 'low' | 'medium' | 'high' | 'critical' = 'low') => {
+  try {
+    await supabase.rpc('log_enhanced_security_event', {
+      event_type: eventType,
+      event_details: details,
+      severity
+    });
+  } catch (error) {
+    console.error('Failed to log auth event:', error);
   }
 };

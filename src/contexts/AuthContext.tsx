@@ -2,7 +2,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { cleanupAuthState, ensureProfileExists } from '@/utils/authUtils';
+import { cleanupAuthState, ensureProfileExists, logAuthEvent } from '@/utils/authUtils';
+import { generateSessionFingerprint } from '@/utils/enhancedSecurityHeaders';
 
 interface AuthContextType {
   user: User | null;
@@ -35,6 +36,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await ensureProfileExists(user.id, user, user.user_metadata?.role);
     } catch (error) {
       console.error('AuthProvider: Error refreshing profile:', error);
+      await logAuthEvent('profile_refresh_failed', {
+        user_id: user.id,
+        error: error.message
+      }, 'medium');
     }
   };
 
@@ -53,6 +58,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (error) {
           console.error('AuthProvider: Error getting initial session:', error);
+          await logAuthEvent('session_initialization_failed', {
+            error: error.message
+          }, 'medium');
         }
 
         if (mounted) {
@@ -61,6 +69,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(initialSession?.user ?? null);
           
           if (initialSession?.user) {
+            // Log successful session restoration
+            await logAuthEvent('session_restored', {
+              user_id: initialSession.user.id,
+              session_fingerprint: generateSessionFingerprint().slice(0, 8)
+            }, 'low');
+            
+            // Check session limits
+            const { data: canProceed } = await supabase.rpc('check_session_limits', {
+              check_user_id: initialSession.user.id
+            });
+            
+            if (!canProceed) {
+              console.warn('Session limit exceeded, signing out');
+              await supabase.auth.signOut();
+              return;
+            }
+            
             // Defer profile creation to avoid blocking
             setTimeout(() => {
               if (mounted) {
@@ -75,6 +100,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch (error) {
         console.error('AuthProvider: Error in initializeAuth:', error);
+        await logAuthEvent('auth_initialization_failed', {
+          error: error.message
+        }, 'high');
       } finally {
         if (mounted) {
           setLoading(false);
@@ -92,9 +120,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
-        // Handle profile creation on sign in
+        // Enhanced logging for auth events
         if (event === 'SIGNED_IN' && newSession?.user) {
           console.log('AuthProvider: User signed in, ensuring profile exists');
+          
+          await logAuthEvent('user_signed_in', {
+            user_id: newSession.user.id,
+            email: newSession.user.email,
+            provider: newSession.user.app_metadata?.provider,
+            session_fingerprint: generateSessionFingerprint().slice(0, 8)
+          }, 'low');
+          
+          // Check session limits
+          const { data: canProceed } = await supabase.rpc('check_session_limits', {
+            check_user_id: newSession.user.id
+          });
+          
+          if (!canProceed) {
+            console.warn('Session limit exceeded during sign in');
+            await supabase.auth.signOut();
+            return;
+          }
+          
           // Defer to prevent potential deadlocks
           setTimeout(() => {
             if (mounted) {
@@ -105,6 +152,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               ).catch(console.error);
             }
           }, 100);
+        }
+
+        if (event === 'SIGNED_OUT') {
+          await logAuthEvent('user_signed_out', {
+            timestamp: new Date().toISOString()
+          }, 'low');
+        }
+
+        if (event === 'TOKEN_REFRESHED' && newSession?.user) {
+          await logAuthEvent('token_refreshed', {
+            user_id: newSession.user.id,
+            timestamp: new Date().toISOString()
+          }, 'low');
         }
 
         if (mounted && !loading) {
@@ -126,6 +186,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('AuthProvider: Starting sign out process');
       setLoading(true);
       
+      const currentUser = user;
+      
+      // Log sign out attempt
+      if (currentUser) {
+        await logAuthEvent('signout_initiated', {
+          user_id: currentUser.id,
+          timestamp: new Date().toISOString()
+        }, 'low');
+      }
+      
       // Clean up auth state first
       cleanupAuthState();
       
@@ -133,6 +203,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       if (error) {
         console.error('AuthProvider: Sign out error:', error);
+        await logAuthEvent('signout_failed', {
+          error: error.message,
+          user_id: currentUser?.id
+        }, 'medium');
+      } else {
+        await logAuthEvent('signout_completed', {
+          user_id: currentUser?.id,
+          timestamp: new Date().toISOString()
+        }, 'low');
       }
       
       // Clear local state
@@ -143,6 +222,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       window.location.href = '/';
     } catch (error) {
       console.error('AuthProvider: Unexpected sign out error:', error);
+      await logAuthEvent('signout_error', {
+        error: error.message,
+        user_id: user?.id
+      }, 'high');
     } finally {
       setLoading(false);
     }
