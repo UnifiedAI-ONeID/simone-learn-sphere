@@ -38,13 +38,6 @@ export const PlatformOverview = () => {
     }
   ];
 
-  const platformStats = [
-    { label: "Active Learners", value: "50K+" },
-    { label: "Courses Available", value: "1,200+" },
-    { label: "Countries Served", value: "120+" },
-    { label: "Average Rating", value: "4.9★" }
-  ];
-
   const coFounders = [
     {
       name: "Fiona Wong",
@@ -77,18 +70,6 @@ export const PlatformOverview = () => {
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
           <LocalizedText text="An AI-powered educational platform designed to democratize learning and empower educators worldwide." />
         </p>
-      </div>
-
-      {/* Platform Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {platformStats.map((stat, index) => (
-          <Card key={index} className="text-center bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-            <CardContent className="p-6">
-              <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
-            </CardContent>
-          </Card>
-        ))}
       </div>
 
       {/* Core Features */}
