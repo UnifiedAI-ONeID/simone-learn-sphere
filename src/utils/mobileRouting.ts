@@ -1,5 +1,6 @@
 
-import { UserRole } from '@/integrations/supabase/types';
+// Define UserRole type locally since it's not exported from supabase types
+type UserRole = 'student' | 'educator' | 'admin';
 
 export const getMobileRoleBasedRoute = (role: UserRole, isMobile: boolean = false): string => {
   if (!isMobile) {

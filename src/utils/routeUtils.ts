@@ -1,8 +1,10 @@
 
 import { useIsMobile } from '@/hooks/use-mobile';
-import { UserRole } from '@/integrations/supabase/types';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
+
+// Define UserRole type locally since it's not exported from supabase types
+type UserRole = 'student' | 'educator' | 'admin';
 
 export const useResponsiveRoute = (role: UserRole) => {
   const isMobile = useIsMobile();
