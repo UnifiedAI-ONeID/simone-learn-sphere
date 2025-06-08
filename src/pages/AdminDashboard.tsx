@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
@@ -10,7 +9,7 @@ import { useEngagementTracking } from '@/hooks/useEngagementTracking';
 import { useSessionTracking } from '@/hooks/useSessionTracking';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 const AdminDashboard = () => {
   const { trackPageView } = useEngagementTracking();
@@ -58,10 +57,10 @@ const AdminDashboard = () => {
               platform === 'android' ? 'text-xl font-medium' : 
               'text-3xl font-bold'
             }`}>
-              <LocalizedText text="Admin Dashboard" />
+              <UnifiedLocalizedText text="Admin Dashboard" />
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              <LocalizedText text="Manage platform operations, users, and monitor system health" />
+              <UnifiedLocalizedText text="Manage platform operations, users, and monitor system health" />
             </p>
           </div>
           <ThemeToggle />
@@ -72,19 +71,19 @@ const AdminDashboard = () => {
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className={`grid w-full grid-cols-5 max-w-3xl mx-auto ${getTabsStyles()}`}>
             <TabsTrigger value="dashboard" className={getTabTriggerStyles()}>
-              <LocalizedText text="Overview" />
+              <UnifiedLocalizedText text="Overview" />
             </TabsTrigger>
             <TabsTrigger value="users" className={getTabTriggerStyles()}>
-              <LocalizedText text="Users" />
+              <UnifiedLocalizedText text="Users" />
             </TabsTrigger>
             <TabsTrigger value="metrics" className={getTabTriggerStyles()}>
-              <LocalizedText text="Metrics" />
+              <UnifiedLocalizedText text="Metrics" />
             </TabsTrigger>
             <TabsTrigger value="security" className={getTabTriggerStyles()}>
-              <LocalizedText text="Security" />
+              <UnifiedLocalizedText text="Security" />
             </TabsTrigger>
             <TabsTrigger value="settings" className={getTabTriggerStyles()}>
-              <LocalizedText text="Settings" />
+              <UnifiedLocalizedText text="Settings" />
             </TabsTrigger>
           </TabsList>
           
@@ -115,10 +114,10 @@ const AdminDashboard = () => {
                 platform === 'android' ? 'text-lg font-medium' :
                 'text-2xl font-bold'
               }`}>
-                <LocalizedText text="System Settings" />
+                <UnifiedLocalizedText text="System Settings" />
               </h2>
               <p className="text-muted-foreground">
-                <LocalizedText text="Advanced system configuration coming soon..." />
+                <UnifiedLocalizedText text="Advanced system configuration coming soon..." />
               </p>
             </div>
           </TabsContent>

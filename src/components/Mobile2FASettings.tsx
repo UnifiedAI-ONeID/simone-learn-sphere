@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { PlatformButton } from '@/components/platform/PlatformButton';
 import { Input } from '@/components/ui/input';
 import { Shield, Smartphone, Mail, CheckCircle } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { TwoFactorLogin } from '@/components/TwoFactorLogin';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmailTwoFactor } from '@/hooks/useEmailTwoFactor';
@@ -88,10 +87,10 @@ export const Mobile2FASettings = () => {
               </div>
               <div>
                 <h3 className="font-medium text-foreground">
-                  <LocalizedText text="Email 2FA" />
+                  <UnifiedLocalizedText text="Email 2FA" />
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  <LocalizedText text="Verify with codes sent to your email" />
+                  <UnifiedLocalizedText text="Verify with codes sent to your email" />
                 </p>
               </div>
             </div>
@@ -101,12 +100,12 @@ export const Mobile2FASettings = () => {
                 <>
                   <CheckCircle className="w-5 h-5 text-green-500" />
                   <span className="text-sm text-green-500 font-medium">
-                    <LocalizedText text="Enabled" />
+                    <UnifiedLocalizedText text="Enabled" />
                   </span>
                 </>
               ) : (
                 <span className="text-sm text-muted-foreground">
-                  <LocalizedText text="Disabled" />
+                  <UnifiedLocalizedText text="Disabled" />
                 </span>
               )}
             </div>
@@ -121,7 +120,7 @@ export const Mobile2FASettings = () => {
                 className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
               >
                 <Shield className="w-4 h-4 mr-2" />
-                <LocalizedText text={state.isLoading ? "Disabling..." : "Disable 2FA"} />
+                <UnifiedLocalizedText text={state.isLoading ? "Disabling..." : "Disable 2FA"} />
               </PlatformButton>
             ) : (
               <PlatformButton
@@ -130,14 +129,14 @@ export const Mobile2FASettings = () => {
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <Mail className="w-4 h-4 mr-2" />
-                <LocalizedText text={state.isLoading ? "Setting up..." : "Enable Email 2FA"} />
+                <UnifiedLocalizedText text={state.isLoading ? "Setting up..." : "Enable Email 2FA"} />
               </PlatformButton>
             )}
           </div>
 
           <div className="p-3 bg-muted/50 rounded-lg">
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Two-factor authentication adds an extra layer of security by requiring a verification code sent to your email when signing in." />
+              <UnifiedLocalizedText text="Two-factor authentication adds an extra layer of security by requiring a verification code sent to your email when signing in." />
             </p>
           </div>
         </div>

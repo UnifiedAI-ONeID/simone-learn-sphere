@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
@@ -6,7 +5,7 @@ import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BookOpen, Clock, Users, Play } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const CourseOverview = () => {
   const { id } = useParams();
@@ -16,10 +15,10 @@ export const CourseOverview = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">
-            <LocalizedText text="Course Overview" />
+            <UnifiedLocalizedText text="Course Overview" />
           </h1>
           <p className="text-muted-foreground">
-            <LocalizedText text="Track your progress and continue learning" />
+            <UnifiedLocalizedText text="Track your progress and continue learning" />
           </p>
         </div>
 
@@ -27,7 +26,7 @@ export const CourseOverview = () => {
           <div className="lg:col-span-2 space-y-6">
             <PlatformCard>
               <h2 className="text-xl font-semibold mb-4">
-                <LocalizedText text="Course Progress" />
+                <UnifiedLocalizedText text="Course Progress" />
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -54,7 +53,7 @@ export const CourseOverview = () => {
 
             <PlatformCard>
               <h2 className="text-xl font-semibold mb-4">
-                <LocalizedText text="Course Modules" />
+                <UnifiedLocalizedText text="Course Modules" />
               </h2>
               <div className="space-y-3">
                 {[1, 2, 3, 4].map((module) => (
@@ -79,7 +78,7 @@ export const CourseOverview = () => {
           <div className="space-y-6">
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Course Details" />
+                <UnifiedLocalizedText text="Course Details" />
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -99,17 +98,17 @@ export const CourseOverview = () => {
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Quick Actions" />
+                <UnifiedLocalizedText text="Quick Actions" />
               </h3>
               <div className="space-y-2">
                 <Button variant="outline" className="w-full justify-start">
-                  <LocalizedText text="Ask AI Tutor" />
+                  <UnifiedLocalizedText text="Ask AI Tutor" />
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <LocalizedText text="Join Study Group" />
+                  <UnifiedLocalizedText text="Join Study Group" />
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <LocalizedText text="Course Forum" />
+                  <UnifiedLocalizedText text="Course Forum" />
                 </Button>
               </div>
             </PlatformCard>

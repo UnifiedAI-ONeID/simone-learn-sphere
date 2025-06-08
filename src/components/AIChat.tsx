@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, Bot, User, Loader2 } from 'lucide-react';
 import { useChatGPT } from '@/hooks/useChatGPT';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface Message {
   id: string;
@@ -57,10 +56,10 @@ export const AIChat: React.FC<AIChatProps> = ({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
-            <LocalizedText text="AI Assistant" />
+            <UnifiedLocalizedText text="AI Assistant" />
           </CardTitle>
           <Button variant="outline" size="sm" onClick={clearChat}>
-            <LocalizedText text="Clear" />
+            <UnifiedLocalizedText text="Clear" />
           </Button>
         </div>
       </CardHeader>
@@ -71,7 +70,7 @@ export const AIChat: React.FC<AIChatProps> = ({
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground py-8">
                 <Bot className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p><LocalizedText text="Start a conversation with AI" /></p>
+                <p><UnifiedLocalizedText text="Start a conversation with AI" /></p>
               </div>
             )}
             

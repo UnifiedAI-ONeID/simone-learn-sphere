@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Shield, Mail, ArrowLeft } from 'lucide-react';
 import { useEmailTwoFactor } from '@/hooks/useEmailTwoFactor';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface TwoFactorLoginProps {
   email: string;
@@ -44,10 +44,10 @@ export const TwoFactorLogin = ({ email, onVerificationSuccess, onBack }: TwoFact
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-center">
           <Shield className="h-5 w-5" />
-          <LocalizedText text="Two-Factor Authentication" />
+          <UnifiedLocalizedText text="Two-Factor Authentication" />
         </CardTitle>
         <CardDescription className="text-center">
-          <LocalizedText text="Enter the verification code sent to your email" />
+          <UnifiedLocalizedText text="Enter the verification code sent to your email" />
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -76,7 +76,7 @@ export const TwoFactorLogin = ({ email, onVerificationSuccess, onBack }: TwoFact
             </InputOTP>
           </div>
           <p className="text-sm text-gray-600 text-center">
-            <LocalizedText text="Enter the 6-digit code from your email" />
+            <UnifiedLocalizedText text="Enter the 6-digit code from your email" />
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export const TwoFactorLogin = ({ email, onVerificationSuccess, onBack }: TwoFact
             disabled={state.isLoading || verificationCode.length !== 6}
             className="w-full"
           >
-            <LocalizedText text={state.isLoading ? 'Verifying...' : 'Verify Code'} />
+            <UnifiedLocalizedText text={state.isLoading ? 'Verifying...' : 'Verify Code'} />
           </Button>
 
           <div className="flex gap-2">
@@ -97,7 +97,7 @@ export const TwoFactorLogin = ({ email, onVerificationSuccess, onBack }: TwoFact
               className="flex-1"
             >
               <Mail className="h-4 w-4 mr-2" />
-              <LocalizedText text="Resend Code" />
+              <UnifiedLocalizedText text="Resend Code" />
             </Button>
             <Button
               variant="outline"
@@ -106,7 +106,7 @@ export const TwoFactorLogin = ({ email, onVerificationSuccess, onBack }: TwoFact
               className="flex-1"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              <LocalizedText text="Back" />
+              <UnifiedLocalizedText text="Back" />
             </Button>
           </div>
         </div>

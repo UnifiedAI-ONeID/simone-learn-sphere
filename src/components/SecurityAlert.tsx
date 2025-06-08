@@ -2,7 +2,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Shield, Clock } from 'lucide-react';
 import { useEnhancedSessionSecurity } from '@/hooks/useEnhancedSessionSecurity';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const SecurityAlert = () => {
   const { securityState, extendSession } = useEnhancedSessionSecurity();
@@ -19,14 +19,14 @@ export const SecurityAlert = () => {
           <AlertDescription className="flex items-center justify-between">
             <div>
               <p className="font-medium text-orange-800 dark:text-orange-200">
-                <LocalizedText text="Session Expiring Soon" />
+                <UnifiedLocalizedText text="Session Expiring Soon" />
               </p>
               <p className="text-sm text-orange-700 dark:text-orange-300">
-                <LocalizedText text="Your session will expire in" /> {Math.ceil(securityState.timeUntilExpiry / (60 * 1000))} <LocalizedText text="minutes" />
+                <UnifiedLocalizedText text="Your session will expire in" /> {Math.ceil(securityState.timeUntilExpiry / (60 * 1000))} <UnifiedLocalizedText text="minutes" />
               </p>
             </div>
             <Button size="sm" onClick={extendSession} className="ml-2">
-              <LocalizedText text="Extend" />
+              <UnifiedLocalizedText text="Extend" />
             </Button>
           </AlertDescription>
         </Alert>
@@ -39,13 +39,13 @@ export const SecurityAlert = () => {
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-red-600" />
               <span className="font-medium text-red-800 dark:text-red-200">
-                <LocalizedText text="Security Threats Detected" />
+                <UnifiedLocalizedText text="Security Threats Detected" />
               </span>
             </div>
             <ul className="mt-2 space-y-1">
               {securityState.securityThreats.map((threat, index) => (
                 <li key={index} className="text-sm text-red-700 dark:text-red-300">
-                  • <LocalizedText text={threat} />
+                  • <UnifiedLocalizedText text={threat} />
                 </li>
               ))}
             </ul>

@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Loader2, Brain, AlertTriangle, Wifi } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -39,11 +38,11 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
         <ErrorIcon className={cn(sizeClasses[size], "text-destructive")} />
         <div className="space-y-2">
           <p className="text-sm text-destructive">
-            <LocalizedText text={error} />
+            <UnifiedLocalizedText text={error} />
           </p>
           {onRetry && (
             <Button onClick={onRetry} variant="outline" size="sm">
-              <LocalizedText text="Try Again" />
+              <UnifiedLocalizedText text="Try Again" />
             </Button>
           )}
         </div>
@@ -69,7 +68,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       <IconComponent className={cn(sizeClasses[size], iconClass, "text-primary")} />
       {text && (
         <p className="text-sm text-muted-foreground text-center">
-          <LocalizedText text={text} />
+          <UnifiedLocalizedText text={text} />
         </p>
       )}
     </div>

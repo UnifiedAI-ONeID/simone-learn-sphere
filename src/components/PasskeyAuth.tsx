@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Fingerprint, AlertCircle } from 'lucide-react';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { supabase } from '@/integrations/supabase/client';
 import toast from 'react-hot-toast';
 
@@ -96,7 +95,7 @@ export const PasskeyAuth: React.FC<PasskeyAuthProps> = ({
         disabled={isLoading || !email}
       >
         <Fingerprint className="h-4 w-4 mr-2" />
-        <LocalizedText 
+        <UnifiedLocalizedText 
           text={isSignUp ? "Set up Passkey" : "Sign in with Passkey"} 
         />
       </Button>

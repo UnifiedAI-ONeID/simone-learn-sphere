@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { LogOut, Brain, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -84,17 +84,17 @@ export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIc
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              <LocalizedText text={title} />
+              <UnifiedLocalizedText text={title} />
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              <LocalizedText text={subtitle} />
+              <UnifiedLocalizedText text={subtitle} />
             </p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
           <Badge variant="secondary" className="px-3 py-1">
             <DisplayBadgeIcon className="w-4 h-4 mr-1" />
-            <LocalizedText text={displayBadgeText} />
+            <UnifiedLocalizedText text={displayBadgeText} />
           </Badge>
           
           {/* User Profile Section */}
@@ -135,7 +135,7 @@ export const DashboardHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIc
           >
             <LogOut className="h-4 w-4" />
             <span>
-              <LocalizedText text={isSigningOut ? 'Signing Out...' : 'Sign Out'} />
+              <UnifiedLocalizedText text={isSigningOut ? 'Signing Out...' : 'Sign Out'} />
             </span>
           </Button>
         </div>

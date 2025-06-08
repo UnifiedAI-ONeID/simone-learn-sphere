@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
@@ -6,7 +5,7 @@ import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, ChevronRight, MessageCircle, BookOpen } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const LessonView = () => {
   const { id, moduleId, lessonId } = useParams();
@@ -23,7 +22,7 @@ export const LessonView = () => {
             <span>Lesson {lessonId}</span>
           </div>
           <h1 className="text-3xl font-bold">
-            <LocalizedText text="Introduction to React Components" />
+            <UnifiedLocalizedText text="Introduction to React Components" />
           </h1>
         </div>
 
@@ -40,7 +39,7 @@ export const LessonView = () => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">
-                    <LocalizedText text="Lesson Progress" />
+                    <UnifiedLocalizedText text="Lesson Progress" />
                   </h2>
                   <span className="text-sm text-muted-foreground">75% complete</span>
                 </div>
@@ -48,13 +47,13 @@ export const LessonView = () => {
                 <div className="flex gap-3">
                   <Button variant="outline" size="sm">
                     <ChevronLeft className="h-4 w-4 mr-2" />
-                    <LocalizedText text="Previous" />
+                    <UnifiedLocalizedText text="Previous" />
                   </Button>
                   <Button size="sm">
-                    <LocalizedText text="Mark Complete" />
+                    <UnifiedLocalizedText text="Mark Complete" />
                   </Button>
                   <Button variant="outline" size="sm">
-                    <LocalizedText text="Next" />
+                    <UnifiedLocalizedText text="Next" />
                     <ChevronRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
@@ -63,7 +62,7 @@ export const LessonView = () => {
 
             <PlatformCard>
               <h3 className="text-lg font-semibold mb-4">
-                <LocalizedText text="Lesson Content" />
+                <UnifiedLocalizedText text="Lesson Content" />
               </h3>
               <div className="prose max-w-none">
                 <p>
@@ -84,7 +83,7 @@ export const LessonView = () => {
           <div className="space-y-6">
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Module Lessons" />
+                <UnifiedLocalizedText text="Module Lessons" />
               </h3>
               <div className="space-y-2">
                 {[1, 2, 3, 4].map((lesson) => (
@@ -101,15 +100,15 @@ export const LessonView = () => {
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Need Help?" />
+                <UnifiedLocalizedText text="Need Help?" />
               </h3>
               <div className="space-y-2">
                 <Button variant="outline" size="sm" className="w-full justify-start">
                   <MessageCircle className="h-4 w-4 mr-2" />
-                  <LocalizedText text="Ask AI Tutor" />
+                  <UnifiedLocalizedText text="Ask AI Tutor" />
                 </Button>
                 <Button variant="outline" size="sm" className="w-full justify-start">
-                  <LocalizedText text="Discussion Forum" />
+                  <UnifiedLocalizedText text="Discussion Forum" />
                 </Button>
               </div>
             </PlatformCard>
