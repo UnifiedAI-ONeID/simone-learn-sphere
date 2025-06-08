@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle, Shield } from 'lucide-react';
@@ -192,7 +193,6 @@ export const SimpleMobileAuth = () => {
             <RoleSelector
               selectedRole={selectedRole}
               onRoleChange={setSelectedRole}
-              disabled={isLoading}
             />
           </div>
         )}
@@ -421,3 +421,4 @@ export const SimpleMobileAuth = () => {
     </PlatformCard>
   );
 };
+
