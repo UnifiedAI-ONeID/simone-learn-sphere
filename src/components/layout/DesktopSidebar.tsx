@@ -82,7 +82,7 @@ export const DesktopSidebar = () => {
           >
             <item.icon className="h-5 w-5" />
             <span className="font-medium">
-              <LocalizedText text={item.label} />
+              <UnifiedLocalizedText text={item.label} />
             </span>
           </NavLink>
         ))}

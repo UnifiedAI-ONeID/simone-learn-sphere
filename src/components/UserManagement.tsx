@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useImpersonation } from '@/hooks/useImpersonation';
 import { useUserRole } from '@/hooks/useUserRole';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface User {
   id: string;
