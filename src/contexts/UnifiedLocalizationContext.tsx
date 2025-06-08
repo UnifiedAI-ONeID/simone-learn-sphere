@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -63,6 +64,7 @@ const UnifiedLocalizationContext = createContext<UnifiedLocalizationContextType 
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
+const TRANSLATION_TIMEOUT = 10000; // 10 seconds
 
 const detectUserLanguage = (): SupportedLanguage => {
   // Always default to English first
@@ -239,12 +241,14 @@ export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }
     // Check cache first
     const cached = translationCache[cacheKey];
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      console.log('UnifiedLocalization: Using cached translation for:', text.substring(0, 30));
       return cached.translation;
     }
 
     // Check offline translations
     const offlineTranslation = getOfflineTranslation(text, target);
     if (offlineTranslation) {
+      console.log('UnifiedLocalization: Using offline translation for:', text.substring(0, 30));
       return offlineTranslation;
     }
 
@@ -255,22 +259,36 @@ export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }
       const translationOperation = async () => {
         console.log('UnifiedLocalization: Calling translate-text-fixed for:', text.substring(0, 30), 'to', target);
         
-        const { data, error } = await supabase.functions.invoke('translate-text-fixed', {
-          body: { text: text.trim(), targetLanguage: target }
-        });
+        // Add timeout to prevent hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), TRANSLATION_TIMEOUT);
+        
+        try {
+          const { data, error } = await supabase.functions.invoke('translate-text-fixed', {
+            body: { text: text.trim(), targetLanguage: target },
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
 
-        if (error) {
-          console.error('UnifiedLocalization: Translation service error:', error);
-          throw new Error(`Translation service error: ${error.message}`);
+          clearTimeout(timeoutId);
+
+          if (error) {
+            console.error('UnifiedLocalization: Translation service error:', error);
+            throw new Error(`Translation service error: ${error.message}`);
+          }
+
+          if (!data || !data.translatedText) {
+            console.warn('UnifiedLocalization: No translation data received for:', text.substring(0, 30));
+            throw new Error('No translation data received');
+          }
+
+          console.log('UnifiedLocalization: Translation successful for:', text.substring(0, 30), '→', data.translatedText.substring(0, 30));
+          return data.translatedText;
+        } catch (err) {
+          clearTimeout(timeoutId);
+          throw err;
         }
-
-        if (!data || !data.translatedText) {
-          console.warn('UnifiedLocalization: No translation data received for:', text.substring(0, 30));
-          throw new Error('No translation data received');
-        }
-
-        console.log('UnifiedLocalization: Translation successful for:', text.substring(0, 30), '→', data.translatedText.substring(0, 30));
-        return data.translatedText;
       };
 
       const translatedText = await retryOperation(translationOperation);
@@ -299,7 +317,7 @@ export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }
 
       return translatedText;
     } catch (error: any) {
-      console.warn('UnifiedLocalization: Translation failed:', error);
+      console.warn('UnifiedLocalization: Translation failed for:', text.substring(0, 30), error);
       
       const fallbackTranslation = getOfflineTranslation(text, target);
       if (fallbackTranslation) {
@@ -327,12 +345,15 @@ export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }
     ];
 
     try {
+      console.log('UnifiedLocalization: Downloading language content for:', languageCode);
       const translations: { [key: string]: string } = {};
       
       for (const phrase of commonPhrases) {
         try {
           const translation = await getTranslation(phrase, languageCode);
           translations[phrase] = translation;
+          // Small delay to prevent overwhelming the service
+          await new Promise(resolve => setTimeout(resolve, 100));
         } catch (error) {
           console.warn(`Failed to translate "${phrase}" to ${languageCode}:`, error);
           translations[phrase] = phrase;
@@ -350,6 +371,7 @@ export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }
       setOfflineTranslations(newOfflineTranslations);
       saveOfflineTranslations(newOfflineTranslations);
       
+      console.log('UnifiedLocalization: Language content downloaded successfully for:', languageCode);
       return true;
     } catch (error) {
       console.error('Failed to download language content:', error);
@@ -363,6 +385,7 @@ export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }
   }, [offlineTranslations]);
 
   const clearTranslationCache = useCallback(() => {
+    console.log('UnifiedLocalization: Clearing translation cache');
     setTranslationCache({});
     localStorage.removeItem('translationCache');
     localStorage.removeItem('offlineTranslations');

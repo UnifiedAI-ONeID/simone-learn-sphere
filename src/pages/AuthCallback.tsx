@@ -31,6 +31,7 @@ const AuthCallback = () => {
           return;
         }
         
+        // Handle the auth callback
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -47,7 +48,7 @@ const AuthCallback = () => {
         if (data.session?.user) {
           console.log('AuthCallback: User authenticated:', data.session.user.id);
           
-          // Get pending role and clean up
+          // Get pending role and clean up state
           const pendingUserRole = localStorage.getItem('pendingUserRole');
           console.log('AuthCallback: Found pending role:', pendingUserRole);
           
@@ -75,9 +76,10 @@ const AuthCallback = () => {
             // Continue with authentication even if profile creation fails
           }
           
-          // Verify role in database with retry
+          // Verify role in database with retry mechanism
           for (let attempt = 1; attempt <= 3; attempt++) {
             try {
+              console.log(`AuthCallback: Profile verification attempt ${attempt}`);
               const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('role')
@@ -94,7 +96,7 @@ const AuthCallback = () => {
             } catch (retryError) {
               console.warn(`Profile verification attempt ${attempt} failed:`, retryError);
               if (attempt < 3) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
               }
             }
           }

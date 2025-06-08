@@ -48,9 +48,11 @@ export const UnifiedLocalizedText: React.FC<UnifiedLocalizedTextProps> = ({
     setIsLoading(true);
     
     try {
+      console.log('UnifiedLocalizedText: Translating:', textToTranslate.substring(0, 30), 'to', target);
       const result = await getTranslation(textToTranslate.trim(), target);
       setLocalizedText(result);
       setRetryCount(0);
+      console.log('UnifiedLocalizedText: Translation result:', result.substring(0, 30));
     } catch (error) {
       console.error('UnifiedLocalizedText: Translation error for:', textToTranslate.substring(0, 30), error);
       setLocalizedText(textToTranslate);

@@ -31,6 +31,7 @@ export const MobileAuthCallback = () => {
           return;
         }
         
+        // Handle the auth callback
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -43,7 +44,7 @@ export const MobileAuthCallback = () => {
         if (data.session?.user) {
           console.log('MobileAuthCallback: User authenticated:', data.session.user.id);
           
-          // Get pending role and clean up
+          // Get pending role and clean up state
           const pendingUserRole = localStorage.getItem('pendingUserRole');
           console.log('MobileAuthCallback: Found pending role:', pendingUserRole);
           
@@ -71,9 +72,10 @@ export const MobileAuthCallback = () => {
             // Continue with authentication even if profile creation fails
           }
           
-          // Verify role in database with retry
+          // Verify role in database with retry mechanism
           for (let attempt = 1; attempt <= 3; attempt++) {
             try {
+              console.log(`MobileAuthCallback: Profile verification attempt ${attempt}`);
               const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('role')
@@ -90,7 +92,7 @@ export const MobileAuthCallback = () => {
             } catch (retryError) {
               console.warn(`Profile verification attempt ${attempt} failed:`, retryError);
               if (attempt < 3) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
               }
             }
           }
