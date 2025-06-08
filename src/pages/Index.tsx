@@ -1,4 +1,3 @@
-
 import { isMobile, isTablet } from 'react-device-detect';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +18,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { LandingPageAssistant } from '@/components/LandingPageAssistant';
+import { PlatformOverview } from '@/components/PlatformOverview';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -148,212 +148,10 @@ const Index = () => {
         </nav>
       </header>
 
-      {/* Hero Section - Device Responsive */}
+      {/* Main Content */}
       <main id="main-content" className="px-4 py-12 md:px-6 lg:px-8" role="main">
         <div className="mx-auto max-w-7xl">
-          {isMobileDevice ? (
-            // Mobile-First Landing
-            <div className="text-center space-y-8">
-              <div className="space-y-4">
-                <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                  📱 <LocalizedText text="Mobile-Optimized Learning" />
-                </Badge>
-                <h2 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
-                  <LocalizedText text="Learn & Teach" />
-                  <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                    <LocalizedText text="On the Go" />
-                  </span>
-                </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                  <LocalizedText text="Access powerful educational tools from your mobile device. Create courses, learn with AI assistance, and connect with a global community of learners." />
-                </p>
-              </div>
-              
-              <div className="space-y-4">
-                <Button 
-                  onClick={handleGetStarted}
-                  size="lg" 
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 text-lg"
-                  aria-describedby="mobile-cta-description"
-                >
-                  <LocalizedText text="Start Learning Today" />
-                </Button>
-                <p id="mobile-cta-description" className="text-sm text-gray-500 dark:text-gray-400">
-                  <LocalizedText text="Free to start • No credit card required" />
-                </p>
-              </div>
-            </div>
-          ) : (
-            // Desktop Landing
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                    🚀 <LocalizedText text="Democratizing Education Worldwide" />
-                  </Badge>
-                  <h2 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-white lg:text-6xl">
-                    <LocalizedText text="Empower Your" />
-                    <span className="block bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                      <LocalizedText text="Teaching Journey" />
-                    </span>
-                  </h2>
-                  <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl">
-                    <LocalizedText text="Create immersive educational experiences with AI-powered tools. Build, deliver, and monetize courses while connecting with learners globally." />
-                  </p>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button 
-                    onClick={handleGetStarted}
-                    size="lg" 
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4"
-                    aria-describedby="desktop-cta-description"
-                  >
-                    <LocalizedText text="Get Started Free" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="lg"
-                    className="border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/20 px-8 py-4"
-                    onClick={() => {
-                      toast.success(<LocalizedText text="Demo coming soon!" />);
-                      announce("Demo coming soon!");
-                    }}
-                  >
-                    <LocalizedText text="Watch Demo" />
-                  </Button>
-                </div>
-                
-                <div id="desktop-cta-description" className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" aria-hidden="true"></div>
-                    <LocalizedText text="Free to start" />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" aria-hidden="true"></div>
-                    <LocalizedText text="No credit card required" />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" aria-hidden="true"></div>
-                    <LocalizedText text="Fully accessible" />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Visual Element */}
-              <div className="relative">
-                <div className="relative rounded-2xl bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-blue-900/20 p-8">
-                  <div className="grid grid-cols-2 gap-4">
-                    {features.map((feature, index) => (
-                      <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                        <CardHeader className="pb-3">
-                          <feature.icon className="h-8 w-8 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-                        </CardHeader>
-                        <CardContent>
-                          <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
-                            <LocalizedText text={feature.title} />
-                          </CardTitle>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Features Section */}
-        <div className="mx-auto max-w-7xl mt-24">
-          <div className="text-center space-y-4 mb-16">
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-              <LocalizedText text="Everything You Need to Succeed" />
-            </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              <LocalizedText text="From AI-powered course creation to community building, SimoneLabs provides all the tools for modern education." />
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8" role="list" aria-label="Features">
-            {features.map((feature, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-800" role="listitem">
-                <CardHeader>
-                  <div className="mx-auto w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
-                  </div>
-                  <CardTitle className="text-gray-900 dark:text-white">
-                    <LocalizedText text={feature.title} />
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-600 dark:text-gray-300">
-                    <LocalizedText text={feature.description} />
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Co-Founders Section */}
-        <div className="mx-auto max-w-7xl mt-24">
-          <div className="text-center space-y-4 mb-16">
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-              <LocalizedText text="Meet Our Co-Founders" />
-            </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              <LocalizedText text="Passionate leaders dedicated to transforming education through innovation and technology." />
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto" role="list" aria-label="Co-founders">
-            {coFounders.map((founder, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-800 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm" role="listitem">
-                <CardHeader className="pb-4">
-                  <div className="flex justify-center mb-4">
-                    <Avatar className="w-20 h-20 ring-4 ring-purple-100 dark:ring-purple-800">
-                      <AvatarImage src={founder.avatarUrl} alt={`Portrait of ${founder.name}`} />
-                      <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xl font-semibold">
-                        {founder.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <CardTitle className="text-xl text-gray-900 dark:text-white">
-                    <LocalizedText text={founder.name} />
-                  </CardTitle>
-                  <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                    <LocalizedText text={founder.role} />
-                  </Badge>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-600 dark:text-gray-300 text-base">
-                    <LocalizedText text={founder.description} />
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="mx-auto max-w-4xl mt-24 text-center">
-          <Card className="border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
-            <CardContent className="py-12">
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                <LocalizedText text="Ready to Transform Education?" />
-              </h3>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-                <LocalizedText text="Join thousands of educators who are already creating amazing learning experiences with SimoneLabs." />
-              </p>
-              <Button 
-                onClick={handleGetStarted}
-                size="lg" 
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-12 py-4 text-lg"
-              >
-                <LocalizedText text="Start Your Journey" />
-              </Button>
-            </CardContent>
-          </Card>
+          <PlatformOverview />
         </div>
       </main>
 
