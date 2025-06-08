@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Brain, 
   BookOpen, 
@@ -42,6 +43,23 @@ export const PlatformOverview = () => {
     { label: "Courses Available", value: "1,200+" },
     { label: "Countries Served", value: "120+" },
     { label: "Average Rating", value: "4.9★" }
+  ];
+
+  const coFounders = [
+    {
+      name: "Fiona Wong",
+      role: "Co-Founder & CEO",
+      avatar: "FW",
+      avatarUrl: "/lovable-uploads/d6a21c1b-8b9b-4811-a5eb-eafac22bca5f.png",
+      description: "Passionate about democratizing education and empowering educators worldwide"
+    },
+    {
+      name: "Simon Luke",
+      role: "Co-Founder & CTO",
+      avatar: "SL",
+      avatarUrl: "/lovable-uploads/7a68d4b0-5778-4fc6-bd9d-8d45d0d83da0.png",
+      description: "Building innovative AI-powered solutions for the future of learning"
+    }
   ];
 
   return (
@@ -102,6 +120,42 @@ export const PlatformOverview = () => {
                   </div>
                 </div>
               </CardHeader>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Co-Founders Section */}
+      <section>
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            <LocalizedText text="Meet Our Co-Founders" />
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <LocalizedText text="Passionate about transforming education through innovation" />
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {coFounders.map((founder, index) => (
+            <Card key={index} className="text-center hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-8">
+                <Avatar className="h-24 w-24 mx-auto mb-4">
+                  <AvatarImage src={founder.avatarUrl} alt={founder.name} />
+                  <AvatarFallback className="text-lg bg-primary/10 text-primary">
+                    {founder.avatar}
+                  </AvatarFallback>
+                </Avatar>
+                <h3 className="text-xl font-bold text-foreground mb-1">
+                  <LocalizedText text={founder.name} />
+                </h3>
+                <p className="text-primary font-medium mb-3">
+                  <LocalizedText text={founder.role} />
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  <LocalizedText text={founder.description} />
+                </p>
+              </CardContent>
             </Card>
           ))}
         </div>
