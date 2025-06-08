@@ -85,6 +85,14 @@ function AppRoutes() {
         <Route path="/student/*" element={<MobileStudentDashboard />} />
         <Route path="/educator/*" element={<MobileEducatorDashboard />} />
         <Route path="/admin/*" element={<MobileAdminDashboard />} />
+        
+        {/* Mobile-specific routes for detailed flows */}
+        <Route path="/ai-tutor" element={<AITutor />} />
+        <Route path="/course/:id/overview" element={<CourseOverview />} />
+        <Route path="/forums" element={<Forums />} />
+        <Route path="/study-groups" element={<StudyGroups />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+        
         <Route path="/404" element={<MobileNotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
