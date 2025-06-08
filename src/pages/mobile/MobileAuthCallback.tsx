@@ -5,6 +5,7 @@ import { Brain } from 'lucide-react';
 import { LocalizedText } from '@/components/LocalizedText';
 import { supabase } from '@/integrations/supabase/client';
 import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
+import { ensureProfileExists } from '@/utils/authUtils';
 import toast from 'react-hot-toast';
 
 // Define UserRole type locally since it's not exported from supabase types
@@ -38,11 +39,20 @@ export const MobileAuthCallback = () => {
             localStorage.removeItem('pendingUserRole');
           }
           
-          // Determine role with priority for educator
+          // Determine role with priority for the selected role
           let userRole = pendingUserRole || data.session.user.user_metadata?.role || 'student';
           console.log('MobileAuthCallback: Initial role determination:', userRole);
           
-          // Wait a moment for profile creation to complete
+          // Ensure profile exists with the correct role
+          try {
+            await ensureProfileExists(data.session.user.id, data.session.user, userRole);
+            console.log('MobileAuthCallback: Profile ensured with role:', userRole);
+          } catch (profileError) {
+            console.error('MobileAuthCallback: Profile creation failed:', profileError);
+            // Continue with authentication even if profile creation fails
+          }
+          
+          // Wait a moment for profile operations to complete
           await new Promise(resolve => setTimeout(resolve, 1000));
           
           // Verify role in database
@@ -60,7 +70,9 @@ export const MobileAuthCallback = () => {
           }
           
           // Show success message with role
-          toast.success(`Welcome! Successfully signed in as ${userRole}.`);
+          const roleDisplayName = userRole === 'educator' ? 'Educator' : 
+                                 userRole === 'admin' ? 'Admin' : 'Student';
+          toast.success(`Welcome! Successfully signed in as ${roleDisplayName}.`);
           
           // Use mobile-specific routing
           const redirectRoute = getMobileRoleBasedRoute(userRole as UserRole, true);
@@ -92,7 +104,7 @@ export const MobileAuthCallback = () => {
           <LocalizedText text="Completing Sign In..." />
         </h2>
         <p className="text-muted-foreground">
-          <LocalizedText text="Please wait while we set up your account" />
+          <LocalizedText text="Setting up your account with the selected role" />
         </p>
       </div>
     </div>

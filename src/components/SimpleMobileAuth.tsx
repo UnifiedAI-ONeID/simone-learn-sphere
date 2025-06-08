@@ -1,20 +1,16 @@
 
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { LocalizedText } from '@/components/LocalizedText';
 import { PlatformButton } from '@/components/platform/PlatformButton';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { PasskeyAuth } from '@/components/PasskeyAuth';
+import { RoleSelector } from '@/components/auth/RoleSelector';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
-import { handleAuthError, cleanupAuthState, validatePasswordStrength } from '@/utils/authUtils';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
-import toast from 'react-hot-toast';
+import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
+import { validatePasswordStrength } from '@/utils/authUtils';
 
 export const SimpleMobileAuth = () => {
   const [email, setEmail] = useState('');
@@ -23,14 +19,12 @@ export const SimpleMobileAuth = () => {
   const [lastName, setLastName] = useState('');
   const [selectedRole, setSelectedRole] = useState('student');
   const [isSignUp, setIsSignUp] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   
   const navigate = useNavigate();
   const { platform } = usePlatformTheme();
-  const isMobile = useIsMobile();
+  const { isLoading, error, setError, signUpWithEmail, signInWithEmail, signInWithOAuth } = useEnhancedAuth();
 
   // Validate password in real-time for signup
   React.useEffect(() => {
@@ -44,168 +38,45 @@ export const SimpleMobileAuth = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
 
-    try {
-      cleanupAuthState();
-
-      if (isSignUp) {
-        // Validate password for signup
-        const passwordValidation = validatePasswordStrength(password);
-        if (!passwordValidation.isValid) {
-          setError('Password does not meet requirements');
-          setIsLoading(false);
-          return;
-        }
-
-        // Store role in localStorage before signup
-        console.log('Storing pending role for signup:', selectedRole);
-        localStorage.setItem('pendingUserRole', selectedRole);
-
-        // Determine redirect URL based on platform
-        const redirectUrl = isMobile 
-          ? `${window.location.origin}/mobile/auth/callback`
-          : `${window.location.origin}/auth/callback`;
-
-        console.log('Starting signup with redirect:', redirectUrl);
-
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: redirectUrl,
-            data: {
-              first_name: firstName,
-              last_name: lastName,
-              role: selectedRole
-            }
-          }
-        });
-
-        if (error) throw error;
-
-        if (data.user && !data.session) {
-          toast.success('Check your email for the confirmation link!');
-          setError('Please check your email and click the confirmation link to complete registration.');
-        } else if (data.session) {
-          console.log('Immediate signup success, navigating...');
-          toast.success(`Account created successfully! Welcome, ${selectedRole}!`);
-          
-          // Navigate based on role and platform
-          const redirectRoute = isMobile 
-            ? getMobileRoleBasedRoute(selectedRole as any, true)
-            : getRoleBasedRoute(selectedRole, true);
-          
-          console.log('Navigating to:', redirectRoute);
-          navigate(redirectRoute, { replace: true });
-        }
-      } else {
-        console.log('Starting sign in...');
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
-
-        if (data.user) {
-          console.log('Sign in successful');
-          toast.success('Welcome back!');
-          // Navigation will be handled by auth context
-        }
+    if (isSignUp) {
+      if (!selectedRole) {
+        setError('Please select a role before continuing');
+        return;
       }
-    } catch (error: any) {
-      console.error('Auth error:', error);
-      const errorMessage = handleAuthError(error);
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+
+      const result = await signUpWithEmail(email, password, firstName, lastName, selectedRole);
+      if (result.success && !result.requiresEmailConfirmation) {
+        // Navigation handled in hook
+      }
+    } else {
+      const result = await signInWithEmail(email, password);
+      if (result.success) {
+        // Navigation handled by auth context
+      }
     }
   };
 
   const handleGoogleAuth = async () => {
-    setIsLoading(true);
-    setError('');
-
-    try {
-      cleanupAuthState();
-      
-      // Store role for OAuth signup
-      console.log('Storing pending role for Google OAuth:', selectedRole);
-      localStorage.setItem('pendingUserRole', selectedRole);
-
-      // Determine redirect URL based on platform
-      const redirectUrl = isMobile 
-        ? `${window.location.origin}/mobile/auth/callback`
-        : `${window.location.origin}/auth/callback`;
-
-      console.log('Starting Google OAuth with redirect:', redirectUrl);
-
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
-        }
-      });
-
-      if (error) throw error;
-    } catch (error: any) {
-      console.error('Google auth error:', error);
-      const errorMessage = handleAuthError(error, 'Google');
-      setError(errorMessage);
-      toast.error(errorMessage);
-      setIsLoading(false);
+    if (isSignUp && !selectedRole) {
+      setError('Please select a role before continuing with Google');
+      return;
     }
+
+    await signInWithOAuth('google', isSignUp ? selectedRole : undefined);
   };
 
   const handleLinkedInAuth = async () => {
-    setIsLoading(true);
-    setError('');
-
-    try {
-      cleanupAuthState();
-      
-      // Store role for OAuth signup
-      console.log('Storing pending role for LinkedIn OAuth:', selectedRole);
-      localStorage.setItem('pendingUserRole', selectedRole);
-
-      // Determine redirect URL based on platform
-      const redirectUrl = isMobile 
-        ? `${window.location.origin}/mobile/auth/callback`
-        : `${window.location.origin}/auth/callback`;
-
-      console.log('Starting LinkedIn OAuth with redirect:', redirectUrl);
-
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'linkedin_oidc',
-        options: {
-          redirectTo: redirectUrl,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
-        }
-      });
-
-      if (error) throw error;
-    } catch (error: any) {
-      console.error('LinkedIn auth error:', error);
-      const errorMessage = handleAuthError(error, 'LinkedIn');
-      setError(errorMessage);
-      toast.error(errorMessage);
-      setIsLoading(false);
+    if (isSignUp && !selectedRole) {
+      setError('Please select a role before continuing with LinkedIn');
+      return;
     }
+
+    await signInWithOAuth('linkedin_oidc', isSignUp ? selectedRole : undefined);
   };
 
   const handlePasskeySuccess = () => {
-    toast.success('Authentication successful!');
-    // Navigation will be handled by auth context
+    // Navigation handled by auth context
   };
 
   return (
@@ -310,27 +181,12 @@ export const SimpleMobileAuth = () => {
         </div>
 
         {isSignUp && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">
-              <LocalizedText text="I want to join as:" />
-            </label>
-            <div className="flex gap-2">
-              <Badge 
-                variant={selectedRole === 'student' ? 'default' : 'outline'}
-                className="cursor-pointer"
-                onClick={() => setSelectedRole('student')}
-              >
-                <LocalizedText text="Student" />
-              </Badge>
-              <Badge 
-                variant={selectedRole === 'educator' ? 'default' : 'outline'}
-                className="cursor-pointer"
-                onClick={() => setSelectedRole('educator')}
-              >
-                <LocalizedText text="Educator" />
-              </Badge>
-            </div>
-          </div>
+          <RoleSelector
+            selectedRole={selectedRole}
+            onRoleChange={setSelectedRole}
+            variant="badge"
+            required
+          />
         )}
 
         {email && (
@@ -344,7 +200,7 @@ export const SimpleMobileAuth = () => {
         <PlatformButton
           type="submit"
           className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-          disabled={isLoading || (isSignUp && passwordErrors.length > 0)}
+          disabled={isLoading || (isSignUp && passwordErrors.length > 0) || (isSignUp && !selectedRole)}
         >
           <LocalizedText text={
             isLoading 
