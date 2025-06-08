@@ -2,10 +2,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { UnifiedLocalizationProvider } from '@/contexts/UnifiedLocalizationContext';
 import { PlatformThemeProvider } from '@/contexts/PlatformThemeContext';
 import GlobalErrorBoundary from '@/components/GlobalErrorBoundary';
-import { TranslationErrorBoundary } from '@/components/TranslationErrorBoundary';
 import { SecurityProvider } from '@/components/SecurityProvider';
 import { Toaster } from 'react-hot-toast';
 import { usePlatformDetection } from '@/hooks/usePlatformDetection';
@@ -168,42 +166,38 @@ function App() {
   return (
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <UnifiedLocalizationProvider>
-          <TranslationErrorBoundary>
-            <PlatformThemeProvider>
-              <AuthProvider>
-                <SecurityProvider>
-                  <Router>
-                    <AppRoutes />
-                    <Toaster 
-                      position="top-right"
-                      toastOptions={{
-                        duration: 4000,
-                        style: {
-                          background: 'var(--background)',
-                          color: 'var(--foreground)',
-                          border: '1px solid var(--border)',
-                        },
-                        success: {
-                          iconTheme: {
-                            primary: 'var(--primary)',
-                            secondary: 'var(--primary-foreground)',
-                          },
-                        },
-                        error: {
-                          iconTheme: {
-                            primary: 'var(--destructive)',
-                            secondary: 'var(--destructive-foreground)',
-                          },
-                        },
-                      }}
-                    />
-                  </Router>
-                </SecurityProvider>
-              </AuthProvider>
-            </PlatformThemeProvider>
-          </TranslationErrorBoundary>
-        </UnifiedLocalizationProvider>
+        <PlatformThemeProvider>
+          <AuthProvider>
+            <SecurityProvider>
+              <Router>
+                <AppRoutes />
+                <Toaster 
+                  position="top-right"
+                  toastOptions={{
+                    duration: 4000,
+                    style: {
+                      background: 'var(--background)',
+                      color: 'var(--foreground)',
+                      border: '1px solid var(--border)',
+                    },
+                    success: {
+                      iconTheme: {
+                        primary: 'var(--primary)',
+                        secondary: 'var(--primary-foreground)',
+                      },
+                    },
+                    error: {
+                      iconTheme: {
+                        primary: 'var(--destructive)',
+                        secondary: 'var(--destructive-foreground)',
+                      },
+                    },
+                  }}
+                />
+              </Router>
+            </SecurityProvider>
+          </AuthProvider>
+        </PlatformThemeProvider>
       </QueryClientProvider>
     </GlobalErrorBoundary>
   );

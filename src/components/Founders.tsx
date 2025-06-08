@@ -2,7 +2,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { OptimizedLocalizedText } from '@/components/OptimizedLocalizedText';
 import { Linkedin, Twitter } from 'lucide-react';
 
 const foundersData = [
@@ -31,14 +30,9 @@ export const Founders: React.FC = () => {
     <section className="py-16 bg-card/30 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-            <OptimizedLocalizedText text="Meet Our Founders" priority={2} />
-          </h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Meet Our Founders</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            <OptimizedLocalizedText 
-              text="Passionate educators and technologists united by a vision to democratize quality education worldwide through innovative AI-powered learning platforms." 
-              priority={1} 
-            />
+            Passionate educators and technologists united by a vision to democratize quality education worldwide through innovative AI-powered learning platforms.
           </p>
         </div>
 
@@ -58,18 +52,11 @@ export const Founders: React.FC = () => {
                     </AvatarFallback>
                   </Avatar>
                   
-                  <h3 className="text-xl font-bold mb-2">
-                    <OptimizedLocalizedText text={founder.name} priority={2} />
-                  </h3>
-                  
-                  <p className="text-primary font-semibold mb-4">
-                    <OptimizedLocalizedText text={founder.role} priority={2} />
-                  </p>
+                  <h3 className="text-xl font-bold mb-2">{founder.name}</h3>
+                  <p className="text-primary font-semibold mb-4">{founder.role}</p>
                 </div>
 
-                <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                  <OptimizedLocalizedText text={founder.bio} priority={1} />
-                </p>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-6">{founder.bio}</p>
 
                 <div className="flex justify-center space-x-4">
                   <a 
@@ -94,10 +81,7 @@ export const Founders: React.FC = () => {
 
         <div className="text-center mt-12">
           <p className="text-muted-foreground">
-            <OptimizedLocalizedText 
-              text="Together, we're building the future of education - one learner at a time." 
-              priority={1} 
-            />
+            Together, we're building the future of education - one learner at a time.
           </p>
         </div>
       </div>

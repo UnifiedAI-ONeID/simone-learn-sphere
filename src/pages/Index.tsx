@@ -1,11 +1,10 @@
+
 import { isMobile, isTablet } from 'react-device-detect';
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun, Brain } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { OptimizedLocalizedText } from '@/components/OptimizedLocalizedText';
-import { LanguageSelector } from '@/components/LanguageSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
@@ -58,9 +57,7 @@ const Index = () => {
           <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center animate-pulse shadow-lg">
             <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
-          <p className="landing-subtitle">
-            <OptimizedLocalizedText text="Loading..." waitForContent={false} />
-          </p>
+          <p className="landing-subtitle">Loading...</p>
         </div>
       </div>
     );
@@ -74,9 +71,7 @@ const Index = () => {
           <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center animate-pulse shadow-lg">
             <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
-          <p className="landing-subtitle">
-            <OptimizedLocalizedText text="Redirecting to your dashboard..." waitForContent={false} />
-          </p>
+          <p className="landing-subtitle">Redirecting to your dashboard...</p>
         </div>
       </div>
     );
@@ -84,7 +79,7 @@ const Index = () => {
 
   const handleGetStarted = () => {
     console.log('Index: Get started clicked, navigating to auth');
-    toast.success(<OptimizedLocalizedText text="Welcome to SimoneLabs!" waitForContent={false} />);
+    toast.success('Welcome to SimoneLabs!');
     navigate('/auth');
   };
 
@@ -103,13 +98,10 @@ const Index = () => {
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary shadow-lg">
               <Brain className="h-7 w-7 text-primary-foreground" aria-hidden="true" />
             </div>
-            <h1 className="text-3xl font-bold landing-gradient-text">
-              <OptimizedLocalizedText text="SimoneLabs" priority={3} />
-            </h1>
+            <h1 className="text-3xl font-bold landing-gradient-text">SimoneLabs</h1>
           </div>
           
           <div className="flex items-center space-x-4">
-            <LanguageSelector />
             {componentsLoaded && (
               <Suspense fallback={null}>
                 <AccessibilityControls />
@@ -130,7 +122,7 @@ const Index = () => {
               variant="outline"
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-semibold"
             >
-              <OptimizedLocalizedText text="Sign In" priority={3} />
+              Sign In
             </Button>
           </div>
         </nav>
@@ -144,9 +136,7 @@ const Index = () => {
               <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center animate-pulse">
                 <Brain className="w-8 h-8 text-primary-foreground" />
               </div>
-              <p className="text-muted-foreground">
-                <OptimizedLocalizedText text="Loading content..." waitForContent={false} />
-              </p>
+              <p className="text-muted-foreground">Loading content...</p>
             </div>
           }>
             <PlatformOverview 
@@ -168,9 +158,7 @@ const Index = () => {
       <footer className="mt-24 border-t border-border/50 py-12 bg-card/30 backdrop-blur-sm" role="contentinfo">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center text-muted-foreground">
-            <p className="text-lg font-medium">
-              <OptimizedLocalizedText text="© 2024 SimoneLabs. Democratizing education worldwide." priority={1} />
-            </p>
+            <p className="text-lg font-medium">© 2024 SimoneLabs. Democratizing education worldwide.</p>
           </div>
         </div>
       </footer>
