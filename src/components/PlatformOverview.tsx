@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +19,6 @@ import {
   BarChart3,
   Shield
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface PlatformOverviewProps {
   totalUsers: number;
@@ -44,16 +44,16 @@ export const PlatformOverview: React.FC<PlatformOverviewProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-4 w-4 text-blue-500" />
-            <UnifiedLocalizedText text="Total Users" />
+            Total Users
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="All registered users" />
+            All registered users
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold">{totalUsers}</div>
           <div className="text-sm text-gray-500">
-            <UnifiedLocalizedText text="Since last month" />: +12%
+            Since last month: +12%
           </div>
         </CardContent>
       </Card>
@@ -63,16 +63,16 @@ export const PlatformOverview: React.FC<PlatformOverviewProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-green-500" />
-            <UnifiedLocalizedText text="Active Courses" />
+            Active Courses
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Courses currently in progress" />
+            Courses currently in progress
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold">{activeCourses}</div>
           <div className="text-sm text-gray-500">
-            <UnifiedLocalizedText text="New courses this month" />: +5
+            New courses this month: +5
           </div>
         </CardContent>
       </Card>
@@ -82,10 +82,10 @@ export const PlatformOverview: React.FC<PlatformOverviewProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <GraduationCap className="h-4 w-4 text-yellow-500" />
-            <UnifiedLocalizedText text="Completion Rate" />
+            Completion Rate
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Percentage of completed courses" />
+            Percentage of completed courses
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -99,16 +99,16 @@ export const PlatformOverview: React.FC<PlatformOverviewProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-4 w-4 text-purple-500" />
-            <UnifiedLocalizedText text="AI Usage" />
+            AI Usage
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="How often AI tools are used" />
+            How often AI tools are used
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold">{aiUsage}%</div>
           <div className="text-sm text-gray-500">
-            <UnifiedLocalizedText text="Increased AI interactions" />: +25%
+            Increased AI interactions: +25%
           </div>
         </CardContent>
       </Card>
@@ -118,16 +118,16 @@ export const PlatformOverview: React.FC<PlatformOverviewProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-4 w-4 text-orange-500" />
-            <UnifiedLocalizedText text="User Engagement" />
+            User Engagement
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Active users and interactions" />
+            Active users and interactions
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold">{userEngagement}</div>
           <div className="text-sm text-gray-500">
-            <UnifiedLocalizedText text="Daily active users" />: +8%
+            Daily active users: +8%
           </div>
         </CardContent>
       </Card>
@@ -137,16 +137,16 @@ export const PlatformOverview: React.FC<PlatformOverviewProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-red-500" />
-            <UnifiedLocalizedText text="Security Score" />
+            Security Score
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Overall platform security rating" />
+            Overall platform security rating
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold">{securityScore}/100</div>
           <div className="text-sm text-gray-500">
-            <UnifiedLocalizedText text="Threats neutralized" />: +3
+            Threats neutralized: +3
           </div>
         </CardContent>
       </Card>

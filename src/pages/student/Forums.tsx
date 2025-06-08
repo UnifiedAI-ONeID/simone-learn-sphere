@@ -1,177 +1,172 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { PlatformLayout } from '@/components/platform/PlatformLayout';
-import { PlatformCard } from '@/components/platform/PlatformCard';
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, ThumbsUp, Search, Plus, Pin } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { MessageCircle, Plus, Search, ThumbsUp, Reply, Clock, Users } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface ForumPost {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  timestamp: string;
+  likes: number;
+  replies: number;
+  category: string;
+}
 
 export const Forums = () => {
-  const { courseId } = useParams();
+  const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const forumPosts = [
+  const mockPosts: ForumPost[] = [
     {
-      id: 1,
-      title: "Question about React hooks",
-      author: "Sarah Chen",
-      replies: 12,
-      likes: 8,
-      lastActivity: "2 hours ago",
-      isPinned: true,
-      category: "Q&A"
-    },
-    {
-      id: 2,
-      title: "Project showcase: Todo App with Redux",
-      author: "Mike Johnson",
-      replies: 5,
+      id: '1',
+      title: 'Best study techniques for programming?',
+      content: 'I\'m struggling with retaining programming concepts. What are your best study methods?',
+      author: 'John Doe',
+      timestamp: '2 hours ago',
       likes: 15,
-      lastActivity: "4 hours ago",
-      isPinned: false,
-      category: "Projects"
+      replies: 8,
+      category: 'Study Tips'
     },
     {
-      id: 3,
-      title: "Best practices for component structure",
-      author: "Lisa Wang",
-      replies: 18,
+      id: '2',
+      title: 'JavaScript vs Python for beginners',
+      content: 'Which language should I start with as a complete beginner?',
+      author: 'Jane Smith',
+      timestamp: '5 hours ago',
       likes: 23,
-      lastActivity: "1 day ago",
-      isPinned: false,
-      category: "Discussion"
+      replies: 12,
+      category: 'Programming'
+    },
+    {
+      id: '3',
+      title: 'How to stay motivated during long courses?',
+      content: 'I keep losing motivation halfway through courses. Any tips?',
+      author: 'Mike Johnson',
+      timestamp: '1 day ago',
+      likes: 31,
+      replies: 18,
+      category: 'Motivation'
     }
   ];
 
+  const categories = ['all', 'Study Tips', 'Programming', 'Motivation', 'Career', 'Technical Help'];
+
+  const filteredPosts = mockPosts.filter(post => {
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
   return (
-    <PlatformLayout>
-      <div className="container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">
-            <UnifiedLocalizedText text="Course Forum" />
-          </h1>
-          <p className="text-muted-foreground">
-            <UnifiedLocalizedText text="Discuss topics, ask questions, and help your fellow students" />
-          </p>
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Student Forums</h1>
+          <p className="text-gray-600">Connect with fellow learners and share knowledge</p>
         </div>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          New Post
+        </Button>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3 space-y-6">
-            <PlatformCard>
-              <div className="flex gap-4 items-center mb-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search discussions..." className="pl-10" />
-                </div>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  <UnifiedLocalizedText text="New Post" />
+      {/* Search and Filter */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search posts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category)}
+                  className="capitalize"
+                >
+                  {category}
                 </Button>
-              </div>
-            </PlatformCard>
-
-            <div className="space-y-4">
-              {forumPosts.map((post) => (
-                <PlatformCard key={post.id}>
-                  <div className="flex gap-4">
-                    <Avatar>
-                      <AvatarFallback>
-                        {post.author.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            {post.isPinned && <Pin className="h-4 w-4 text-primary" />}
-                            <h3 className="font-semibold hover:text-primary cursor-pointer">
-                              {post.title}
-                            </h3>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>by {post.author}</span>
-                            <span>•</span>
-                            <span>{post.lastActivity}</span>
-                          </div>
-                        </div>
-                        <Badge variant="secondary">{post.category}</Badge>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <MessageCircle className="h-4 w-4" />
-                          <span>{post.replies} replies</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <ThumbsUp className="h-4 w-4" />
-                          <span>{post.likes} likes</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </PlatformCard>
               ))}
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="space-y-6">
-            <PlatformCard>
-              <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Forum Guidelines" />
-              </h3>
-              <div className="text-sm text-muted-foreground space-y-2">
-                <p>• Be respectful and constructive</p>
-                <p>• Search before posting</p>
-                <p>• Use clear, descriptive titles</p>
-                <p>• Help others when you can</p>
-              </div>
-            </PlatformCard>
-
-            <PlatformCard>
-              <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Categories" />
-              </h3>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Q&A</span>
-                  <span className="text-muted-foreground">24</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Projects</span>
-                  <span className="text-muted-foreground">12</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Discussion</span>
-                  <span className="text-muted-foreground">18</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Announcements</span>
-                  <span className="text-muted-foreground">3</span>
-                </div>
-              </div>
-            </PlatformCard>
-
-            <PlatformCard>
-              <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Active Contributors" />
-              </h3>
-              <div className="space-y-3">
-                {['Sarah Chen', 'Mike Johnson', 'Lisa Wang'].map((name, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Avatar className="w-6 h-6">
-                      <AvatarFallback className="text-xs">
-                        {name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm">{name}</span>
+      {/* Posts */}
+      <div className="space-y-4">
+        {filteredPosts.map((post) => (
+          <Card key={post.id} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-4">
+                <Avatar>
+                  <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-semibold text-lg">{post.title}</h3>
+                      <div className="flex items-center space-x-2 text-sm text-gray-500">
+                        <span>{post.author}</span>
+                        <span>•</span>
+                        <span className="flex items-center">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {post.timestamp}
+                        </span>
+                      </div>
+                    </div>
+                    <Badge variant="secondary">{post.category}</Badge>
                   </div>
-                ))}
+                  
+                  <p className="text-gray-700">{post.content}</p>
+                  
+                  <div className="flex items-center space-x-4 pt-2">
+                    <Button variant="ghost" size="sm">
+                      <ThumbsUp className="h-4 w-4 mr-1" />
+                      {post.likes}
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <MessageCircle className="h-4 w-4 mr-1" />
+                      {post.replies} replies
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <Reply className="h-4 w-4 mr-1" />
+                      Reply
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </PlatformCard>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
-    </PlatformLayout>
+
+      {filteredPosts.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <MessageCircle className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
+            <p className="text-gray-600">Try adjusting your search or create a new post to start the discussion.</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 };

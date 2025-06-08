@@ -14,7 +14,6 @@ import {
   CheckCircle,
   BarChart3
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface SystemMetric {
   name: string;
@@ -111,15 +110,15 @@ export const SystemMetrics = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">
-            <UnifiedLocalizedText text="System Metrics" />
+            System Metrics
           </h2>
           <p className="text-muted-foreground">
-            <UnifiedLocalizedText text="Real-time system performance monitoring" />
+            Real-time system performance monitoring
           </p>
         </div>
         <Badge variant="outline" className="flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <UnifiedLocalizedText text="Live" />
+          Live
         </Badge>
       </div>
 
@@ -130,7 +129,7 @@ export const SystemMetrics = () => {
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  <UnifiedLocalizedText text={metric.name} />
+                  {metric.name}
                 </CardTitle>
                 <div className="flex items-center gap-2">
                   {getStatusIcon(metric.status)}
@@ -148,7 +147,7 @@ export const SystemMetrics = () => {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2 capitalize">
-                  <UnifiedLocalizedText text={metric.status} />
+                  {metric.status}
                 </p>
               </CardContent>
             </Card>
@@ -161,10 +160,10 @@ export const SystemMetrics = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Server className="h-5 w-5" />
-            <UnifiedLocalizedText text="System Overview" />
+            System Overview
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Overall system health and status" />
+            Overall system health and status
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -172,19 +171,19 @@ export const SystemMetrics = () => {
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600">98.5%</div>
               <p className="text-sm text-muted-foreground">
-                <UnifiedLocalizedText text="Uptime" />
+                Uptime
               </p>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600">1,847</div>
               <p className="text-sm text-muted-foreground">
-                <UnifiedLocalizedText text="Active Users" />
+                Active Users
               </p>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600">23ms</div>
               <p className="text-sm text-muted-foreground">
-                <UnifiedLocalizedText text="Avg Response" />
+                Avg Response
               </p>
             </div>
           </div>

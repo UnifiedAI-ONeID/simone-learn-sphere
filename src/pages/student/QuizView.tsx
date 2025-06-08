@@ -1,189 +1,352 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle, XCircle, Clock, Award, ArrowRight, ArrowLeft, RefreshCw } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
+import { Checkbox } from '@/components/ui/checkbox';
+import { 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
+  Brain, 
+  ArrowLeft, 
+  ArrowRight,
+  Trophy,
+  Target
+} from 'lucide-react';
 
 interface Question {
-  id: number;
-  text: string;
+  id: string;
+  type: 'multiple-choice' | 'multiple-select' | 'true-false';
+  question: string;
   options: string[];
-  correctAnswer: string;
-  explanation: string;
+  correctAnswers: string[];
+  explanation?: string;
 }
 
-const mockQuestions: Question[] = [
-  {
-    id: 1,
-    text: 'What is the capital of France?',
-    options: ['Berlin', 'Madrid', 'Paris', 'Rome'],
-    correctAnswer: 'Paris',
-    explanation: 'Paris is the capital and largest city of France.'
-  },
-  {
-    id: 2,
-    text: 'Which planet is known as the "Red Planet"?',
-    options: ['Venus', 'Mars', 'Jupiter', 'Saturn'],
-    correctAnswer: 'Mars',
-    explanation: 'Mars is often called the "Red Planet" due to its reddish appearance.'
-  },
-  {
-    id: 3,
-    text: 'What is the largest mammal in the world?',
-    options: ['African Elephant', 'Blue Whale', 'Giraffe', 'Polar Bear'],
-    correctAnswer: 'Blue Whale',
-    explanation: 'The Blue Whale is the largest known mammal on Earth.'
-  }
-];
+interface Quiz {
+  id: string;
+  title: string;
+  description: string;
+  timeLimit: number; // in minutes
+  questions: Question[];
+  passingScore: number;
+}
 
 export const QuizView = () => {
+  const { quizId } = useParams();
+  const navigate = useNavigate();
+  
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<string[]>(Array(mockQuestions.length).fill(''));
+  const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [score, setScore] = useState(0);
 
-  const currentQuestion = mockQuestions[currentQuestionIndex];
-  const totalQuestions = mockQuestions.length;
-  const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-
-  const handleAnswerChange = (answer: string) => {
-    const updatedAnswers = [...userAnswers];
-    updatedAnswers[currentQuestionIndex] = answer;
-    setUserAnswers(updatedAnswers);
+  // Mock quiz data
+  const quiz: Quiz = {
+    id: quizId || '1',
+    title: 'JavaScript Fundamentals Quiz',
+    description: 'Test your knowledge of JavaScript basics including variables, functions, and control structures.',
+    timeLimit: 30,
+    passingScore: 70,
+    questions: [
+      {
+        id: '1',
+        type: 'multiple-choice',
+        question: 'Which of the following is the correct way to declare a variable in JavaScript?',
+        options: ['var myVar = 5;', 'variable myVar = 5;', 'v myVar = 5;', 'declare myVar = 5;'],
+        correctAnswers: ['var myVar = 5;'],
+        explanation: 'In JavaScript, variables can be declared using var, let, or const keywords.'
+      },
+      {
+        id: '2',
+        type: 'multiple-select',
+        question: 'Which of the following are JavaScript data types? (Select all that apply)',
+        options: ['String', 'Number', 'Boolean', 'Integer', 'Character'],
+        correctAnswers: ['String', 'Number', 'Boolean'],
+        explanation: 'JavaScript has several primitive data types including String, Number, Boolean, undefined, null, and Symbol.'
+      },
+      {
+        id: '3',
+        type: 'true-false',
+        question: 'JavaScript is a case-sensitive language.',
+        options: ['True', 'False'],
+        correctAnswers: ['True'],
+        explanation: 'JavaScript is indeed case-sensitive, meaning "myVariable" and "MyVariable" are different identifiers.'
+      }
+    ]
   };
 
-  const goToNextQuestion = () => {
-    if (currentQuestionIndex < totalQuestions - 1) {
+  useEffect(() => {
+    if (quizStarted && !quizCompleted) {
+      setTimeRemaining(quiz.timeLimit * 60); // Convert to seconds
+    }
+  }, [quizStarted, quiz.timeLimit, quizCompleted]);
+
+  useEffect(() => {
+    if (timeRemaining > 0 && quizStarted && !quizCompleted) {
+      const timer = setTimeout(() => {
+        setTimeRemaining(timeRemaining - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (timeRemaining === 0 && quizStarted) {
+      handleSubmitQuiz();
+    }
+  }, [timeRemaining, quizStarted, quizCompleted]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleStartQuiz = () => {
+    setQuizStarted(true);
+  };
+
+  const handleAnswerChange = (questionId: string, answer: string, isMultiSelect = false) => {
+    setAnswers(prev => {
+      if (isMultiSelect) {
+        const currentAnswers = prev[questionId] || [];
+        const newAnswers = currentAnswers.includes(answer)
+          ? currentAnswers.filter(a => a !== answer)
+          : [...currentAnswers, answer];
+        return { ...prev, [questionId]: newAnswers };
+      } else {
+        return { ...prev, [questionId]: [answer] };
+      }
+    });
+  };
+
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      calculateScore();
-      setQuizCompleted(true);
     }
   };
 
-  const goToPreviousQuestion = () => {
+  const handlePreviousQuestion = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
 
-  const calculateScore = () => {
-    let correctAnswersCount = 0;
-    for (let i = 0; i < totalQuestions; i++) {
-      if (userAnswers[i] === mockQuestions[i].correctAnswer) {
-        correctAnswersCount++;
-      }
-    }
-    const calculatedScore = (correctAnswersCount / totalQuestions) * 100;
-    setScore(calculatedScore);
+  const handleSubmitQuiz = () => {
+    // Calculate score
+    let correctAnswers = 0;
+    quiz.questions.forEach(question => {
+      const userAnswers = answers[question.id] || [];
+      const isCorrect = question.correctAnswers.length === userAnswers.length &&
+                       question.correctAnswers.every(answer => userAnswers.includes(answer));
+      if (isCorrect) correctAnswers++;
+    });
+    
+    const finalScore = Math.round((correctAnswers / quiz.questions.length) * 100);
+    setScore(finalScore);
+    setQuizCompleted(true);
   };
 
-  const resetQuiz = () => {
-    setCurrentQuestionIndex(0);
-    setUserAnswers(Array(mockQuestions.length).fill(''));
-    setQuizCompleted(false);
-    setScore(0);
-  };
+  const currentQuestion = quiz.questions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
-  const isCorrect = quizCompleted && userAnswers[currentQuestionIndex] === currentQuestion.correctAnswer;
+  if (!quizStarted) {
+    return (
+      <div className="container mx-auto py-6">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate(-1)}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
 
-  return (
-    <div className="container mx-auto p-4 space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            <UnifiedLocalizedText text="Quiz Time!" />
-          </CardTitle>
-          <CardDescription>
-            <UnifiedLocalizedText text="Test your knowledge and earn rewards" />
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Progress value={progress} className="h-2" />
-          <div className="text-sm text-muted-foreground">
-            <UnifiedLocalizedText text="Question" /> {currentQuestionIndex + 1} / {totalQuestions}
-          </div>
-
-          {!quizCompleted ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold">
-                  <UnifiedLocalizedText text={currentQuestion.text} />
-                </h3>
-                <RadioGroup defaultValue={userAnswers[currentQuestionIndex]} onValueChange={handleAnswerChange}>
-                  {currentQuestion.options.map((option) => (
-                    <div key={option} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option} id={`option-${option}`} className="border-2" />
-                      <Label htmlFor={`option-${option}`}>
-                        <UnifiedLocalizedText text={option} />
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-4">
+              <Brain className="h-8 w-8 text-white" />
+            </div>
+            <CardTitle className="text-2xl">{quiz.title}</CardTitle>
+            <CardDescription className="text-base">{quiz.description}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <Clock className="h-6 w-6 mx-auto text-blue-600 mb-2" />
+                <p className="font-semibold">Time Limit</p>
+                <p className="text-sm text-gray-600">{quiz.timeLimit} minutes</p>
               </div>
-
-              <div className="flex justify-between">
-                <Button variant="outline" size="sm" onClick={goToPreviousQuestion} disabled={currentQuestionIndex === 0}>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  <UnifiedLocalizedText text="Previous" />
-                </Button>
-                <Button size="sm" onClick={goToNextQuestion}>
-                  {currentQuestionIndex === totalQuestions - 1 ? (
-                    <><UnifiedLocalizedText text="Submit Quiz" /></>
-                  ) : (
-                    <>
-                      <UnifiedLocalizedText text="Next" />
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </>
-                  )}
-                </Button>
+              <div className="p-4 bg-green-50 rounded-lg">
+                <Target className="h-6 w-6 mx-auto text-green-600 mb-2" />
+                <p className="font-semibold">Questions</p>
+                <p className="text-sm text-gray-600">{quiz.questions.length} total</p>
+              </div>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <Trophy className="h-6 w-6 mx-auto text-purple-600 mb-2" />
+                <p className="font-semibold">Passing Score</p>
+                <p className="text-sm text-gray-600">{quiz.passingScore}%</p>
               </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold">
-                  <UnifiedLocalizedText text="Quiz Completed!" />
-                </h3>
-                <Badge variant="secondary">
-                  <Award className="h-4 w-4 mr-2" />
-                  <UnifiedLocalizedText text={`Score: ${score.toFixed(0)}%`} />
-                </Badge>
-              </div>
-
-              <div className="space-y-2">
-                <h4 className="text-lg font-medium">
-                  <UnifiedLocalizedText text="Question" /> {currentQuestionIndex + 1}: <UnifiedLocalizedText text={currentQuestion.text} />
-                </h4>
-                {isCorrect ? (
-                  <Alert>
-                    <CheckCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      <UnifiedLocalizedText text="Correct!" /> {currentQuestion.explanation}
-                    </AlertDescription>
-                  </Alert>
-                ) : (
-                  <Alert variant="destructive">
-                    <XCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      <UnifiedLocalizedText text="Incorrect." /> <UnifiedLocalizedText text="The correct answer is" /> {currentQuestion.correctAnswer}. {currentQuestion.explanation}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-
-              <Button onClick={resetQuiz}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                <UnifiedLocalizedText text="Retake Quiz" />
+            
+            <div className="text-center">
+              <Button onClick={handleStartQuiz} size="lg" className="px-8">
+                Start Quiz
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (quizCompleted) {
+    const passed = score >= quiz.passingScore;
+    
+    return (
+      <div className="container mx-auto py-6">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader className="text-center">
+            <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${
+              passed ? 'bg-green-100' : 'bg-red-100'
+            }`}>
+              {passed ? (
+                <Trophy className="h-8 w-8 text-green-600" />
+              ) : (
+                <XCircle className="h-8 w-8 text-red-600" />
+              )}
+            </div>
+            <CardTitle className="text-2xl">
+              {passed ? 'Congratulations!' : 'Quiz Complete'}
+            </CardTitle>
+            <CardDescription>
+              {passed ? 'You passed the quiz!' : 'Better luck next time!'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="text-center">
+              <div className={`text-4xl font-bold mb-2 ${
+                passed ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {score}%
+              </div>
+              <p className="text-gray-600">
+                Your Score ({quiz.questions.filter(q => {
+                  const userAnswers = answers[q.id] || [];
+                  return q.correctAnswers.length === userAnswers.length &&
+                         q.correctAnswers.every(answer => userAnswers.includes(answer));
+                }).length} out of {quiz.questions.length} correct)
+              </p>
+            </div>
+
+            <div className="flex justify-center space-x-4">
+              <Button variant="outline" onClick={() => navigate(-1)}>
+                Back to Course
+              </Button>
+              <Button onClick={() => window.location.reload()}>
+                Retake Quiz
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-6">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Exit Quiz
+          </Button>
+          <div>
+            <h1 className="text-xl font-semibold">{quiz.title}</h1>
+            <p className="text-sm text-gray-600">
+              Question {currentQuestionIndex + 1} of {quiz.questions.length}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Badge variant="outline" className="flex items-center space-x-1">
+            <Clock className="h-3 w-3" />
+            <span>{formatTime(timeRemaining)}</span>
+          </Badge>
+        </div>
+      </div>
+
+      {/* Progress */}
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <Progress value={progress} className="w-full" />
+        </CardContent>
+      </Card>
+
+      {/* Question */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">{currentQuestion.question}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {currentQuestion.type === 'multiple-choice' || currentQuestion.type === 'true-false' ? (
+            <RadioGroup
+              value={answers[currentQuestion.id]?.[0] || ''}
+              onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+            >
+              {currentQuestion.options.map((option, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <RadioGroupItem value={option} id={`option-${index}`} />
+                  <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
+                    {option}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          ) : (
+            <div className="space-y-2">
+              {currentQuestion.options.map((option, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`option-${index}`}
+                    checked={answers[currentQuestion.id]?.includes(option) || false}
+                    onCheckedChange={() => handleAnswerChange(currentQuestion.id, option, true)}
+                  />
+                  <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
+                    {option}
+                  </Label>
+                </div>
+              ))}
+            </div>
           )}
+
+          {/* Navigation */}
+          <div className="flex justify-between pt-6">
+            <Button
+              variant="outline"
+              onClick={handlePreviousQuestion}
+              disabled={currentQuestionIndex === 0}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Previous
+            </Button>
+            
+            {currentQuestionIndex === quiz.questions.length - 1 ? (
+              <Button onClick={handleSubmitQuiz}>
+                Submit Quiz
+              </Button>
+            ) : (
+              <Button onClick={handleNextQuestion}>
+                Next
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
