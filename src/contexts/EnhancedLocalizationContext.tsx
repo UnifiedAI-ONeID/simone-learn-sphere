@@ -15,6 +15,12 @@ interface TranslationCache {
   };
 }
 
+interface OfflineTranslations {
+  [languageCode: string]: {
+    [text: string]: string;
+  };
+}
+
 interface EnhancedLocalizationContextType {
   currentLanguage: Language;
   availableLanguages: Language[];
@@ -24,6 +30,9 @@ interface EnhancedLocalizationContextType {
   isTranslating: boolean;
   translationError: string | null;
   clearTranslationCache: () => void;
+  downloadLanguageContent: (languageCode: string) => Promise<boolean>;
+  isLanguageDownloaded: (languageCode: string) => boolean;
+  getOfflineTranslation: (text: string, targetLanguage: string) => string | null;
 }
 
 const EnhancedLocalizationContext = createContext<EnhancedLocalizationContextType | undefined>(undefined);
@@ -41,17 +50,20 @@ const AVAILABLE_LANGUAGES: Language[] = [
   { code: 'zh', name: '中文', flag: '🇨🇳' },
 ];
 
-const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
-const TRANSLATION_TIMEOUT = 10000; // 10 seconds
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const TRANSLATION_TIMEOUT = 8000; // 8 seconds
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
 
 export const EnhancedLocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState<Language>(AVAILABLE_LANGUAGES[0]);
   const [translationKey, setTranslationKey] = useState(0);
   const [translationCache, setTranslationCache] = useState<TranslationCache>({});
+  const [offlineTranslations, setOfflineTranslations] = useState<OfflineTranslations>({});
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationError, setTranslationError] = useState<string | null>(null);
 
-  // Load saved language preference
+  // Load saved data on initialization
   useEffect(() => {
     const savedLanguage = localStorage.getItem('selectedLanguage');
     if (savedLanguage) {
@@ -66,7 +78,6 @@ export const EnhancedLocalizationProvider: React.FC<{ children: React.ReactNode 
     if (savedCache) {
       try {
         const cache = JSON.parse(savedCache);
-        // Clean expired cache entries
         const now = Date.now();
         const cleanCache: TranslationCache = {};
         Object.entries(cache).forEach(([key, value]: [string, any]) => {
@@ -77,6 +88,16 @@ export const EnhancedLocalizationProvider: React.FC<{ children: React.ReactNode 
         setTranslationCache(cleanCache);
       } catch (error) {
         console.warn('Failed to load translation cache:', error);
+      }
+    }
+
+    // Load offline translations
+    const savedOfflineTranslations = localStorage.getItem('offlineTranslations');
+    if (savedOfflineTranslations) {
+      try {
+        setOfflineTranslations(JSON.parse(savedOfflineTranslations));
+      } catch (error) {
+        console.warn('Failed to load offline translations:', error);
       }
     }
   }, []);
@@ -95,6 +116,39 @@ export const EnhancedLocalizationProvider: React.FC<{ children: React.ReactNode 
     }
   }, []);
 
+  const saveOfflineTranslations = useCallback((translations: OfflineTranslations) => {
+    try {
+      localStorage.setItem('offlineTranslations', JSON.stringify(translations));
+    } catch (error) {
+      console.warn('Failed to save offline translations:', error);
+    }
+  }, []);
+
+  const getOfflineTranslation = useCallback((text: string, targetLanguage: string): string | null => {
+    return offlineTranslations[targetLanguage]?.[text] || null;
+  }, [offlineTranslations]);
+
+  const retryOperation = async <T,>(
+    operation: () => Promise<T>,
+    maxRetries: number = MAX_RETRIES,
+    delay: number = RETRY_DELAY
+  ): Promise<T> => {
+    let lastError: any;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, delay * attempt));
+        }
+      }
+    }
+    
+    throw lastError;
+  };
+
   const getTranslation = useCallback(async (text: string, targetLanguage: string): Promise<string> => {
     if (!text || targetLanguage === 'en') {
       return text;
@@ -108,21 +162,29 @@ export const EnhancedLocalizationProvider: React.FC<{ children: React.ReactNode 
       return cached.translation;
     }
 
+    // Check offline translations
+    const offlineTranslation = getOfflineTranslation(text, targetLanguage);
+    if (offlineTranslation) {
+      return offlineTranslation;
+    }
+
     setIsTranslating(true);
     setTranslationError(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke('translate-text-fixed', {
-        body: { text, targetLanguage }
-      });
+      const translationOperation = async () => {
+        const { data, error } = await supabase.functions.invoke('translate-text-fixed', {
+          body: { text, targetLanguage }
+        });
 
-      if (error) {
-        console.warn('Translation service error:', error);
-        setTranslationError('Translation service temporarily unavailable');
-        return text; // Return original text as fallback
-      }
+        if (error) {
+          throw new Error(`Translation service error: ${error.message}`);
+        }
 
-      const translatedText = data?.translatedText || text;
+        return data?.translatedText || text;
+      };
+
+      const translatedText = await retryOperation(translationOperation);
 
       // Cache the translation
       const newCache = {
@@ -135,19 +197,86 @@ export const EnhancedLocalizationProvider: React.FC<{ children: React.ReactNode 
       setTranslationCache(newCache);
       saveTranslationCache(newCache);
 
+      // Also save to offline translations
+      const newOfflineTranslations = {
+        ...offlineTranslations,
+        [targetLanguage]: {
+          ...offlineTranslations[targetLanguage],
+          [text]: translatedText
+        }
+      };
+      setOfflineTranslations(newOfflineTranslations);
+      saveOfflineTranslations(newOfflineTranslations);
+
       return translatedText;
     } catch (error: any) {
       console.warn('Translation failed:', error);
-      setTranslationError('Translation service unavailable');
-      return text; // Return original text as fallback
+      
+      // Check if we have any offline fallback
+      const fallbackTranslation = getOfflineTranslation(text, targetLanguage);
+      if (fallbackTranslation) {
+        return fallbackTranslation;
+      }
+      
+      setTranslationError('Translation service temporarily unavailable');
+      return text; // Return original text as final fallback
     } finally {
       setIsTranslating(false);
     }
-  }, [translationCache, saveTranslationCache]);
+  }, [translationCache, offlineTranslations, saveTranslationCache, saveOfflineTranslations, getOfflineTranslation]);
+
+  const downloadLanguageContent = useCallback(async (languageCode: string): Promise<boolean> => {
+    if (languageCode === 'en') return true; // English is the base language
+    
+    const commonPhrases = [
+      'Welcome', 'Sign In', 'Sign Up', 'Dashboard', 'Profile', 'Settings',
+      'Courses', 'Lessons', 'Student', 'Educator', 'Admin', 'Loading...',
+      'Error', 'Success', 'Cancel', 'Save', 'Delete', 'Edit', 'Create',
+      'Search', 'Filter', 'Sort', 'Home', 'About', 'Contact', 'Help',
+      'Account', 'Password', 'Email', 'Name', 'Language', 'Theme'
+    ];
+
+    try {
+      const translations: { [key: string]: string } = {};
+      
+      for (const phrase of commonPhrases) {
+        try {
+          const translation = await getTranslation(phrase, languageCode);
+          translations[phrase] = translation;
+        } catch (error) {
+          console.warn(`Failed to translate "${phrase}" to ${languageCode}:`, error);
+          translations[phrase] = phrase; // Fallback to original
+        }
+      }
+
+      const newOfflineTranslations = {
+        ...offlineTranslations,
+        [languageCode]: {
+          ...offlineTranslations[languageCode],
+          ...translations
+        }
+      };
+      
+      setOfflineTranslations(newOfflineTranslations);
+      saveOfflineTranslations(newOfflineTranslations);
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to download language content:', error);
+      return false;
+    }
+  }, [getTranslation, offlineTranslations, saveOfflineTranslations]);
+
+  const isLanguageDownloaded = useCallback((languageCode: string): boolean => {
+    if (languageCode === 'en') return true;
+    return Object.keys(offlineTranslations[languageCode] || {}).length > 10;
+  }, [offlineTranslations]);
 
   const clearTranslationCache = useCallback(() => {
     setTranslationCache({});
     localStorage.removeItem('translationCache');
+    localStorage.removeItem('offlineTranslations');
+    setOfflineTranslations({});
     setTranslationKey(prev => prev + 1);
   }, []);
 
@@ -159,7 +288,10 @@ export const EnhancedLocalizationProvider: React.FC<{ children: React.ReactNode 
     translationKey,
     isTranslating,
     translationError,
-    clearTranslationCache
+    clearTranslationCache,
+    downloadLanguageContent,
+    isLanguageDownloaded,
+    getOfflineTranslation
   };
 
   return (

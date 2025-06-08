@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun, Brain } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { LocalizedText } from '@/components/LocalizedText';
+import { EnhancedLocalizedText } from '@/components/EnhancedLocalizedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -55,7 +55,7 @@ const Index = () => {
             <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
           <p className="landing-subtitle">
-            <LocalizedText text="Loading..." />
+            <EnhancedLocalizedText text="Loading..." />
           </p>
         </div>
       </div>
@@ -71,7 +71,7 @@ const Index = () => {
             <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
           <p className="landing-subtitle">
-            <LocalizedText text="Redirecting to your dashboard..." />
+            <EnhancedLocalizedText text="Redirecting to your dashboard..." />
           </p>
         </div>
       </div>
@@ -79,7 +79,7 @@ const Index = () => {
   }
 
   const handleGetStarted = () => {
-    toast.success(<LocalizedText text="Welcome to SimoneLabs!" />);
+    toast.success(<EnhancedLocalizedText text="Welcome to SimoneLabs!" />);
     navigate('/auth');
   };
 
@@ -99,7 +99,7 @@ const Index = () => {
               <Brain className="h-7 w-7 text-primary-foreground" aria-hidden="true" />
             </div>
             <h1 className="text-3xl font-bold landing-gradient-text">
-              <LocalizedText text="SimoneLabs" />
+              <EnhancedLocalizedText text="SimoneLabs" />
             </h1>
           </div>
           
@@ -125,7 +125,7 @@ const Index = () => {
               variant="outline"
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-semibold"
             >
-              <LocalizedText text="Sign In" />
+              <EnhancedLocalizedText text="Sign In" />
             </Button>
           </div>
         </nav>
@@ -152,7 +152,7 @@ const Index = () => {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center text-muted-foreground">
             <p className="text-lg font-medium">
-              <LocalizedText text="© 2024 SimoneLabs. Democratizing education worldwide." />
+              <EnhancedLocalizedText text="© 2024 SimoneLabs. Democratizing education worldwide." />
             </p>
           </div>
         </div>
