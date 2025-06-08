@@ -11,15 +11,15 @@ import { Toaster } from 'react-hot-toast';
 import { usePlatformDetection } from '@/hooks/usePlatformDetection';
 import { useOptimizedPerformance } from '@/hooks/useOptimizedPerformance';
 
-// Mobile Pages
-import MobileAuth from '@/pages/mobile/MobileAuth';
-import MobileAuthCallback from '@/pages/mobile/MobileAuthCallback';
-import MobileIndex from '@/pages/mobile/MobileIndex';
-import MobileProfileSettings from '@/pages/mobile/MobileProfileSettings';
-import MobileNotFound from '@/pages/mobile/MobileNotFound';
-import MobileStudentDashboard from '@/pages/student/MobileStudentDashboard';
-import MobileEducatorDashboard from '@/pages/educator/MobileEducatorDashboard';
-import MobileAdminDashboard from '@/pages/admin/MobileAdminDashboard';
+// Mobile Pages - using named imports
+import { MobileAuth } from '@/pages/mobile/MobileAuth';
+import { MobileAuthCallback } from '@/pages/mobile/MobileAuthCallback';
+import { MobileIndex } from '@/pages/mobile/MobileIndex';
+import { MobileProfileSettings } from '@/pages/mobile/MobileProfileSettings';
+import { MobileNotFound } from '@/pages/mobile/MobileNotFound';
+import { MobileStudentDashboard } from '@/pages/student/MobileStudentDashboard';
+import { MobileEducatorDashboard } from '@/pages/educator/MobileEducatorDashboard';
+import { MobileAdminDashboard } from '@/pages/admin/MobileAdminDashboard';
 
 // Desktop Pages
 import Index from '@/pages/Index';
@@ -44,7 +44,8 @@ const queryClient = new QueryClient({
 });
 
 function AppRoutes() {
-  const { isMobile } = usePlatformDetection();
+  const platform = usePlatformDetection();
+  const isMobile = platform === 'ios' || platform === 'android';
   
   if (isMobile) {
     return (
@@ -79,7 +80,11 @@ function AppRoutes() {
 }
 
 function App() {
-  useOptimizedPerformance();
+  useOptimizedPerformance({
+    enableLazyLoading: true,
+    enableCodeSplitting: true,
+    enableImageOptimization: true
+  });
 
   return (
     <ErrorBoundary>
