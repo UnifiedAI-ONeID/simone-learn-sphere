@@ -117,7 +117,7 @@ export const Mobile2FASettings = () => {
               <PlatformButton
                 onClick={handleDisable2FA}
                 disabled={state.isLoading}
-                variant="outline"
+                variant="secondary"
                 className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
               >
                 <Shield className="w-4 h-4 mr-2" />
