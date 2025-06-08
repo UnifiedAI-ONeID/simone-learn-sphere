@@ -4,7 +4,7 @@ import { BookOpen, Users, Brain, Trophy, Smartphone } from 'lucide-react';
 import { LocalizedText } from '@/components/LocalizedText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { Badge } from '@/components/ui/badge';
 
@@ -21,12 +21,12 @@ export const MobileIndex = () => {
   const { role, loading: roleLoading } = useUserRole();
   const { platform, theme } = usePlatformTheme();
 
-  // Redirect authenticated users
+  // Redirect authenticated users using mobile routing
   useEffect(() => {
     if (!authLoading && !roleLoading && user && role) {
-      console.log('MobileIndex: Authenticated user detected, redirecting to dashboard');
+      console.log('MobileIndex: Authenticated user detected, redirecting to mobile dashboard');
       console.log('MobileIndex: User role:', role);
-      const redirectRoute = getRoleBasedRoute(role, true);
+      const redirectRoute = getMobileRoleBasedRoute(role, true);
       console.log('MobileIndex: Redirecting to:', redirectRoute);
       navigate(redirectRoute, { replace: true });
     }

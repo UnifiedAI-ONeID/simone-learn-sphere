@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Users, Settings, Brain } from 'lucide-react';
+import { Home, BookOpen, Users, Settings, Brain, Shield } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
 import { cn } from '@/lib/utils';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { getRoleBasedRoute } from '@/utils/roleRouting';
 
 export const MobileAppNavigation = () => {
   const { role } = useUserRole();
@@ -19,39 +20,38 @@ export const MobileAppNavigation = () => {
   };
 
   const getNavItems = () => {
-    const baseItems = [
-      { icon: Home, label: 'Dashboard', path: `/${role}-dashboard` },
-      { icon: Settings, label: 'Settings', path: '/profile-settings' },
-    ];
-
     if (role === 'student') {
       return [
-        ...baseItems.slice(0, 1),
-        { icon: BookOpen, label: 'Courses', path: '/student-dashboard', tab: 'courses' },
-        { icon: Brain, label: 'AI Tutor', path: '/student-dashboard', tab: 'ai-tutor' },
-        ...baseItems.slice(1),
+        { icon: Home, label: 'Dashboard', path: getRoleBasedRoute('student', true) },
+        { icon: BookOpen, label: 'Courses', path: '/student-dashboard' },
+        { icon: Brain, label: 'AI Tutor', path: '/student-dashboard' },
+        { icon: Settings, label: 'Settings', path: '/profile-settings' },
       ];
     }
 
     if (role === 'educator') {
       return [
-        ...baseItems.slice(0, 1),
-        { icon: BookOpen, label: 'Courses', path: '/educator-dashboard', tab: 'courses' },
-        { icon: Brain, label: 'AI Tools', path: '/educator-dashboard', tab: 'ai-planner' },
-        ...baseItems.slice(1),
+        { icon: Home, label: 'Dashboard', path: getRoleBasedRoute('educator', true) },
+        { icon: BookOpen, label: 'Courses', path: '/educator-dashboard' },
+        { icon: Brain, label: 'AI Tools', path: '/educator-dashboard' },
+        { icon: Settings, label: 'Settings', path: '/profile-settings' },
       ];
     }
 
     if (role === 'admin') {
       return [
-        ...baseItems.slice(0, 1),
-        { icon: Users, label: 'Users', path: '/admin-dashboard', tab: 'users' },
-        { icon: BookOpen, label: 'Security', path: '/admin-dashboard', tab: 'security' },
-        ...baseItems.slice(1),
+        { icon: Home, label: 'Dashboard', path: getRoleBasedRoute('admin', true) },
+        { icon: Users, label: 'Users', path: '/admin-dashboard' },
+        { icon: Shield, label: 'Security', path: '/admin-dashboard' },
+        { icon: Settings, label: 'Settings', path: '/profile-settings' },
       ];
     }
 
-    return baseItems;
+    // Fallback for unrecognized roles
+    return [
+      { icon: Home, label: 'Dashboard', path: '/' },
+      { icon: Settings, label: 'Settings', path: '/profile-settings' },
+    ];
   };
 
   const navItems = getNavItems();
@@ -60,7 +60,10 @@ export const MobileAppNavigation = () => {
     <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-purple-100 px-4 py-2 z-50">
       <div className="flex justify-around items-center max-w-md mx-auto">
         {navItems.map((item, index) => {
-          const isActive = location.pathname === item.path;
+          const isActive = location.pathname === item.path || 
+                          (location.pathname.startsWith('/student-dashboard') && item.path === '/student-dashboard') ||
+                          (location.pathname.startsWith('/educator-dashboard') && item.path === '/educator-dashboard') ||
+                          (location.pathname.startsWith('/admin-dashboard') && item.path === '/admin-dashboard');
           
           return (
             <NavLink
