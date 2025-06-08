@@ -14,27 +14,34 @@ export const getUnifiedRoleRoute = (
     return isMobile ? '/mobile/student-dashboard' : '/student-dashboard';
   }
 
-  // During login, always prioritize admin role if user has it
-  if (isLoginContext && role.includes('admin')) {
-    console.log('Login context: Admin user detected, routing to admin dashboard');
-    return isMobile ? '/mobile/admin-dashboard' : '/admin-dashboard';
+  // Handle combined roles - prioritize in order: admin > educator > student
+  let primaryRole = role;
+  if (role.includes('admin')) {
+    primaryRole = 'admin';
+  } else if (role.includes('educator')) {
+    primaryRole = 'educator';
+  } else if (role.includes('student')) {
+    primaryRole = 'student';
   }
 
-  // Handle combined roles - prioritize in order: admin > educator > student
-  if (role.includes('admin')) {
-    console.log('Routing admin to admin dashboard');
-    return isMobile ? '/mobile/admin-dashboard' : '/admin-dashboard';
-  } else if (role.includes('educator')) {
-    console.log('Routing educator to educator dashboard');
-    return isMobile ? '/mobile/educator-dashboard' : '/educator-dashboard';
-  } else if (role.includes('student')) {
-    console.log('Routing student to student dashboard');
-    return isMobile ? '/mobile/student-dashboard' : '/student-dashboard';
+  console.log('Primary role determined:', primaryRole);
+
+  // Route based on primary role
+  switch (primaryRole) {
+    case 'admin':
+      console.log('Routing admin to admin dashboard');
+      return isMobile ? '/mobile/admin-dashboard' : '/admin-dashboard';
+    case 'educator':
+      console.log('Routing educator to educator dashboard');
+      return isMobile ? '/mobile/educator-dashboard' : '/educator-dashboard';
+    case 'student':
+      console.log('Routing student to student dashboard');
+      return isMobile ? '/mobile/student-dashboard' : '/student-dashboard';
+    default:
+      // Default to student dashboard for any unknown roles
+      console.warn('Unknown role, defaulting to student dashboard:', role);
+      return isMobile ? '/mobile/student-dashboard' : '/student-dashboard';
   }
-  
-  // Default to student dashboard for any unknown roles
-  console.warn('Unknown role, defaulting to student dashboard:', role);
-  return isMobile ? '/mobile/student-dashboard' : '/student-dashboard';
 };
 
 export const canAccessRoute = (userRole: string | null, route: string): boolean => {
@@ -57,7 +64,6 @@ export const canAccessRoute = (userRole: string | null, route: string): boolean 
     case '/student-dashboard':
       return true; // All authenticated users can access student dashboard
     case '/auth':
-    case '/mobile/auth':
       return true; // Anyone can access auth page
     case '/':
       return true; // Anyone can access landing page

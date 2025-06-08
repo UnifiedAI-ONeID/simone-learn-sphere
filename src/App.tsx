@@ -83,16 +83,25 @@ function AppRoutes() {
   const platform = usePlatformDetection();
   const isMobile = platform === 'ios' || platform === 'android';
   
+  console.log('AppRoutes: Platform detected:', platform, 'isMobile:', isMobile);
+  
   if (isMobile) {
     return (
       <Routes>
         <Route path="/" element={<MobileIndex />} />
-        <Route path="/auth" element={<MobileAuth />} />
-        <Route path="/auth/callback" element={<MobileAuthCallback />} />
-        <Route path="/profile" element={<MobileProfileSettings />} />
-        <Route path="/student/*" element={<MobileStudentDashboard />} />
-        <Route path="/educator/*" element={<MobileEducatorDashboard />} />
-        <Route path="/admin/*" element={<MobileAdminDashboard />} />
+        <Route path="/mobile/auth" element={<MobileAuth />} />
+        <Route path="/mobile/auth/callback" element={<MobileAuthCallback />} />
+        <Route path="/mobile/profile" element={<MobileProfileSettings />} />
+        <Route path="/mobile/student-dashboard" element={<MobileStudentDashboard />} />
+        <Route path="/mobile/educator-dashboard" element={<MobileEducatorDashboard />} />
+        <Route path="/mobile/admin-dashboard" element={<MobileAdminDashboard />} />
+        
+        {/* Legacy mobile routes for backward compatibility */}
+        <Route path="/auth" element={<Navigate to="/mobile/auth" replace />} />
+        <Route path="/auth/callback" element={<Navigate to="/mobile/auth/callback" replace />} />
+        <Route path="/student-dashboard" element={<Navigate to="/mobile/student-dashboard" replace />} />
+        <Route path="/educator-dashboard" element={<Navigate to="/mobile/educator-dashboard" replace />} />
+        <Route path="/admin-dashboard" element={<Navigate to="/mobile/admin-dashboard" replace />} />
         
         {/* Mobile-specific routes for detailed flows */}
         <Route path="/ai-tutor" element={<AITutor />} />
@@ -114,7 +123,7 @@ function AppRoutes() {
       <Route path="/auth/callback" element={<AuthCallback />} />
       
       {/* Student Routes */}
-      <Route path="/student" element={<StudentDashboard />} />
+      <Route path="/student-dashboard" element={<StudentDashboard />} />
       <Route path="/course/:id/overview" element={<CourseOverview />} />
       <Route path="/course/:id/module/:moduleId/lesson/:lessonId" element={<LessonView />} />
       <Route path="/course/:id/assignments" element={<Assignments />} />
@@ -126,7 +135,7 @@ function AppRoutes() {
       <Route path="/study-groups/:groupId/live" element={<StudyGroups />} />
       
       {/* Educator Routes */}
-      <Route path="/educator" element={<EducatorDashboard />} />
+      <Route path="/educator-dashboard" element={<EducatorDashboard />} />
       <Route path="/educator/course/create" element={<CourseCreate />} />
       <Route path="/educator/course/:id/editor" element={<CourseEditor />} />
       <Route path="/educator/course/:id/analytics" element={<CourseAnalytics />} />
@@ -136,7 +145,7 @@ function AppRoutes() {
       <Route path="/educator/announcements" element={<Announcements />} />
       
       {/* Admin Routes */}
-      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
       <Route path="/admin/analytics" element={<PlatformAnalytics />} />
       <Route path="/admin/users" element={<UserManagement />} />
       <Route path="/admin/user/:userId" element={<UserProfile />} />

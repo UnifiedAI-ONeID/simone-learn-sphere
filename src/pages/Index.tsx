@@ -1,3 +1,4 @@
+
 import { isMobile, isTablet } from 'react-device-detect';
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +9,7 @@ import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 
 // Lazy load heavy components
@@ -26,12 +27,14 @@ const Index = () => {
   const { isDarkMode, toggleDarkMode } = usePlatformTheme();
   const [componentsLoaded, setComponentsLoaded] = useState(false);
 
+  console.log('Index: Rendering with user:', !!user, 'role:', role, 'authLoading:', authLoading, 'roleLoading:', roleLoading);
+
   // Redirect authenticated users to their dashboard
   useEffect(() => {
     if (!authLoading && !roleLoading && user && role) {
       console.log('Index: Authenticated user detected, redirecting to dashboard');
       console.log('Index: User role:', role);
-      const redirectRoute = getRoleBasedRoute(role, true);
+      const redirectRoute = getUnifiedRoleRoute(role, true, false);
       console.log('Index: Redirecting to:', redirectRoute);
       navigate(redirectRoute, { replace: true });
     }
@@ -78,6 +81,7 @@ const Index = () => {
   }
 
   const handleGetStarted = () => {
+    console.log('Index: Get started clicked, navigating to auth');
     toast.success(<UnifiedLocalizedText text="Welcome to SimoneLabs!" />);
     navigate('/auth');
   };

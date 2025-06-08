@@ -7,7 +7,7 @@ import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
+import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 
 // Define UserRole type locally since it's not exported from supabase types
@@ -19,11 +19,13 @@ export const MobileIndex = () => {
   const { role, loading: roleLoading } = useUserRole();
   const { isDarkMode, toggleDarkMode } = usePlatformTheme();
 
+  console.log('MobileIndex: Rendering with user:', !!user, 'role:', role, 'authLoading:', authLoading, 'roleLoading:', roleLoading);
+
   // Redirect authenticated users to their dashboard
   useEffect(() => {
     if (!authLoading && !roleLoading && user && role) {
       console.log('MobileIndex: Authenticated user detected, redirecting to dashboard');
-      const redirectRoute = getMobileRoleBasedRoute(role as UserRole, true);
+      const redirectRoute = getUnifiedRoleRoute(role as UserRole, true, true);
       console.log('MobileIndex: Redirecting to:', redirectRoute);
       navigate(redirectRoute, { replace: true });
     }
@@ -62,7 +64,8 @@ export const MobileIndex = () => {
   }
 
   const handleGetStarted = () => {
-    navigate('/auth');
+    console.log('MobileIndex: Get started clicked, navigating to mobile auth');
+    navigate('/mobile/auth');
   };
 
   return (
