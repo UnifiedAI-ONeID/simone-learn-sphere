@@ -8,6 +8,9 @@ import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { Badge } from '@/components/ui/badge';
 
+// Define UserRole type locally since it's not exported from supabase types
+type UserRole = 'student' | 'educator' | 'admin';
+
 // Lazy load heavy components
 const PlatformButton = lazy(() => import('@/components/platform/PlatformButton').then(m => ({ default: m.PlatformButton })));
 const PlatformCard = lazy(() => import('@/components/platform/PlatformCard').then(m => ({ default: m.PlatformCard })));
@@ -26,7 +29,7 @@ export const MobileIndex = () => {
     if (!authLoading && !roleLoading && user && role) {
       console.log('MobileIndex: Authenticated user detected, redirecting to mobile dashboard');
       console.log('MobileIndex: User role:', role);
-      const redirectRoute = getMobileRoleBasedRoute(role, true);
+      const redirectRoute = getMobileRoleBasedRoute(role as UserRole, true);
       console.log('MobileIndex: Redirecting to:', redirectRoute);
       navigate(redirectRoute, { replace: true });
     }
