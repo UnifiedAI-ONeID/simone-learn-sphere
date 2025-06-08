@@ -6,6 +6,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
 import { DesktopAuth } from '@/components/auth/DesktopAuth';
+import { AuthLoadingState } from '@/components/auth/AuthLoadingState';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -31,14 +32,7 @@ const Auth = () => {
 
   // Show loading state while checking auth
   if (authLoading || roleLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    return <AuthLoadingState message="Checking authentication..." />;
   }
 
   return <DesktopAuth />;

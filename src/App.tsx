@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LocalizationProvider } from '@/contexts/LocalizationContext';
 import { PlatformThemeProvider } from '@/contexts/PlatformThemeContext';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { GlobalErrorBoundary } from '@/components/GlobalErrorBoundary';
 import { TranslationErrorBoundary } from '@/components/TranslationErrorBoundary';
 import { SecurityProvider } from '@/components/SecurityProvider';
 import { Toaster } from 'react-hot-toast';
@@ -67,6 +67,14 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 30 * 60 * 1000, // 30 minutes
+      retry: (failureCount, error: any) => {
+        // Don't retry on 4xx errors
+        if (error?.status >= 400 && error?.status < 500) {
+          return false;
+        }
+        return failureCount < 3;
+      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
 });
@@ -149,7 +157,7 @@ function App() {
   useOptimizedPerformance('App');
 
   return (
-    <ErrorBoundary>
+    <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <LocalizationProvider>
           <TranslationErrorBoundary>
@@ -163,8 +171,21 @@ function App() {
                       toastOptions={{
                         duration: 4000,
                         style: {
-                          background: '#363636',
-                          color: '#fff',
+                          background: 'var(--background)',
+                          color: 'var(--foreground)',
+                          border: '1px solid var(--border)',
+                        },
+                        success: {
+                          iconTheme: {
+                            primary: 'var(--primary)',
+                            secondary: 'var(--primary-foreground)',
+                          },
+                        },
+                        error: {
+                          iconTheme: {
+                            primary: 'var(--destructive)',
+                            secondary: 'var(--destructive-foreground)',
+                          },
                         },
                       }}
                     />
@@ -175,7 +196,7 @@ function App() {
           </TranslationErrorBoundary>
         </LocalizationProvider>
       </QueryClientProvider>
-    </ErrorBoundary>
+    </GlobalErrorBoundary>
   );
 }
 

@@ -5,7 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
-import { handleAuthError, cleanupAuthState, validatePasswordStrength } from '@/utils/authUtils';
+import { 
+  handleAuthError, 
+  cleanupAuthState, 
+  validatePasswordStrength,
+  retryAuthOperation,
+  isRateLimitError,
+  getRetryDelay
+} from '@/utils/authUtils';
 import toast from 'react-hot-toast';
 
 export const useEnhancedAuth = () => {
@@ -24,7 +31,7 @@ export const useEnhancedAuth = () => {
 
   const getRedirectUrl = useCallback(() => {
     return isMobile 
-      ? `${window.location.origin}/mobile/auth/callback`
+      ? `${window.location.origin}/auth/callback`
       : `${window.location.origin}/auth/callback`;
   }, [isMobile]);
 
@@ -112,20 +119,25 @@ export const useEnhancedAuth = () => {
       const redirectUrl = getRedirectUrl();
       console.log('Starting email signup with role:', selectedRole);
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            role: selectedRole
+      const signupOperation = async () => {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: redirectUrl,
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              role: selectedRole
+            }
           }
-        }
-      });
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+        return data;
+      };
+
+      const data = await retryAuthOperation(signupOperation, 3);
 
       if (data.user && !data.session) {
         // Send verification email
@@ -161,7 +173,14 @@ export const useEnhancedAuth = () => {
       console.error('Signup error:', error);
       const errorMessage = handleAuthError(error);
       setError(errorMessage);
-      toast.error(errorMessage);
+      
+      // Special handling for rate limit errors
+      if (isRateLimitError(error)) {
+        toast.error('Too many signup attempts. Try social login instead!');
+      } else {
+        toast.error(errorMessage);
+      }
+      
       return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
@@ -176,12 +195,17 @@ export const useEnhancedAuth = () => {
       cleanupAuthState();
       console.log('Starting email sign in');
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const signinOperation = async () => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+        return data;
+      };
+
+      const data = await retryAuthOperation(signinOperation, 3);
 
       if (data.user) {
         // Check security setup requirements
@@ -226,7 +250,14 @@ export const useEnhancedAuth = () => {
       console.error('Sign in error:', error);
       const errorMessage = handleAuthError(error);
       setError(errorMessage);
-      toast.error(errorMessage);
+      
+      // Special handling for rate limit errors
+      if (isRateLimitError(error)) {
+        toast.error('Too many signin attempts. Try social login or wait a few minutes.');
+      } else {
+        toast.error(errorMessage);
+      }
+      
       return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
@@ -248,18 +279,22 @@ export const useEnhancedAuth = () => {
       const redirectUrl = getRedirectUrl();
       console.log('Starting OAuth with redirect:', redirectUrl);
 
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: redirectUrl,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
+      const oauthOperation = async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: redirectUrl,
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent',
+            }
           }
-        }
-      });
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+      };
+
+      await retryAuthOperation(oauthOperation, 2);
       return { success: true };
     } catch (error: any) {
       console.error('OAuth error:', error);

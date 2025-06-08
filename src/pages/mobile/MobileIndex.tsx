@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Users, Brain, Trophy, Smartphone } from 'lucide-react';
@@ -9,6 +8,7 @@ import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { AuthLoadingState } from '@/components/auth/AuthLoadingState';
 
 // Define UserRole type locally since it's not exported from supabase types
 type UserRole = 'student' | 'educator' | 'admin';
@@ -38,23 +38,7 @@ export const MobileIndex = () => {
   }, [user, role, authLoading, roleLoading, navigate]);
 
   if (authLoading || roleLoading || user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground transition-colors duration-300">
-        <div className="absolute top-4 right-4 z-10">
-          <Suspense fallback={null}>
-            <ThemeToggle />
-          </Suspense>
-        </div>
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center animate-pulse">
-            <Brain className="w-8 h-8 text-primary-foreground" />
-          </div>
-          <p className="text-muted-foreground">
-            <LocalizedText text="Loading..." />
-          </p>
-        </div>
-      </div>
-    );
+    return <AuthLoadingState message="Loading..." />;
   }
 
   const handleGetStarted = async () => {
@@ -178,16 +162,7 @@ export const MobileIndex = () => {
   };
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center animate-pulse">
-            <Brain className="w-8 h-8 text-primary-foreground" />
-          </div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<AuthLoadingState message="Loading interface..." />}>
       <PlatformLayout className="bg-background text-foreground transition-colors duration-300">
         {/* Theme Toggle */}
         <div className="absolute top-4 right-4 z-10">
