@@ -9,7 +9,8 @@ const corsHeaders = {
 
 interface RequestBody {
   email: string;
-  action: 'enable_2fa' | 'login_verification';
+  firstName?: string;
+  lastName?: string;
 }
 
 serve(async (req) => {
@@ -18,10 +19,10 @@ serve(async (req) => {
   }
 
   try {
-    const { email, action }: RequestBody = await req.json();
+    const { email, firstName, lastName }: RequestBody = await req.json();
 
-    if (!email || !action) {
-      throw new Error('Email and action are required');
+    if (!email) {
+      throw new Error('Email is required');
     }
 
     const supabase = createClient(
@@ -29,20 +30,17 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Clean up expired codes first
-    await supabase.rpc('cleanup_expired_verification_codes');
-
     // Generate a 6-digit verification code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Store the code with expiration (5 minutes for 2FA)
+    // Store verification code with 24-hour expiration
     const { error: storeError } = await supabase
       .from('verification_codes')
       .insert({
         email,
         code,
-        action,
-        expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        action: 'email_verification',
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         used: false
       });
 
@@ -51,19 +49,20 @@ serve(async (req) => {
       throw new Error('Failed to store verification code');
     }
 
-    // In production, integrate with your email service
-    console.log(`2FA Code for ${email}: ${code} (Action: ${action})`);
-
-    const emailSubject = action === 'enable_2fa' 
-      ? 'Enable Two-Factor Authentication' 
-      : 'Login Verification Code';
+    // In production, integrate with your email service (Resend, SendGrid, etc.)
+    console.log(`Email verification code for ${email}: ${code}`);
     
+    const emailSubject = 'Verify your SimoneLabs account';
     const emailBody = `
-      Your verification code is: ${code}
+      Hi ${firstName || 'there'}!
       
-      This code will expire in 5 minutes.
+      Welcome to SimoneLabs! Please verify your email address by entering this code:
       
-      If you didn't request this code, please ignore this email.
+      ${code}
+      
+      This code will expire in 24 hours.
+      
+      If you didn't create this account, please ignore this email.
       
       Best regards,
       The SimoneLabs Team
@@ -76,7 +75,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Verification code sent successfully',
+        message: 'Verification email sent successfully',
         // In development, include the code for testing
         ...(Deno.env.get('DENO_ENV') === 'development' && { code })
       }),
@@ -86,10 +85,10 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error in send-2fa-code function:', error);
+    console.error('Error in send-verification-email function:', error);
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Failed to send verification code' 
+        error: error.message || 'Failed to send verification email' 
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

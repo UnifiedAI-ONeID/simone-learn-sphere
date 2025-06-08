@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +10,8 @@ import toast from 'react-hot-toast';
 export const useEnhancedAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState('');
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -33,6 +34,36 @@ export const useEnhancedAuth = () => {
     console.log('Navigating to:', redirectRoute);
     navigate(redirectRoute, { replace: true });
   }, [isMobile, navigate]);
+
+  const sendVerificationEmail = useCallback(async (email: string, firstName?: string, lastName?: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('send-verification-email', {
+        body: { email, firstName, lastName }
+      });
+
+      if (error) throw error;
+      return { success: true };
+    } catch (error: any) {
+      console.error('Send verification email error:', error);
+      return { success: false, error: error.message };
+    }
+  }, []);
+
+  const verifyEmail = useCallback(async (email: string, code: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-email', {
+        body: { email, code }
+      });
+
+      if (error) throw error;
+      if (!data?.valid) throw new Error('Invalid verification code');
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Email verification error:', error);
+      return { success: false, error: error.message };
+    }
+  }, []);
 
   const signUpWithEmail = useCallback(async (
     email: string, 
@@ -81,9 +112,18 @@ export const useEnhancedAuth = () => {
       if (error) throw error;
 
       if (data.user && !data.session) {
-        toast.success('Check your email for the confirmation link!');
-        setError('Please check your email and click the confirmation link to complete registration.');
-        return { success: true, requiresEmailConfirmation: true };
+        // Send verification email
+        const verificationResult = await sendVerificationEmail(email, firstName, lastName);
+        if (verificationResult.success) {
+          setPendingVerificationEmail(email);
+          setShowEmailVerification(true);
+          toast.success('Please check your email and verify your account!');
+          return { success: true, requiresEmailVerification: true };
+        } else {
+          toast.success('Check your email for the confirmation link!');
+          setError('Please check your email and click the confirmation link to complete registration.');
+          return { success: true, requiresEmailConfirmation: true };
+        }
       } else if (data.session) {
         console.log('Immediate signup success');
         toast.success(`Account created successfully! Welcome, ${selectedRole}!`);
@@ -101,7 +141,7 @@ export const useEnhancedAuth = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [storeRoleForAuth, getRedirectUrl, navigateBasedOnRole]);
+  }, [storeRoleForAuth, getRedirectUrl, navigateBasedOnRole, sendVerificationEmail]);
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
@@ -119,9 +159,31 @@ export const useEnhancedAuth = () => {
       if (error) throw error;
 
       if (data.user) {
+        // Check if email is verified
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('email_verified, two_factor_enabled')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profile && !profile.email_verified) {
+          setError('Please verify your email address before signing in.');
+          setPendingVerificationEmail(email);
+          setShowEmailVerification(true);
+          
+          // Send new verification email
+          await sendVerificationEmail(email);
+          return { success: false, requiresEmailVerification: true };
+        }
+
+        // Check if 2FA is enabled
+        if (profile?.two_factor_enabled) {
+          // Trigger 2FA flow
+          return { success: true, requires2FA: true, email };
+        }
+
         console.log('Sign in successful');
         toast.success('Welcome back!');
-        // Navigation will be handled by auth context
         return { success: true };
       }
 
@@ -135,7 +197,7 @@ export const useEnhancedAuth = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [sendVerificationEmail]);
 
   const signInWithOAuth = useCallback(async (provider: 'google' | 'linkedin_oidc', selectedRole?: string) => {
     setIsLoading(true);
@@ -175,13 +237,23 @@ export const useEnhancedAuth = () => {
     }
   }, [storeRoleForAuth, getRedirectUrl]);
 
+  const handleEmailVerificationSuccess = useCallback(() => {
+    setShowEmailVerification(false);
+    setPendingVerificationEmail('');
+    toast.success('Email verified successfully! You can now sign in.');
+  }, []);
+
   return {
     isLoading,
     error,
     setError,
+    showEmailVerification,
+    pendingVerificationEmail,
     signUpWithEmail,
     signInWithEmail,
     signInWithOAuth,
-    storeRoleForAuth
+    storeRoleForAuth,
+    verifyEmail,
+    handleEmailVerificationSuccess
   };
 };

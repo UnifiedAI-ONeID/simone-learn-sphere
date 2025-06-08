@@ -548,30 +548,39 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           email: string
+          email_verified: boolean | null
           first_name: string | null
           id: string
+          last_login_at: string | null
           last_name: string | null
           role: string
+          two_factor_enabled: boolean | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           email: string
+          email_verified?: boolean | null
           first_name?: string | null
           id: string
+          last_login_at?: string | null
           last_name?: string | null
           role?: string
+          two_factor_enabled?: boolean | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           email?: string
+          email_verified?: boolean | null
           first_name?: string | null
           id?: string
+          last_login_at?: string | null
           last_name?: string | null
           role?: string
+          two_factor_enabled?: boolean | null
           updated_at?: string
         }
         Relationships: []
@@ -603,6 +612,33 @@ export type Database = {
           ip_address?: string | null
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      temp_session_tokens: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          token: string
+          used: boolean
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          token: string
+          used?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean
         }
         Relationships: []
       }
@@ -761,6 +797,36 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_codes: {
+        Row: {
+          action: string
+          code: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          used: boolean
+        }
+        Insert: {
+          action: string
+          code: string
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          used?: boolean
+        }
+        Update: {
+          action?: string
+          code?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          used?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -771,6 +837,10 @@ export type Database = {
         Returns: undefined
       }
       cleanup_expired_impersonation_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      cleanup_expired_verification_codes: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }

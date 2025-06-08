@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle } from 'lucide-react';
@@ -11,6 +10,8 @@ import { RoleSelector } from '@/components/auth/RoleSelector';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 import { validatePasswordStrength } from '@/utils/authUtils';
+import { EmailVerification } from '@/components/EmailVerification';
+import { PasswordResetRequest } from '@/components/PasswordResetRequest';
 
 export const SimpleMobileAuth = () => {
   const [email, setEmail] = useState('');
@@ -21,10 +22,21 @@ export const SimpleMobileAuth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
   
   const navigate = useNavigate();
   const { platform } = usePlatformTheme();
-  const { isLoading, error, setError, signUpWithEmail, signInWithEmail, signInWithOAuth } = useEnhancedAuth();
+  const { 
+    isLoading, 
+    error, 
+    setError, 
+    showEmailVerification,
+    pendingVerificationEmail,
+    signUpWithEmail, 
+    signInWithEmail, 
+    signInWithOAuth,
+    handleEmailVerificationSuccess
+  } = useEnhancedAuth();
 
   // Validate password in real-time for signup
   React.useEffect(() => {
@@ -35,6 +47,28 @@ export const SimpleMobileAuth = () => {
       setPasswordErrors([]);
     }
   }, [password, isSignUp]);
+
+  if (showEmailVerification && pendingVerificationEmail) {
+    return (
+      <div className="w-full max-w-sm">
+        <EmailVerification
+          email={pendingVerificationEmail}
+          onVerificationSuccess={handleEmailVerificationSuccess}
+          onBack={() => setError('')}
+        />
+      </div>
+    );
+  }
+
+  if (showPasswordReset) {
+    return (
+      <div className="w-full max-w-sm">
+        <PasswordResetRequest
+          onBack={() => setShowPasswordReset(false)}
+        />
+      </div>
+    );
+  }
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,8 +85,11 @@ export const SimpleMobileAuth = () => {
       }
     } else {
       const result = await signInWithEmail(email, password);
-      if (result.success) {
+      if (result.success && !result.requires2FA) {
         // Navigation handled by auth context
+      } else if (result.requires2FA) {
+        // Handle 2FA flow
+        console.log('2FA required');
       }
     }
   };
@@ -197,65 +234,78 @@ export const SimpleMobileAuth = () => {
           />
         )}
 
-        <PlatformButton
-          type="submit"
-          className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-          disabled={isLoading || (isSignUp && passwordErrors.length > 0) || (isSignUp && !selectedRole)}
-        >
-          <LocalizedText text={
-            isLoading 
-              ? "Please wait..." 
-              : isSignUp 
-                ? "Create Account" 
-                : "Sign In"
-          } />
-        </PlatformButton>
+        <div className="text-center space-y-2">
+          {!isSignUp && (
+            <PlatformButton
+              type="button"
+              variant="ghost"
+              onClick={() => setShowPasswordReset(true)}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              <LocalizedText text="Forgot your password?" />
+            </PlatformButton>
+          )}
+          
+          <PlatformButton
+            type="submit"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            disabled={isLoading || (isSignUp && passwordErrors.length > 0) || (isSignUp && !selectedRole)}
+          >
+            <LocalizedText text={
+              isLoading 
+                ? "Please wait..." 
+                : isSignUp 
+                  ? "Create Account" 
+                  : "Sign In"
+            } />
+          </PlatformButton>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">
+                <LocalizedText text="Or continue with" />
+              </span>
+            </div>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">
-              <LocalizedText text="Or continue with" />
-            </span>
+
+          <div className="grid grid-cols-2 gap-2">
+            <PlatformButton
+              type="button"
+              variant="secondary"
+              onClick={handleGoogleAuth}
+              disabled={isLoading}
+              className="border-input hover:bg-accent hover:text-accent-foreground"
+            >
+              <LocalizedText text="Google" />
+            </PlatformButton>
+            <PlatformButton
+              type="button"
+              variant="secondary"
+              onClick={handleLinkedInAuth}
+              disabled={isLoading}
+              className="border-input hover:bg-accent hover:text-accent-foreground"
+            >
+              <LocalizedText text="LinkedIn" />
+            </PlatformButton>
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <PlatformButton
-            type="button"
-            variant="secondary"
-            onClick={handleGoogleAuth}
-            disabled={isLoading}
-            className="border-input hover:bg-accent hover:text-accent-foreground"
-          >
-            <LocalizedText text="Google" />
-          </PlatformButton>
-          <PlatformButton
-            type="button"
-            variant="secondary"
-            onClick={handleLinkedInAuth}
-            disabled={isLoading}
-            className="border-input hover:bg-accent hover:text-accent-foreground"
-          >
-            <LocalizedText text="LinkedIn" />
-          </PlatformButton>
-        </div>
-
-        <div className="text-center">
-          <PlatformButton
-            type="button"
-            variant="ghost"
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setError('');
-              setPasswordErrors([]);
-            }}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            <LocalizedText text={isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"} />
-          </PlatformButton>
+          <div className="text-center">
+            <PlatformButton
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError('');
+                setPasswordErrors([]);
+              }}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              <LocalizedText text={isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"} />
+            </PlatformButton>
+          </div>
         </div>
       </form>
     </PlatformCard>

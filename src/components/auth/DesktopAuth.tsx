@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,8 @@ import { PasskeyAuth } from '@/components/PasskeyAuth';
 import { RoleSelector } from '@/components/auth/RoleSelector';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 import { validatePasswordStrength } from '@/utils/authUtils';
+import { EmailVerification } from '@/components/EmailVerification';
+import { PasswordResetRequest } from '@/components/PasswordResetRequest';
 
 export const DesktopAuth = () => {
   const [email, setEmail] = useState('');
@@ -19,8 +20,19 @@ export const DesktopAuth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
   
-  const { isLoading, error, setError, signUpWithEmail, signInWithEmail, signInWithOAuth } = useEnhancedAuth();
+  const { 
+    isLoading, 
+    error, 
+    setError, 
+    showEmailVerification,
+    pendingVerificationEmail,
+    signUpWithEmail, 
+    signInWithEmail, 
+    signInWithOAuth,
+    handleEmailVerificationSuccess
+  } = useEnhancedAuth();
 
   // Validate password in real-time for signup
   React.useEffect(() => {
@@ -31,6 +43,28 @@ export const DesktopAuth = () => {
       setPasswordErrors([]);
     }
   }, [password, isSignUp]);
+
+  if (showEmailVerification && pendingVerificationEmail) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <EmailVerification
+          email={pendingVerificationEmail}
+          onVerificationSuccess={handleEmailVerificationSuccess}
+          onBack={() => setError('')}
+        />
+      </div>
+    );
+  }
+
+  if (showPasswordReset) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <PasswordResetRequest
+          onBack={() => setShowPasswordReset(false)}
+        />
+      </div>
+    );
+  }
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +81,11 @@ export const DesktopAuth = () => {
       }
     } else {
       const result = await signInWithEmail(email, password);
-      if (result.success) {
+      if (result.success && !result.requires2FA) {
         // Navigation handled by auth context
+      } else if (result.requires2FA) {
+        // Handle 2FA flow - this would need additional state management
+        console.log('2FA required');
       }
     }
   };
@@ -244,7 +281,18 @@ export const DesktopAuth = () => {
                 </Button>
               </div>
 
-              <div className="text-center">
+              <div className="text-center space-y-2">
+                {!isSignUp && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setShowPasswordReset(true)}
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    <LocalizedText text="Forgot your password?" />
+                  </Button>
+                )}
+                
                 <Button
                   type="button"
                   variant="ghost"

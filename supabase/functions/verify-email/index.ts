@@ -10,7 +10,6 @@ const corsHeaders = {
 interface RequestBody {
   email: string;
   code: string;
-  action: 'enable_2fa' | 'login_verification';
 }
 
 serve(async (req) => {
@@ -19,10 +18,10 @@ serve(async (req) => {
   }
 
   try {
-    const { email, code, action }: RequestBody = await req.json();
+    const { email, code }: RequestBody = await req.json();
 
-    if (!email || !code || !action) {
-      throw new Error('Email, code, and action are required');
+    if (!email || !code) {
+      throw new Error('Email and code are required');
     }
 
     const supabase = createClient(
@@ -36,7 +35,7 @@ serve(async (req) => {
       .select('*')
       .eq('email', email)
       .eq('code', code)
-      .eq('action', action)
+      .eq('action', 'email_verification')
       .eq('used', false)
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
@@ -61,41 +60,21 @@ serve(async (req) => {
       console.error('Error marking code as used:', updateError);
     }
 
-    // Generate session token for login verification
-    let sessionToken;
-    if (action === 'login_verification') {
-      sessionToken = crypto.randomUUID();
-      
-      // Store session token temporarily
-      const { error: sessionError } = await supabase
-        .from('temp_session_tokens')
-        .insert({
-          token: sessionToken,
-          email,
-          expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-        });
+    // Mark email as verified in profiles
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({ email_verified: true })
+      .eq('email', email);
 
-      if (sessionError) {
-        console.error('Error storing session token:', sessionError);
-      }
-    } else if (action === 'enable_2fa') {
-      // Enable 2FA for the user
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ two_factor_enabled: true })
-        .eq('email', email);
-
-      if (profileError) {
-        console.error('Error enabling 2FA:', profileError);
-        throw new Error('Failed to enable 2FA');
-      }
+    if (profileError) {
+      console.error('Error updating profile:', profileError);
+      throw new Error('Failed to verify email');
     }
 
     return new Response(
       JSON.stringify({ 
         valid: true,
-        action,
-        ...(sessionToken && { sessionToken })
+        message: 'Email verified successfully'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -103,7 +82,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error in verify-2fa-code function:', error);
+    console.error('Error in verify-email function:', error);
     return new Response(
       JSON.stringify({ 
         valid: false,
