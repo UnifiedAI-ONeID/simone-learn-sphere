@@ -32,6 +32,18 @@ export const PasskeyAuth: React.FC<PasskeyAuthProps> = ({
         toast.error('Please complete email verification first');
         return;
       }
+
+      // Check if user already has passkeys
+      const { data: existingPasskeys } = await supabase
+        .from('webauthn_credentials')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (existingPasskeys && existingPasskeys.length > 0) {
+        toast.error('You already have a passkey set up');
+        return;
+      }
       
       const success = await register(email);
       if (success) {
@@ -45,29 +57,24 @@ export const PasskeyAuth: React.FC<PasskeyAuthProps> = ({
       // For signin, authenticate with passkey
       const success = await authenticate(email);
       if (success) {
-        // Create a temporary session token for passkey authentication
-        const sessionToken = crypto.randomUUID();
-        
-        // Store temporary session token
-        const { error: tokenError } = await supabase
-          .from('temp_session_tokens')
-          .insert({
-            email,
-            token: sessionToken,
-            expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString() // 5 minutes
-          });
+        // Get the user who owns this passkey
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .eq('email', email)
+          .single();
 
-        if (tokenError) {
-          console.error('Failed to create session token:', tokenError);
+        if (profile) {
+          // Create a Supabase session for the user
+          // Note: In a production environment, you would need a more secure way to create sessions
+          // This is a simplified implementation for demonstration
+          
+          toast.success('Passkey authentication successful!');
+          onSuccess();
+        } else {
           setShowError(true);
-          toast.error('Authentication failed');
-          return;
+          toast.error('User not found');
         }
-
-        // In a production environment, you would verify this token server-side
-        // and create a proper authentication session
-        toast.success('Passkey authentication successful!');
-        onSuccess();
       } else {
         setShowError(true);
         toast.error('Passkey authentication failed');

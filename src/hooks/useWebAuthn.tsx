@@ -60,6 +60,7 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
           authenticatorSelection: {
             authenticatorAttachment: 'platform',
             userVerification: 'preferred',
+            requireResidentKey: false,
           },
           timeout: 60000,
           attestation: 'direct',
@@ -81,22 +82,38 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
         // Convert ArrayBuffer to base64 string for storage
         const publicKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(publicKeyBuffer)));
         
-        // Store credential info in Supabase
-        const { error } = await supabase
-          .from('user_passkeys')
+        // Store credential info in the new webauthn_credentials table
+        const { error: insertError } = await supabase
+          .from('webauthn_credentials')
           .insert({
             user_id: user.id,
-            user_email: email,
             credential_id: credential.id,
             public_key: publicKeyBase64,
+            device_type: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop',
             device_name: navigator.userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop',
           });
 
-        if (error) {
-          console.error('Failed to save passkey:', error);
+        if (insertError) {
+          console.error('Failed to save passkey:', insertError);
           setError('Failed to save passkey');
           return false;
         }
+
+        // Update user profile to indicate passkey is enabled
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ 
+            passkey_enabled: true,
+            two_factor_setup_completed: true 
+          })
+          .eq('id', user.id);
+
+        if (profileError) {
+          console.error('Failed to update profile:', profileError);
+        }
+
+        // Update security level
+        await supabase.rpc('update_user_security_level', { user_id: user.id });
 
         return true;
       }
@@ -121,20 +138,28 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
     setError(null);
 
     try {
-      // Get user's credentials from database
-      const { data: userPasskeys, error: fetchError } = await supabase
-        .from('user_passkeys')
-        .select('credential_id')
-        .eq('user_email', email)
-        .eq('is_active', true);
+      // Get user's credentials from the new table
+      const { data: userCredentials, error: fetchError } = await supabase
+        .from('webauthn_credentials')
+        .select('credential_id, user_id')
+        .eq('is_active', true)
+        .in('user_id', [
+          // We need to get the user_id first by email
+          supabase
+            .from('profiles')
+            .select('id')
+            .eq('email', email)
+            .single()
+            .then(result => result.data?.id)
+        ]);
 
       if (fetchError) {
-        console.error('Error fetching passkeys:', fetchError);
+        console.error('Error fetching credentials:', fetchError);
         setError('Failed to fetch passkeys');
         return false;
       }
 
-      if (!userPasskeys || userPasskeys.length === 0) {
+      if (!userCredentials || userCredentials.length === 0) {
         setError('No passkeys found for this email');
         return false;
       }
@@ -146,8 +171,8 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
       const credentialRequestOptions: CredentialRequestOptions = {
         publicKey: {
           challenge,
-          allowCredentials: userPasskeys.map(pk => ({
-            id: new TextEncoder().encode(pk.credential_id),
+          allowCredentials: userCredentials.map(cred => ({
+            id: new TextEncoder().encode(cred.credential_id),
             type: 'public-key' as const,
           })),
           userVerification: 'preferred',
@@ -160,9 +185,9 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
       if (assertion) {
         // Update last used timestamp
         await supabase
-          .from('user_passkeys')
+          .from('webauthn_credentials')
           .update({ last_used_at: new Date().toISOString() })
-          .eq('user_email', email);
+          .in('credential_id', userCredentials.map(c => c.credential_id));
 
         return true;
       }

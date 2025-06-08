@@ -553,8 +553,11 @@ export type Database = {
           id: string
           last_login_at: string | null
           last_name: string | null
+          passkey_enabled: boolean | null
           role: string
+          security_level: string | null
           two_factor_enabled: boolean | null
+          two_factor_setup_completed: boolean | null
           updated_at: string
         }
         Insert: {
@@ -566,8 +569,11 @@ export type Database = {
           id: string
           last_login_at?: string | null
           last_name?: string | null
+          passkey_enabled?: boolean | null
           role?: string
+          security_level?: string | null
           two_factor_enabled?: boolean | null
+          two_factor_setup_completed?: boolean | null
           updated_at?: string
         }
         Update: {
@@ -579,8 +585,11 @@ export type Database = {
           id?: string
           last_login_at?: string | null
           last_name?: string | null
+          passkey_enabled?: boolean | null
           role?: string
+          security_level?: string | null
           two_factor_enabled?: boolean | null
+          two_factor_setup_completed?: boolean | null
           updated_at?: string
         }
         Relationships: []
@@ -827,6 +836,45 @@ export type Database = {
         }
         Relationships: []
       }
+      webauthn_credentials: {
+        Row: {
+          counter: number | null
+          created_at: string | null
+          credential_id: string
+          device_name: string | null
+          device_type: string | null
+          id: string
+          is_active: boolean | null
+          last_used_at: string | null
+          public_key: string
+          user_id: string | null
+        }
+        Insert: {
+          counter?: number | null
+          created_at?: string | null
+          credential_id: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          public_key: string
+          user_id?: string | null
+        }
+        Update: {
+          counter?: number | null
+          created_at?: string | null
+          credential_id?: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          public_key?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -883,6 +931,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      is_2fa_setup_complete: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       is_current_user_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -915,6 +967,10 @@ export type Database = {
       start_impersonation: {
         Args: { target_user_id: string; target_role: string }
         Returns: string
+      }
+      update_user_security_level: {
+        Args: { user_id: string }
+        Returns: undefined
       }
       update_user_streak: {
         Args: { user_id: string }

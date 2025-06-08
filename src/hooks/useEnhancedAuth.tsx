@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,7 @@ export const useEnhancedAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [show2FASetup, setShow2FASetup] = useState(false);
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState('');
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -34,6 +36,20 @@ export const useEnhancedAuth = () => {
     console.log('Navigating to:', redirectRoute);
     navigate(redirectRoute, { replace: true });
   }, [isMobile, navigate]);
+
+  const checkSecuritySetupRequired = useCallback(async (userId: string) => {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('email_verified, two_factor_setup_completed, security_level')
+      .eq('id', userId)
+      .single();
+
+    return {
+      needsEmailVerification: !profile?.email_verified,
+      needs2FASetup: !profile?.two_factor_setup_completed,
+      securityLevel: profile?.security_level || 'basic'
+    };
+  }, []);
 
   const sendVerificationEmail = useCallback(async (email: string, firstName?: string, lastName?: string) => {
     try {
@@ -126,6 +142,15 @@ export const useEnhancedAuth = () => {
         }
       } else if (data.session) {
         console.log('Immediate signup success');
+        
+        // Check if 2FA setup is required
+        const securityCheck = await checkSecuritySetupRequired(data.user.id);
+        if (securityCheck.needs2FASetup) {
+          setShow2FASetup(true);
+          toast.success('Account created! Please set up additional security measures.');
+          return { success: true, requires2FASetup: true };
+        }
+
         toast.success(`Account created successfully! Welcome, ${selectedRole}!`);
         navigateBasedOnRole(selectedRole);
         return { success: true };
@@ -141,7 +166,7 @@ export const useEnhancedAuth = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [storeRoleForAuth, getRedirectUrl, navigateBasedOnRole, sendVerificationEmail]);
+  }, [storeRoleForAuth, getRedirectUrl, navigateBasedOnRole, sendVerificationEmail, checkSecuritySetupRequired]);
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
@@ -159,14 +184,10 @@ export const useEnhancedAuth = () => {
       if (error) throw error;
 
       if (data.user) {
-        // Check if email is verified
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('email_verified, two_factor_enabled')
-          .eq('id', data.user.id)
-          .single();
+        // Check security setup requirements
+        const securityCheck = await checkSecuritySetupRequired(data.user.id);
 
-        if (profile && !profile.email_verified) {
+        if (securityCheck.needsEmailVerification) {
           setError('Please verify your email address before signing in.');
           setPendingVerificationEmail(email);
           setShowEmailVerification(true);
@@ -176,10 +197,23 @@ export const useEnhancedAuth = () => {
           return { success: false, requiresEmailVerification: true };
         }
 
-        // Check if 2FA is enabled
+        // Check if 2FA is enabled and required
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('two_factor_enabled, passkey_enabled, two_factor_setup_completed')
+          .eq('id', data.user.id)
+          .single();
+
         if (profile?.two_factor_enabled) {
           // Trigger 2FA flow
           return { success: true, requires2FA: true, email };
+        }
+
+        // Check if 2FA setup is required for new accounts
+        if (!profile?.two_factor_setup_completed) {
+          setShow2FASetup(true);
+          toast.success('Welcome back! Please complete your security setup.');
+          return { success: true, requires2FASetup: true };
         }
 
         console.log('Sign in successful');
@@ -197,7 +231,7 @@ export const useEnhancedAuth = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [sendVerificationEmail]);
+  }, [sendVerificationEmail, checkSecuritySetupRequired]);
 
   const signInWithOAuth = useCallback(async (provider: 'google' | 'linkedin_oidc', selectedRole?: string) => {
     setIsLoading(true);
@@ -243,17 +277,26 @@ export const useEnhancedAuth = () => {
     toast.success('Email verified successfully! You can now sign in.');
   }, []);
 
+  const handle2FASetupComplete = useCallback(() => {
+    setShow2FASetup(false);
+    toast.success('Security setup completed! Your account is now fully protected.');
+    // Navigation will be handled by the component
+  }, []);
+
   return {
     isLoading,
     error,
     setError,
     showEmailVerification,
+    show2FASetup,
     pendingVerificationEmail,
     signUpWithEmail,
     signInWithEmail,
     signInWithOAuth,
     storeRoleForAuth,
     verifyEmail,
-    handleEmailVerificationSuccess
+    handleEmailVerificationSuccess,
+    handle2FASetupComplete,
+    checkSecuritySetupRequired
   };
 };
