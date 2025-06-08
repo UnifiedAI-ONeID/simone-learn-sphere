@@ -22,26 +22,38 @@ import {
   BarChart3
 } from 'lucide-react';
 import { LocalizedText } from '@/components/LocalizedText';
+import { useAdminDashboardData } from '@/hooks/useDashboardData';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 export const AdminDashboardContent = () => {
   const navigate = useNavigate();
+  const { data, loading, error } = useAdminDashboardData();
 
-  const criticalAlerts = [
-    { id: 1, type: 'security', message: 'Unusual login activity detected', severity: 'high', time: '5 min ago' },
-    { id: 2, type: 'performance', message: 'Database response time degraded', severity: 'medium', time: '15 min ago' }
-  ];
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
-  const systemMetrics = [
-    { name: 'API Uptime', value: 99.9, status: 'healthy' },
-    { name: 'Database Performance', value: 85, status: 'warning' },
-    { name: 'CDN Response Time', value: 95, status: 'healthy' }
-  ];
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <p className="text-destructive">Error loading dashboard: {error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-2">
+            Retry
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
-  const recentActivities = [
-    { type: 'user_created', message: 'New educator account created', user: 'john.doe@example.com', time: '2 hours ago' },
-    { type: 'impersonation', message: 'Admin impersonated student account', user: 'admin@platform.com', time: '4 hours ago' },
-    { type: 'course_published', message: 'Course "React Advanced" published', user: 'sarah.smith@example.com', time: '6 hours ago' }
-  ];
+  // Mock critical alerts - in real app this would come from monitoring
+  const criticalAlerts = data?.recentActivities?.filter(activity => 
+    activity.type.includes('security') || activity.type.includes('error')
+  ).slice(0, 2) || [];
 
   return (
     <div className="space-y-6">
@@ -55,15 +67,13 @@ export const AdminDashboardContent = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {criticalAlerts.map((alert) => (
-              <div key={alert.id} className="flex items-center justify-between p-3 bg-white dark:bg-red-900/20 rounded-lg">
+            {criticalAlerts.map((alert, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-white dark:bg-red-900/20 rounded-lg">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-red-800 dark:text-red-400">{alert.message}</p>
                   <p className="text-xs text-red-600 dark:text-red-500">{alert.time}</p>
                 </div>
-                <Badge variant={alert.severity === 'high' ? 'destructive' : 'secondary'}>
-                  {alert.severity}
-                </Badge>
+                <Badge variant="destructive">high</Badge>
               </div>
             ))}
             <Button 
@@ -89,9 +99,9 @@ export const AdminDashboardContent = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">12,847</div>
+            <div className="text-2xl font-bold text-foreground">{data?.totalUsers || 0}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="+234 this week" />
+              <LocalizedText text={`${Math.round(((data?.activeUsers || 0) / (data?.totalUsers || 1)) * 100)}% active`} />
             </p>
           </CardContent>
         </Card>
@@ -104,9 +114,9 @@ export const AdminDashboardContent = () => {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">1,247</div>
+            <div className="text-2xl font-bold text-foreground">{data?.activeUsers || 0}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="89 concurrent users" />
+              <LocalizedText text="Current active users" />
             </p>
           </CardContent>
         </Card>
@@ -115,14 +125,14 @@ export const AdminDashboardContent = () => {
               onClick={() => navigate('/admin/revenue')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Monthly Revenue" />
+              <LocalizedText text="Total Courses" />
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">$45,230</div>
+            <div className="text-2xl font-bold text-foreground">{data?.totalCourses || 0}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="+12.5% from last month" />
+              <LocalizedText text="Published courses" />
             </p>
           </CardContent>
         </Card>
@@ -138,7 +148,7 @@ export const AdminDashboardContent = () => {
           <CardContent>
             <div className="text-2xl font-bold text-foreground">94%</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="2 issues to review" />
+              <LocalizedText text={`${data?.recentActivities?.length || 0} recent events`} />
             </p>
           </CardContent>
         </Card>
@@ -157,7 +167,7 @@ export const AdminDashboardContent = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {systemMetrics.map((metric, index) => (
+            {data?.systemMetrics?.map((metric, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">{metric.name}</span>
@@ -168,7 +178,12 @@ export const AdminDashboardContent = () => {
                 <Progress value={metric.value} className="h-2" />
                 <p className="text-xs text-muted-foreground">{metric.value}%</p>
               </div>
-            ))}
+            )) || (
+              <div className="text-center text-muted-foreground py-4">
+                <Database className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No system metrics available</p>
+              </div>
+            )}
             
             <Button 
               variant="outline" 
@@ -193,14 +208,21 @@ export const AdminDashboardContent = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-start space-x-3 p-3 bg-background rounded-lg">
-                <div className="flex-1">
-                  <p className="text-sm text-foreground">{activity.message}</p>
-                  <p className="text-xs text-muted-foreground">{activity.user} • {activity.time}</p>
+            {data?.recentActivities && data.recentActivities.length > 0 ? (
+              data.recentActivities.slice(0, 5).map((activity, index) => (
+                <div key={index} className="flex items-start space-x-3 p-3 bg-background rounded-lg">
+                  <div className="flex-1">
+                    <p className="text-sm text-foreground">{activity.message}</p>
+                    <p className="text-xs text-muted-foreground">{activity.user} • {new Date(activity.time).toLocaleDateString()}</p>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="text-center text-muted-foreground py-4">
+                <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No recent activity</p>
               </div>
-            ))}
+            )}
             
             <Button 
               variant="outline" 
@@ -277,27 +299,31 @@ export const AdminDashboardContent = () => {
             <LocalizedText text="Platform Analytics Summary" />
           </CardTitle>
           <CardDescription>
-            <LocalizedText text="Key performance indicators for the last 30 days" />
+            <LocalizedText text="Key performance indicators" />
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">87%</div>
+              <div className="text-3xl font-bold text-primary">
+                {data?.totalUsers ? Math.round((data.activeUsers / data.totalUsers) * 100) : 0}%
+              </div>
               <p className="text-sm text-muted-foreground">
                 <LocalizedText text="User Retention Rate" />
               </p>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">4.6</div>
+              <div className="text-3xl font-bold text-primary">{data?.totalCourses || 0}</div>
               <p className="text-sm text-muted-foreground">
-                <LocalizedText text="Average Course Rating" />
+                <LocalizedText text="Total Courses" />
               </p>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">23%</div>
+              <div className="text-3xl font-bold text-primary">
+                {data?.usersByRole ? Math.round((data.usersByRole.educators / data.totalUsers) * 100) : 0}%
+              </div>
               <p className="text-sm text-muted-foreground">
-                <LocalizedText text="Course Completion Rate" />
+                <LocalizedText text="Educator Ratio" />
               </p>
             </div>
           </div>
