@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Shield, CheckCircle, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CheckCircle, AlertTriangle, Shield, Smartphone } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface Mobile2FASetupFlowProps {
@@ -76,7 +77,7 @@ export const Mobile2FASetupFlow: React.FC<Mobile2FASetupFlowProps> = ({
 
         {error && (
           <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
+            <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
               <UnifiedLocalizedText text={error} />
             </AlertDescription>

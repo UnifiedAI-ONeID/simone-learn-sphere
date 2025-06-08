@@ -7,28 +7,15 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   BookOpen, 
-  Clock, 
-  Trophy, 
   TrendingUp, 
-  Play,
+  Clock, 
+  Award, 
+  Star, 
+  ChevronRight, 
   Calendar,
-  Star,
-  Award,
-  Users,
-  MessageSquare,
-  Brain,
-  Zap,
   Target,
-  CheckCircle,
-  AlertCircle,
-  GraduationCap,
-  Activity,
-  BarChart3,
-  Bookmark,
-  Download,
-  Share,
-  Heart,
-  Coffee
+  Sparkles,
+  Plus
 } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 

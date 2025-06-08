@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 
 export const DesktopSidebar = () => {
   const { role } = useUserRole();

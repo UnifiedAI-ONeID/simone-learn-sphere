@@ -1,13 +1,25 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Settings, Database, Globe, Security, Bell, Mail } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  Settings, 
+  Shield, 
+  Bell, 
+  Mail, 
+  Database, 
+  Globe, 
+  Lock, 
+  AlertTriangle, 
+  CheckCircle, 
+  Save 
+} from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const SystemSettings = () => {

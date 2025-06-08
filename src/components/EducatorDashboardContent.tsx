@@ -5,26 +5,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { 
+  BarChart3, 
+  TrendingUp, 
   Users, 
   BookOpen, 
-  TrendingUp, 
-  AlertTriangle,
-  GraduationCap,
-  Clock,
-  DollarSign,
+  DollarSign, 
   Star,
-  Play,
-  PlusCircle,
-  Eye,
-  Edit,
-  BarChart3,
-  Award,
-  MessageSquare,
-  Calendar,
-  FileText,
-  Activity,
-  Zap,
-  Brain
+  Rocket,
+  Lightbulb,
+  Bot,
+  Sparkles,
+  Heart
 } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 

@@ -1,152 +1,196 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { PlatformLayout } from '@/components/platform/PlatformLayout';
-import { PlatformCard } from '@/components/platform/PlatformCard';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { CheckCircle, Clock, AlertCircle, ChevronRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, XCircle, Clock, Award, ArrowRight, ArrowLeft } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
-export const QuizView = () => {
-  const { id, quizId } = useParams();
-  const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [selectedAnswer, setSelectedAnswer] = useState('');
-  const totalQuestions = 5;
+interface Question {
+  id: number;
+  text: string;
+  options: string[];
+  correctAnswer: string;
+  explanation: string;
+}
 
-  const question = {
+const mockQuestions: Question[] = [
+  {
     id: 1,
-    question: "What is the primary purpose of React components?",
-    options: [
-      "To handle HTTP requests",
-      "To split the UI into independent, reusable pieces",
-      "To manage database connections",
-      "To style web pages"
-    ],
-    correctAnswer: 1
+    text: 'What is the capital of France?',
+    options: ['Berlin', 'Madrid', 'Paris', 'Rome'],
+    correctAnswer: 'Paris',
+    explanation: 'Paris is the capital and largest city of France.'
+  },
+  {
+    id: 2,
+    text: 'Which planet is known as the "Red Planet"?',
+    options: ['Venus', 'Mars', 'Jupiter', 'Saturn'],
+    correctAnswer: 'Mars',
+    explanation: 'Mars is often called the "Red Planet" due to its reddish appearance.'
+  },
+  {
+    id: 3,
+    text: 'What is the largest mammal in the world?',
+    options: ['African Elephant', 'Blue Whale', 'Giraffe', 'Polar Bear'],
+    correctAnswer: 'Blue Whale',
+    explanation: 'The Blue Whale is the largest known mammal on Earth.'
+  }
+];
+
+export const QuizView = () => {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState<string[]>(Array(mockQuestions.length).fill(''));
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [score, setScore] = useState(0);
+
+  const currentQuestion = mockQuestions[currentQuestionIndex];
+  const totalQuestions = mockQuestions.length;
+  const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+
+  const handleAnswerChange = (answer: string) => {
+    const updatedAnswers = [...userAnswers];
+    updatedAnswers[currentQuestionIndex] = answer;
+    setUserAnswers(updatedAnswers);
   };
 
+  const goToNextQuestion = () => {
+    if (currentQuestionIndex < totalQuestions - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      // Quiz is completed, calculate score
+      calculateScore();
+      setQuizCompleted(true);
+    }
+  };
+
+  const goToPreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const calculateScore = () => {
+    let correctAnswersCount = 0;
+    for (let i = 0; i < totalQuestions; i++) {
+      if (userAnswers[i] === mockQuestions[i].correctAnswer) {
+        correctAnswersCount++;
+      }
+    }
+    const calculatedScore = (correctAnswersCount / totalQuestions) * 100;
+    setScore(calculatedScore);
+  };
+
+  const resetQuiz = () => {
+    setCurrentQuestionIndex(0);
+    setUserAnswers(Array(mockQuestions.length).fill(''));
+    setQuizCompleted(false);
+    setScore(0);
+  };
+
+  const isCorrect = quizCompleted && userAnswers[currentQuestionIndex] === currentQuestion.correctAnswer;
+
   return (
-    <PlatformLayout>
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">
-            <UnifiedLocalizedText text="React Components Quiz" />
-          </h1>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              <span>25 minutes remaining</span>
+    <div className="container mx-auto p-4 space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">
+            <UnifiedLocalizedText text="Quiz Time!" />
+          </CardTitle>
+          <CardDescription>
+            <UnifiedLocalizedText text="Test your knowledge and earn rewards" />
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Progress value={progress} className="h-2" />
+          <div className="text-sm text-muted-foreground">
+            <UnifiedLocalizedText text="Question" /> {currentQuestionIndex + 1} / {totalQuestions}
+          </div>
+
+          {!quizCompleted ? (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold">
+                  <UnifiedLocalizedText text={currentQuestion.text} />
+                </h3>
+                <RadioGroup defaultValue={userAnswers[currentQuestionIndex]} onValueChange={handleAnswerChange}>
+                  {currentQuestion.options.map((option) => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <RadioGroupItem value={option} id={`option-${option}`} className="border-2" />
+                      <Label htmlFor={`option-${option}`}>
+                        <UnifiedLocalizedText text={option} />
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              <div className="flex justify-between">
+                <Button variant="outline" size="sm" onClick={goToPreviousQuestion} disabled={currentQuestionIndex === 0}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  <UnifiedLocalizedText text="Previous" />
+                </Button>
+                <Button size="sm" onClick={goToNextQuestion}>
+                  {currentQuestionIndex === totalQuestions - 1 ? (
+                    <><UnifiedLocalizedText text="Submit Quiz" /></>
+                  ) : (
+                    <>
+                      <UnifiedLocalizedText text="Next" />
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <CheckCircle className="h-4 w-4" />
-              <span>Question {currentQuestion} of {totalQuestions}</span>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold">
+                  <UnifiedLocalizedText text="Quiz Completed!" />
+                </h3>
+                <Badge variant="secondary">
+                  <Award className="h-4 w-4 mr-2" />
+                  <UnifiedLocalizedText text={`Score: ${score.toFixed(0)}%`} />
+                </Badge>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-lg font-medium">
+                  <UnifiedLocalizedText text="Question" /> {currentQuestionIndex + 1}: <UnifiedLocalizedText text={currentQuestion.text} />
+                </h4>
+                {isCorrect ? (
+                  <Alert type="success">
+                    <CheckCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      <UnifiedLocalizedText text="Correct!" /> {currentQuestion.explanation}
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Alert type="error">
+                    <XCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      <UnifiedLocalizedText text="Incorrect." /> <UnifiedLocalizedText text="The correct answer is" /> {currentQuestion.correctAnswer}. {currentQuestion.explanation}
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+
+              <Button onClick={resetQuiz}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                <UnifiedLocalizedText text="Retake Quiz" />
+              </Button>
             </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3">
-            <PlatformCard>
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold">
-                    Question {currentQuestion}
-                  </h2>
-                  <span className="text-sm text-muted-foreground">
-                    {Math.round((currentQuestion / totalQuestions) * 100)}% complete
-                  </span>
-                </div>
-                <Progress value={(currentQuestion / totalQuestions) * 100} className="mb-6" />
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-4">
-                    {question.question}
-                  </h3>
-                  <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
-                    {question.options.map((option, index) => (
-                      <div key={index} className="flex items-center space-x-2 p-3 border rounded hover:bg-accent">
-                        <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                        <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
-                          {option}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-
-                <div className="flex gap-3 pt-6 border-t">
-                  <Button 
-                    variant="outline" 
-                    disabled={currentQuestion === 1}
-                    onClick={() => setCurrentQuestion(prev => Math.max(1, prev - 1))}
-                  >
-                    <UnifiedLocalizedText text="Previous" />
-                  </Button>
-                  <Button 
-                    disabled={!selectedAnswer}
-                    onClick={() => {
-                      if (currentQuestion < totalQuestions) {
-                        setCurrentQuestion(prev => prev + 1);
-                        setSelectedAnswer('');
-                      }
-                    }}
-                  >
-                    <UnifiedLocalizedText text={currentQuestion === totalQuestions ? "Submit Quiz" : "Next Question"} />
-                  </Button>
-                </div>
-              </div>
-            </PlatformCard>
-          </div>
-
-          <div className="space-y-6">
-            <PlatformCard>
-              <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Quiz Progress" />
-              </h3>
-              <div className="grid grid-cols-5 gap-2">
-                {[...Array(totalQuestions)].map((_, index) => (
-                  <div
-                    key={index}
-                    className={`aspect-square flex items-center justify-center text-xs rounded border ${
-                      index + 1 === currentQuestion
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : index + 1 < currentQuestion
-                        ? 'bg-green-100 text-green-800 border-green-300'
-                        : 'bg-gray-100 text-gray-500 border-gray-300'
-                    }`}
-                  >
-                    {index + 1}
-                  </div>
-                ))}
-              </div>
-            </PlatformCard>
-
-            <PlatformCard>
-              <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Quiz Details" />
-              </h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Total Questions</span>
-                  <span>{totalQuestions}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Time Limit</span>
-                  <span>30 minutes</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Passing Score</span>
-                  <span>70%</span>
-                </div>
-              </div>
-            </PlatformCard>
-          </div>
-        </div>
-      </div>
-    </PlatformLayout>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
+
+const Alert = ({ children, type }: { children: React.ReactNode; type: 'success' | 'error' }) => (
+  <div className={`p-3 rounded-md flex items-center space-x-2 ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+    {children}
+  </div>
+);
