@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
-import { GraduationCap, Users, Shield } from 'lucide-react';
+import { GraduationCap, Users } from 'lucide-react';
 
 interface RoleSelectorProps {
   value: string;
@@ -25,13 +25,6 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({ value, onValueChange
       description: 'Create and manage courses for students',
       icon: Users,
       color: 'text-green-600'
-    },
-    {
-      value: 'admin',
-      label: 'Administrator',
-      description: 'Manage platform settings and users',
-      icon: Shield,
-      color: 'text-purple-600'
     }
   ];
 
