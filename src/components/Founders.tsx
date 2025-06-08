@@ -8,28 +8,19 @@ import { Linkedin, Twitter } from 'lucide-react';
 const foundersData = [
   {
     id: 1,
-    name: "Dr. Sarah Chen",
+    name: "Fiona Wong",
     role: "CEO & Co-Founder",
     bio: "Former Stanford AI researcher with 15+ years in educational technology. Led development of adaptive learning algorithms at major tech companies.",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=400&h=400&fit=crop&crop=face",
     linkedin: "#",
     twitter: "#"
   },
   {
     id: 2,
-    name: "Marcus Rodriguez",
+    name: "Simon Luke",
     role: "CTO & Co-Founder", 
     bio: "MIT computer science graduate and former lead engineer at educational platforms. Expert in scalable learning systems and AI integration.",
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=400&fit=crop&crop=face",
-    linkedin: "#",
-    twitter: "#"
-  },
-  {
-    id: 3,
-    name: "Dr. Amara Okafor",
-    role: "Head of Education & Co-Founder",
-    bio: "PhD in Educational Psychology from Harvard. 20+ years developing curriculum for diverse learning environments across 30+ countries.",
-    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
     linkedin: "#",
     twitter: "#"
   }
@@ -51,7 +42,7 @@ export const Founders: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {foundersData.map((founder) => (
             <Card key={founder.id} className="group hover:shadow-lg transition-all duration-300 hover:scale-105">
               <CardContent className="p-6 text-center">
