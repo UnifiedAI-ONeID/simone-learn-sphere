@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +15,6 @@ import {
   Shield, 
   Zap 
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const StudentBadges = () => {
   const badges = [
@@ -104,10 +104,10 @@ export const StudentBadges = () => {
     <div className="container mx-auto p-4 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
-          <UnifiedLocalizedText text="Your Badges" />
+          Your Badges
         </h1>
         <p className="text-muted-foreground">
-          <UnifiedLocalizedText text="Track your achievements and progress" />
+          Track your achievements and progress
         </p>
       </div>
 
@@ -121,25 +121,25 @@ export const StudentBadges = () => {
                 ) : (
                   <Award className="h-4 w-4 text-muted-foreground" />
                 )}
-                <UnifiedLocalizedText text={badge.name} />
+                {badge.name}
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text={badge.description} />
+                {badge.description}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Progress value={badge.progress} className="mb-2" />
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span>
-                  <UnifiedLocalizedText text="Progress" />: {badge.progress}%
+                  Progress: {badge.progress}%
                 </span>
                 {badge.isCompleted ? (
                   <Badge variant="outline">
-                    <UnifiedLocalizedText text="Completed" />
+                    Completed
                   </Badge>
                 ) : (
                   <span>
-                    <UnifiedLocalizedText text="Keep going!" />
+                    Keep going!
                   </span>
                 )}
               </div>

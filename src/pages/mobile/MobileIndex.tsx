@@ -1,14 +1,12 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Brain, Moon, Sun } from 'lucide-react';
-import { OptimizedLocalizedText } from '@/components/OptimizedLocalizedText';
-import { LanguageSelector } from '@/components/LanguageSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
-import { useContentReadyState } from '@/hooks/useContentReadyState';
 
 // Define UserRole type locally since it's not exported from supabase types
 type UserRole = 'student' | 'educator' | 'admin';
@@ -18,9 +16,8 @@ export const MobileIndex = () => {
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
   const { isDarkMode, toggleDarkMode } = usePlatformTheme();
-  const { isContentReady } = useContentReadyState({ delay: 200 });
 
-  console.log('MobileIndex: Rendering with user:', !!user, 'role:', role, 'authLoading:', authLoading, 'roleLoading:', roleLoading, 'contentReady:', isContentReady);
+  console.log('MobileIndex: Rendering with user:', !!user, 'role:', role, 'authLoading:', authLoading, 'roleLoading:', roleLoading);
 
   // Redirect authenticated users to their dashboard
   useEffect(() => {
@@ -41,7 +38,7 @@ export const MobileIndex = () => {
             <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
           <p className="text-muted-foreground">
-            <OptimizedLocalizedText text="Loading..." waitForContent={false} />
+            Loading...
           </p>
         </div>
       </div>
@@ -57,7 +54,7 @@ export const MobileIndex = () => {
             <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
           <p className="text-muted-foreground">
-            <OptimizedLocalizedText text="Redirecting to your dashboard..." waitForContent={false} />
+            Redirecting to your dashboard...
           </p>
         </div>
       </div>
@@ -79,12 +76,11 @@ export const MobileIndex = () => {
               <Brain className="h-5 w-5 text-primary-foreground" />
             </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              <OptimizedLocalizedText text="SimoneLabs" priority={3} />
+              SimoneLabs
             </h1>
           </div>
           
           <div className="flex items-center space-x-2">
-            <LanguageSelector />
             <Button
               variant="ghost"
               size="icon"
@@ -102,10 +98,10 @@ export const MobileIndex = () => {
         <div className="text-center space-y-6">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-foreground">
-              <OptimizedLocalizedText text="Learn Anywhere, Anytime" priority={2} />
+              Learn Anywhere, Anytime
             </h2>
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
-              <OptimizedLocalizedText text="Access world-class education from your mobile device. Start your learning journey today." priority={1} />
+              Access world-class education from your mobile device. Start your learning journey today.
             </p>
           </div>
 
@@ -114,11 +110,11 @@ export const MobileIndex = () => {
               onClick={handleGetStarted}
               className="w-full h-12 text-lg font-semibold"
             >
-              <OptimizedLocalizedText text="Get Started" priority={3} />
+              Get Started
             </Button>
             
             <p className="text-sm text-muted-foreground">
-              <OptimizedLocalizedText text="Join thousands of learners worldwide" priority={1} />
+              Join thousands of learners worldwide
             </p>
           </div>
 
@@ -129,10 +125,10 @@ export const MobileIndex = () => {
                 <Brain className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-semibold">
-                <OptimizedLocalizedText text="AI-Powered Learning" priority={1} />
+                AI-Powered Learning
               </h3>
               <p className="text-sm text-muted-foreground">
-                <OptimizedLocalizedText text="Get personalized guidance and support" priority={1} />
+                Get personalized guidance and support
               </p>
             </div>
           </div>
@@ -142,7 +138,7 @@ export const MobileIndex = () => {
       {/* Footer */}
       <footer className="mt-16 px-4 py-6 text-center">
         <p className="text-sm text-muted-foreground">
-          <OptimizedLocalizedText text="© 2024 SimoneLabs. Democratizing education worldwide." priority={1} />
+          © 2024 SimoneLabs. Democratizing education worldwide.
         </p>
       </footer>
     </div>

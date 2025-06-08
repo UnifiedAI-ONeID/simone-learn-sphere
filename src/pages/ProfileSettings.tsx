@@ -8,7 +8,6 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { ProfilePictureUpload } from '@/components/ProfilePictureUpload';
 import { UserRoleManager } from '@/components/UserRoleManager';
 import { TwoFactorSetup } from '@/components/TwoFactorSetup';
@@ -68,10 +67,10 @@ const ProfileSettings = () => {
     <div className="container mx-auto py-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
-          <UnifiedLocalizedText text="Profile Settings" />
+          Profile Settings
         </h1>
         <p className="text-gray-600">
-          <UnifiedLocalizedText text="Manage your account settings and preferences." />
+          Manage your account settings and preferences.
         </p>
       </div>
 
@@ -83,10 +82,10 @@ const ProfileSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="Basic Information" />
+              Basic Information
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Update your personal details." />
+              Update your personal details.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -94,7 +93,7 @@ const ProfileSettings = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">
-                    <UnifiedLocalizedText text="First Name" />
+                    First Name
                   </Label>
                   <Input
                     id="firstName"
@@ -105,7 +104,7 @@ const ProfileSettings = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">
-                    <UnifiedLocalizedText text="Last Name" />
+                    Last Name
                   </Label>
                   <Input
                     id="lastName"
@@ -117,7 +116,7 @@ const ProfileSettings = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  <UnifiedLocalizedText text="Email" />
+                  Email
                 </Label>
                 <Input
                   id="email"
@@ -127,11 +126,11 @@ const ProfileSettings = () => {
                   className="bg-gray-50"
                 />
                 <p className="text-sm text-gray-500">
-                  <UnifiedLocalizedText text="Email cannot be changed" />
+                  Email cannot be changed
                 </p>
               </div>
               <Button type="submit" disabled={isLoading}>
-                <UnifiedLocalizedText text={isLoading ? 'Updating...' : 'Update Profile'} />
+                {isLoading ? 'Updating...' : 'Update Profile'}
               </Button>
             </form>
           </CardContent>
@@ -150,10 +149,10 @@ const ProfileSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="Account Actions" />
+              Account Actions
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Manage your account." />
+              Manage your account.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -162,7 +161,7 @@ const ProfileSettings = () => {
               variant="outline"
               className="w-full"
             >
-              <UnifiedLocalizedText text="Sign Out" />
+              Sign Out
             </Button>
           </CardContent>
         </Card>

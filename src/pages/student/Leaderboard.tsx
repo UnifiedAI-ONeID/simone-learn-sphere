@@ -1,10 +1,10 @@
+
 import React from 'react';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Medal, Award, TrendingUp } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const Leaderboard = () => {
   const leaderboardData = [
@@ -20,10 +20,10 @@ export const Leaderboard = () => {
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">
-            <UnifiedLocalizedText text="Leaderboard" />
+            Leaderboard
           </h1>
           <p className="text-muted-foreground">
-            <UnifiedLocalizedText text="See how you rank among your peers" />
+            See how you rank among your peers
           </p>
         </div>
 
@@ -31,7 +31,7 @@ export const Leaderboard = () => {
           <div className="lg:col-span-2">
             <PlatformCard>
               <h2 className="text-xl font-semibold mb-4">
-                <UnifiedLocalizedText text="Top Performers" />
+                Top Performers
               </h2>
               <div className="space-y-4">
                 {leaderboardData.map((user) => (
@@ -73,7 +73,7 @@ export const Leaderboard = () => {
           <div className="space-y-6">
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Your Rank" />
+                Your Rank
               </h3>
               <div className="text-center">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
@@ -86,7 +86,7 @@ export const Leaderboard = () => {
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Leaderboard Stats" />
+                Leaderboard Stats
               </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -106,7 +106,7 @@ export const Leaderboard = () => {
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Achievements" />
+                Achievements
               </h3>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">

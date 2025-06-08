@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Send, MessageCircle, ArrowLeft, Lightbulb, BookOpen } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const StudentAITutor = () => {
   const navigate = useNavigate();
@@ -47,10 +47,10 @@ export const StudentAITutor = () => {
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
               <Brain className="h-8 w-8 text-primary" />
-              <UnifiedLocalizedText text="AI Study Assistant" />
+              AI Study Assistant
             </h1>
             <p className="text-muted-foreground">
-              <UnifiedLocalizedText text="Get personalized help with your studies" />
+              Get personalized help with your studies
             </p>
           </div>
         </div>
@@ -68,7 +68,7 @@ export const StudentAITutor = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageCircle className="h-5 w-5" />
-                <UnifiedLocalizedText text="Chat" />
+                Chat
               </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col">
@@ -110,10 +110,10 @@ export const StudentAITutor = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Lightbulb className="h-4 w-4" />
-                <UnifiedLocalizedText text="Quick Help" />
+                Quick Help
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Common questions to get started" />
+                Common questions to get started
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -136,28 +136,14 @@ export const StudentAITutor = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <BookOpen className="h-4 w-4" />
-                <UnifiedLocalizedText text="Study Tips" />
+                Study Tips
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <h4 className="font-medium text-sm mb-1">Active Learning</h4>
-                <p className="text-xs text-muted-foreground">
-                  Ask specific questions about concepts you're struggling with.
-                </p>
-              </div>
-              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <h4 className="font-medium text-sm mb-1">Practice Problems</h4>
-                <p className="text-xs text-muted-foreground">
-                  Request practice exercises to reinforce your learning.
-                </p>
-              </div>
-              <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                <h4 className="font-medium text-sm mb-1">Explanations</h4>
-                <p className="text-xs text-muted-foreground">
-                  Ask for step-by-step explanations of complex topics.
-                </p>
-              </div>
+            <CardContent className="space-y-2 text-sm">
+              <p>• Break down complex problems into smaller parts</p>
+              <p>• Practice regularly with different examples</p>
+              <p>• Ask specific questions for better help</p>
+              <p>• Review concepts before moving forward</p>
             </CardContent>
           </Card>
         </div>

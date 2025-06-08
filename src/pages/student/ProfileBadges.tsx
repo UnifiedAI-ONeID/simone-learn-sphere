@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +14,6 @@ import {
   TrendingUp,
   Zap
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const ProfileBadges = () => {
   const badges = [
@@ -86,10 +86,10 @@ export const ProfileBadges = () => {
     <div className="container mx-auto p-4 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
-          <UnifiedLocalizedText text="Your Profile Badges" />
+          Your Profile Badges
         </h1>
         <p className="text-muted-foreground">
-          <UnifiedLocalizedText text="Track your achievements and progress" />
+          Track your achievements and progress
         </p>
       </div>
 
@@ -98,15 +98,15 @@ export const ProfileBadges = () => {
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                <UnifiedLocalizedText text={badge.name} />
+                {badge.name}
               </CardTitle>
               {badge.isCompleted ? (
                 <Badge variant="secondary">
-                  <UnifiedLocalizedText text="Completed" />
+                  Completed
                 </Badge>
               ) : (
                 <Badge variant="outline">
-                  <UnifiedLocalizedText text="In Progress" />
+                  In Progress
                 </Badge>
               )}
             </CardHeader>
@@ -115,7 +115,7 @@ export const ProfileBadges = () => {
                 {badge.progress}%
               </div>
               <p className="text-xs text-muted-foreground">
-                <UnifiedLocalizedText text={badge.description} />
+                {badge.description}
               </p>
               <Progress value={badge.progress} className="mt-2" />
             </CardContent>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
@@ -5,7 +6,6 @@ import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, FileText, AlertCircle } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const Assignments = () => {
   const { id } = useParams();
@@ -21,10 +21,10 @@ export const Assignments = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">
-            <UnifiedLocalizedText text="Assignments & Deadlines" />
+            Assignments & Deadlines
           </h1>
           <p className="text-muted-foreground">
-            <UnifiedLocalizedText text="Track your upcoming assignments and deadlines" />
+            Track your upcoming assignments and deadlines
           </p>
         </div>
 
@@ -66,11 +66,11 @@ export const Assignments = () => {
                   <div className="ml-4">
                     {assignment.status === 'completed' ? (
                       <Button variant="outline" size="sm">
-                        <UnifiedLocalizedText text="Review" />
+                        Review
                       </Button>
                     ) : (
                       <Button size="sm">
-                        <UnifiedLocalizedText text={assignment.status === 'in_progress' ? "Continue" : "Start"} />
+                        {assignment.status === 'in_progress' ? "Continue" : "Start"}
                       </Button>
                     )}
                   </div>
@@ -82,7 +82,7 @@ export const Assignments = () => {
           <div className="space-y-6">
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Upcoming Deadlines" />
+                Upcoming Deadlines
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 bg-red-50 rounded border border-red-200">
@@ -104,7 +104,7 @@ export const Assignments = () => {
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <UnifiedLocalizedText text="Assignment Stats" />
+                Assignment Stats
               </h3>
               <div className="space-y-3">
                 <div className="flex justify-between">

@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Users, Shield, GraduationCap, Settings, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserRoleManagerProps {
@@ -83,7 +82,7 @@ export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
       <Alert>
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          <UnifiedLocalizedText text="You don't have permission to manage user roles." />
+          You don't have permission to manage user roles.
         </AlertDescription>
       </Alert>
     );
@@ -94,10 +93,10 @@ export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Settings className="h-5 w-5" />
-          <UnifiedLocalizedText text="Role Management" />
+          Role Management
         </CardTitle>
         <CardDescription>
-          <UnifiedLocalizedText text="Manage user roles and permissions" />
+          Manage user roles and permissions
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -105,7 +104,7 @@ export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
         {currentRole && (
           <div>
             <label className="text-sm font-medium mb-2 block">
-              <UnifiedLocalizedText text="Current Role" />
+              Current Role
             </label>
             <div className="flex items-center gap-2">
               {roles.map(role => {
@@ -114,7 +113,7 @@ export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
                   return (
                     <Badge key={role.value} className={role.color}>
                       <IconComponent className="h-3 w-3 mr-1" />
-                      <UnifiedLocalizedText text={role.label} />
+                      {role.label}
                     </Badge>
                   );
                 }
@@ -127,7 +126,7 @@ export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
         {/* Role Selection */}
         <div>
           <label className="text-sm font-medium mb-2 block">
-            <UnifiedLocalizedText text="New Role" />
+            New Role
           </label>
           <Select value={selectedRole} onValueChange={setSelectedRole}>
             <SelectTrigger>
@@ -142,10 +141,10 @@ export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
                       <IconComponent className="h-4 w-4" />
                       <div>
                         <div className="font-medium">
-                          <UnifiedLocalizedText text={role.label} />
+                          {role.label}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          <UnifiedLocalizedText text={role.description} />
+                          {role.description}
                         </div>
                       </div>
                     </div>
@@ -159,7 +158,7 @@ export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
         {/* Role Descriptions */}
         <div className="space-y-3">
           <h4 className="text-sm font-medium">
-            <UnifiedLocalizedText text="Role Permissions" />
+            Role Permissions
           </h4>
           {roles.map(role => {
             const IconComponent = role.icon;
@@ -168,10 +167,10 @@ export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
                 <IconComponent className="h-5 w-5 mt-0.5 text-muted-foreground" />
                 <div>
                   <div className="font-medium">
-                    <UnifiedLocalizedText text={role.label} />
+                    {role.label}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    <UnifiedLocalizedText text={role.description} />
+                    {role.description}
                   </div>
                 </div>
               </div>
@@ -186,11 +185,11 @@ export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
             disabled={isUpdating || !selectedRole || selectedRole === currentRole}
           >
             {isUpdating ? (
-              <UnifiedLocalizedText text="Updating..." />
+              "Updating..."
             ) : (
               <>
                 <CheckCircle className="h-4 w-4 mr-2" />
-                <UnifiedLocalizedText text="Update Role" />
+                Update Role
               </>
             )}
           </Button>
