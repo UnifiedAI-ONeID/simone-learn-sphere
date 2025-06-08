@@ -8,6 +8,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // Define UserRole type locally since it's not exported from supabase types
 type UserRole = 'student' | 'educator' | 'admin';
@@ -93,6 +94,23 @@ export const MobileIndex = () => {
     }
   ];
 
+  const coFounders = [
+    {
+      name: "Fiona Wong",
+      role: "Co-Founder & CEO",
+      avatar: "FW",
+      avatarUrl: "/lovable-uploads/d6a21c1b-8b9b-4811-a5eb-eafac22bca5f.png",
+      description: "Passionate about democratizing education and empowering educators worldwide"
+    },
+    {
+      name: "Simon Luke",
+      role: "Co-Founder & CTO",
+      avatar: "SL",
+      avatarUrl: "/lovable-uploads/7a68d4b0-5778-4fc6-bd9d-8d45d0d83da0.png",
+      description: "Building innovative AI-powered solutions for the future of learning"
+    }
+  ];
+
   const getHeroIconStyles = () => {
     switch (platform) {
       case 'ios':
@@ -145,6 +163,17 @@ export const MobileIndex = () => {
         return "w-12 h-12 bg-primary flex items-center justify-center text-white rounded-2xl";
       default:
         return "w-10 h-10 bg-primary flex items-center justify-center text-white rounded-lg";
+    }
+  };
+
+  const getFounderCardStyles = () => {
+    switch (platform) {
+      case 'ios':
+        return "active:scale-95 transition-transform duration-200 rounded-xl bg-card border-border";
+      case 'android':
+        return "active:scale-95 transition-transform duration-200 rounded-3xl bg-card border-border";
+      default:
+        return "active:scale-95 transition-transform duration-200 bg-card border-border";
     }
   };
 
@@ -239,6 +268,50 @@ export const MobileIndex = () => {
                     </h3>
                     <p className="text-muted-foreground text-sm">
                       <LocalizedText text={feature.description} />
+                    </p>
+                  </div>
+                </div>
+              </PlatformCard>
+            ))}
+          </div>
+        </div>
+
+        {/* Co-Founders Section */}
+        <div className="px-4 py-8">
+          <div className="text-center mb-8">
+            <h2 className={getHeadingStyles().replace('text-4xl', 'text-2xl')}>
+              <LocalizedText text="Meet Our Co-Founders" />
+            </h2>
+            <p className="text-muted-foreground mt-2">
+              <LocalizedText text="Passionate about transforming education" />
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-6">
+            {coFounders.map((founder, index) => (
+              <PlatformCard key={index} className={getFounderCardStyles()}>
+                <div className="p-6 text-center space-y-4">
+                  <Avatar className={`h-20 w-20 mx-auto ring-2 ring-primary/20 ${
+                    platform === 'ios' ? 'rounded-2xl' : 
+                    platform === 'android' ? 'rounded-full' : 'rounded-xl'
+                  }`}>
+                    <AvatarImage src={founder.avatarUrl} alt={founder.name} />
+                    <AvatarFallback className="text-lg bg-gradient-to-br from-primary to-secondary text-primary-foreground font-semibold">
+                      {founder.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="space-y-2">
+                    <h3 className={`text-foreground ${
+                      platform === 'ios' ? 'text-xl font-semibold' : 
+                      platform === 'android' ? 'text-xl font-medium' : 'text-xl font-bold'
+                    }`}>
+                      <LocalizedText text={founder.name} />
+                    </h3>
+                    <p className="text-primary font-medium">
+                      <LocalizedText text={founder.role} />
+                    </p>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      <LocalizedText text={founder.description} />
                     </p>
                   </div>
                 </div>
