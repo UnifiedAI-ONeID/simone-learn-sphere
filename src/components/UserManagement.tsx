@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useImpersonation } from '@/hooks/useImpersonation';
 import { useUserRole } from '@/hooks/useUserRole';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface User {
   id: string;
@@ -252,71 +252,61 @@ export const UserManagement = () => {
             </div>
           ) : filteredUsers.length === 0 ? (
             <div className="text-center py-8">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-300">No users found</p>
+              <Users className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No users found</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                {searchTerm || roleFilter !== 'all' 
+                  ? 'Try adjusting your search or filter criteria.'
+                  : 'Users will appear here as they sign up for the platform.'
+                }
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
               {filteredUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="flex-shrink-0">
+                <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800">
                       {getRoleIcon(user.role)}
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-white">
+                      <p className="font-medium text-gray-900 dark:text-white">
                         {user.first_name} {user.last_name}
-                        {user.email === 'simon.luke@unswalumni.com' && (
-                          <Crown className="inline h-4 w-4 ml-2 text-yellow-500" />
-                        )}
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-300">
-                        {user.email}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        Joined: {new Date(user.created_at).toLocaleDateString()}
-                      </div>
+                      </p>
+                      <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center space-x-3">
                     <Badge className={getRoleBadgeColor(user.role)}>
-                      {user.role}
+                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     </Badge>
                     
-                    <div className="flex items-center gap-2">
-                      <Select
-                        value={user.role}
-                        onValueChange={(role) => handleRoleChange(user.id, role)}
-                        disabled={!hasRole('admin')}
-                      >
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {getAvailableRoles().map((role) => (
-                            <SelectItem key={role} value={role}>
-                              {role}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      
-                      {hasRole('admin') && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleImpersonate(user)}
-                          disabled={impersonationLoading}
-                        >
-                          <UserCheck className="h-4 w-4 mr-1" />
-                          Impersonate
-                        </Button>
-                      )}
-                    </div>
+                    <Select
+                      value={user.role}
+                      onValueChange={(newRole) => handleRoleChange(user.id, newRole)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAvailableRoles().map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {role.charAt(0).toUpperCase() + role.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleImpersonate(user)}
+                      disabled={impersonationLoading}
+                    >
+                      <UserCheck className="h-4 w-4 mr-1" />
+                      {impersonationLoading ? 'Starting...' : 'Impersonate'}
+                    </Button>
                   </div>
                 </div>
               ))}

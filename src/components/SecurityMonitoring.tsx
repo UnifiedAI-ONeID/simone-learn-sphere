@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +22,6 @@ import {
   RefreshCw,
   Bell
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface SecurityEvent {
   id: string;
@@ -85,8 +85,6 @@ export const SecurityMonitoring = () => {
     { low: 0, medium: 0, high: 0 }
   );
 
-  const totalEvents = securityEvents.length;
-
   const getSeverityColor = (severity: SecurityEvent['severity']) => {
     switch (severity) {
       case 'low':
@@ -106,10 +104,10 @@ export const SecurityMonitoring = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            <UnifiedLocalizedText text="Security Monitoring" />
+            Security Monitoring
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Real-time monitoring of security events and system health" />
+            Real-time monitoring of security events and system health
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -119,12 +117,12 @@ export const SecurityMonitoring = () => {
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-green-600" />
                   <span className="font-medium">
-                    <UnifiedLocalizedText text="Low Risk Events" />
+                    Low Risk Events
                   </span>
                 </div>
                 <span className="text-2xl font-bold text-green-800">{severityCounts.low}</span>
                 <span className="text-sm text-green-700">
-                  <UnifiedLocalizedText text="Recent low-risk activity" />
+                  Recent low-risk activity
                 </span>
               </CardContent>
             </Card>
@@ -134,12 +132,12 @@ export const SecurityMonitoring = () => {
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-orange-600" />
                   <span className="font-medium">
-                    <UnifiedLocalizedText text="Medium Risk Events" />
+                    Medium Risk Events
                   </span>
                 </div>
                 <span className="text-2xl font-bold text-orange-800">{severityCounts.medium}</span>
                 <span className="text-sm text-orange-700">
-                  <UnifiedLocalizedText text="Potential security concerns" />
+                  Potential security concerns
                 </span>
               </CardContent>
             </Card>
@@ -149,12 +147,12 @@ export const SecurityMonitoring = () => {
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-red-600" />
                   <span className="font-medium">
-                    <UnifiedLocalizedText text="High Risk Events" />
+                    High Risk Events
                   </span>
                 </div>
                 <span className="text-2xl font-bold text-red-800">{severityCounts.high}</span>
                 <span className="text-sm text-red-700">
-                  <UnifiedLocalizedText text="Immediate action required" />
+                  Immediate action required
                 </span>
               </CardContent>
             </Card>
@@ -163,10 +161,10 @@ export const SecurityMonitoring = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                <UnifiedLocalizedText text="Recent Security Events" />
+                Recent Security Events
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Detailed log of recent security-related activity" />
+                Detailed log of recent security-related activity
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -174,7 +172,7 @@ export const SecurityMonitoring = () => {
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <UnifiedLocalizedText text="No security events to display." />
+                    No security events to display.
                   </AlertDescription>
                 </Alert>
               ) : (
@@ -194,7 +192,7 @@ export const SecurityMonitoring = () => {
                         <div className="flex items-center gap-2">
                           <Zap className={`h-4 w-4 ${getSeverityColor(event.severity)}`} />
                           <span className="text-sm">
-                            <UnifiedLocalizedText text={event.description} />
+                            {event.description}
                           </span>
                         </div>
                         {event.user && (
@@ -215,7 +213,7 @@ export const SecurityMonitoring = () => {
                         )}
                       </div>
                       <Badge variant="outline">
-                        <UnifiedLocalizedText text={event.type} />
+                        {event.type}
                       </Badge>
                     </div>
                   ))}
@@ -227,11 +225,11 @@ export const SecurityMonitoring = () => {
           <div className="flex justify-between">
             <Button variant="outline">
               <RefreshCw className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text="Refresh Events" />
+              Refresh Events
             </Button>
             <Button>
               <Settings className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text="Security Settings" />
+              Security Settings
             </Button>
           </div>
         </CardContent>

@@ -4,8 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bell, Search, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
-import { LanguageSelector } from '@/components/LanguageSelector';
 
 export const MobileHeader = () => {
   const { user } = useAuth();
@@ -18,12 +16,11 @@ export const MobileHeader = () => {
             <Menu className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            <UnifiedLocalizedText text="SimoneLabs" />
+            SimoneLabs
           </h1>
         </div>
         
         <div className="flex items-center space-x-2">
-          <LanguageSelector />
           <Button variant="ghost" size="sm" className="p-2">
             <Search className="h-4 w-4" />
           </Button>

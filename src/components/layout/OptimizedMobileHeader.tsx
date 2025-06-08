@@ -1,8 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Brain, Menu, Settings, Bell } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useMobileSidebar } from '@/contexts/MobileSidebarContext';
@@ -36,7 +36,7 @@ export const OptimizedMobileHeader: React.FC<OptimizedMobileHeaderProps> = ({ on
           <div className="flex items-center">
             <Brain className="mr-2 h-6 w-6 text-primary" />
             <span className="font-bold text-xl">
-              <UnifiedLocalizedText text="Platform" />
+              Platform
             </span>
           </div>
           <div className="flex items-center space-x-4">

@@ -1,8 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Brain, LogOut, Settings } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
@@ -85,17 +85,17 @@ export const DesktopHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIcon
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              <UnifiedLocalizedText text={title} />
+              {title}
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              <UnifiedLocalizedText text={subtitle} />
+              {subtitle}
             </p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
           <Button variant="secondary" className="px-3 py-1">
             <DisplayBadgeIcon className="w-4 h-4 mr-1" />
-            <UnifiedLocalizedText text={displayBadgeText} />
+            {displayBadgeText}
           </Button>
           
           {/* User Profile Section */}
@@ -136,7 +136,7 @@ export const DesktopHeader = ({ title, subtitle, badgeText, badgeIcon: BadgeIcon
           >
             <LogOut className="h-4 w-4" />
             <span>
-              <UnifiedLocalizedText text={isSigningOut ? 'Signing Out...' : 'Sign Out'} />
+              {isSigningOut ? 'Signing Out...' : 'Sign Out'}
             </span>
           </Button>
         </div>

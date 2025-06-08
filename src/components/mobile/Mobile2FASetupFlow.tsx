@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, AlertTriangle, Shield, Smartphone } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface Mobile2FASetupFlowProps {
   email: string;
@@ -43,16 +43,16 @@ export const Mobile2FASetupFlow: React.FC<Mobile2FASetupFlowProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-center">
           <Shield className="h-5 w-5" />
-          <UnifiedLocalizedText text="Two-Factor Authentication Setup" />
+          Two-Factor Authentication Setup
         </CardTitle>
         <CardDescription className="text-center">
-          <UnifiedLocalizedText text="Enter the verification code sent to your email" />
+          Enter the verification code sent to your email
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">
-            <UnifiedLocalizedText text="Email" />
+            Email
           </Label>
           <Input
             type="email"
@@ -64,7 +64,7 @@ export const Mobile2FASetupFlow: React.FC<Mobile2FASetupFlowProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="verificationCode">
-            <UnifiedLocalizedText text="Verification Code" />
+            Verification Code
           </Label>
           <Input
             type="text"
@@ -79,7 +79,7 @@ export const Mobile2FASetupFlow: React.FC<Mobile2FASetupFlowProps> = ({
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              <UnifiedLocalizedText text={error} />
+              {error}
             </AlertDescription>
           </Alert>
         )}
@@ -91,11 +91,11 @@ export const Mobile2FASetupFlow: React.FC<Mobile2FASetupFlowProps> = ({
             className="w-full"
           >
             {isLoading ? (
-              <UnifiedLocalizedText text="Verifying..." />
+              'Verifying...'
             ) : (
               <>
                 <CheckCircle className="h-4 w-4 mr-2" />
-                <UnifiedLocalizedText text="Verify Code" />
+                Verify Code
               </>
             )}
           </Button>
@@ -104,7 +104,7 @@ export const Mobile2FASetupFlow: React.FC<Mobile2FASetupFlowProps> = ({
             onClick={onCancel}
             className="w-full"
           >
-            <UnifiedLocalizedText text="Cancel" />
+            Cancel
           </Button>
         </div>
       </CardContent>

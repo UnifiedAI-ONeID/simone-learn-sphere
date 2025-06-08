@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bot, Send, User, Loader2 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface MobileAIChatProps {
   isOpen: boolean;
@@ -43,14 +43,14 @@ export const MobileAIChat: React.FC<MobileAIChatProps> = ({ isOpen, onClose, con
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Bot className="h-5 w-5" />
-              <UnifiedLocalizedText text="AI Assistant" />
+              AI Assistant
             </CardTitle>
             <Button variant="ghost" size="sm" onClick={onClose}>
-              <UnifiedLocalizedText text="Close" />
+              Close
             </Button>
           </div>
           <CardDescription>
-            <UnifiedLocalizedText text="Get instant help with your studies" />
+            Get instant help with your studies
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col">
