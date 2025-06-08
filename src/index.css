@@ -14,24 +14,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 262.1 83.3% 57.8%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262.1 83.3% 57.8%;
 
     --radius: 0.5rem;
 
@@ -42,7 +42,14 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 262.1 83.3% 57.8%;
+
+    /* Enhanced landing page colors */
+    --landing-primary: 262.1 83.3% 57.8%;
+    --landing-secondary: 258.3 89.5% 66.3%;
+    --landing-accent: 270 95.2% 75.3%;
+    --landing-gradient-from: 262.1 83.3% 57.8%;
+    --landing-gradient-to: 258.3 89.5% 66.3%;
   }
 
   .dark {
@@ -55,8 +62,8 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 40% 98%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -72,15 +79,23 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --ring: 262.1 83.3% 57.8%;
+    
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary: 262.1 83.3% 57.8%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 262.1 83.3% 57.8%;
+
+    /* Enhanced dark mode landing colors */
+    --landing-primary: 262.1 83.3% 57.8%;
+    --landing-secondary: 258.3 89.5% 66.3%;
+    --landing-accent: 270 95.2% 75.3%;
+    --landing-gradient-from: 262.1 83.3% 57.8%;
+    --landing-gradient-to: 258.3 89.5% 66.3%;
   }
 
   /* High Contrast Mode */
@@ -149,6 +164,22 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-variation-settings: normal;
+    line-height: 1.6;
+  }
+
+  /* Enhanced typography consistency */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  p {
+    line-height: 1.7;
   }
 
   /* Enhanced focus indicators */
@@ -185,6 +216,24 @@
     color: hsl(var(--background)) !important;
   }
 
+  /* Enhanced landing page gradients */
+  .landing-gradient {
+    background: linear-gradient(135deg, 
+      hsl(var(--landing-gradient-from)), 
+      hsl(var(--landing-gradient-to))
+    );
+  }
+
+  .landing-gradient-text {
+    background: linear-gradient(135deg, 
+      hsl(var(--landing-primary)), 
+      hsl(var(--landing-secondary))
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   /* Font size controls */
   .text-sm {
     font-size: 0.875rem;
@@ -213,14 +262,43 @@
 
   /* Improve text contrast */
   .text-gray-500 {
-    color: #6b7280;
+    color: hsl(var(--muted-foreground));
   }
 
   .dark .text-gray-500 {
-    color: #9ca3af;
+    color: hsl(var(--muted-foreground));
   }
 
   .high-contrast .text-gray-500 {
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Landing page specific enhancements */
+  .landing-hero-text {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+  }
+
+  .landing-subtitle {
+    font-size: clamp(1.125rem, 2.5vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.6;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .landing-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: hsl(var(--foreground));
+  }
+
+  .landing-card-description {
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
     color: hsl(var(--muted-foreground));
   }
 }
