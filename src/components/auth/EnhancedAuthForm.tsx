@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useEnhancedAuthentication } from '@/hooks/useEnhancedAuthentication';
 import { RoleSelector } from './RoleSelector';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { EnhancedLocalizedText } from '@/components/EnhancedLocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { 
   Eye, 
   EyeOff, 
@@ -96,10 +95,10 @@ export const EnhancedAuthForm: React.FC = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">
-            <EnhancedLocalizedText text="Welcome to SimoneLabs" />
+            <UnifiedLocalizedText text="Welcome to SimoneLabs" />
           </CardTitle>
           <CardDescription>
-            <EnhancedLocalizedText text="Sign in to your account or create a new one" />
+            <UnifiedLocalizedText text="Sign in to your account or create a new one" />
           </CardDescription>
         </CardHeader>
         
@@ -125,7 +124,7 @@ export const EnhancedAuthForm: React.FC = () => {
             <Alert className="mb-4">
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                <EnhancedLocalizedText text="Try signing in with Google or LinkedIn for faster access" />
+                <UnifiedLocalizedText text="Try signing in with Google or LinkedIn for faster access" />
               </AlertDescription>
             </Alert>
           )}
@@ -134,7 +133,7 @@ export const EnhancedAuthForm: React.FC = () => {
             <Alert className="mb-4">
               <Mail className="h-4 w-4" />
               <AlertDescription>
-                <EnhancedLocalizedText text={`Verification email sent to ${authState.pendingVerificationEmail}. Please check your inbox.`} />
+                <UnifiedLocalizedText text={`Verification email sent to ${authState.pendingVerificationEmail}. Please check your inbox.`} />
               </AlertDescription>
             </Alert>
           )}
@@ -148,7 +147,7 @@ export const EnhancedAuthForm: React.FC = () => {
               className="w-full"
             >
               <Chrome className="h-4 w-4 mr-2" />
-              <EnhancedLocalizedText text="Google" />
+              <UnifiedLocalizedText text="Google" />
             </Button>
             <Button
               variant="outline"
@@ -157,7 +156,7 @@ export const EnhancedAuthForm: React.FC = () => {
               className="w-full"
             >
               <Linkedin className="h-4 w-4 mr-2" />
-              <EnhancedLocalizedText text="LinkedIn" />
+              <UnifiedLocalizedText text="LinkedIn" />
             </Button>
           </div>
 
@@ -167,7 +166,7 @@ export const EnhancedAuthForm: React.FC = () => {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                <EnhancedLocalizedText text="Or continue with email" />
+                <UnifiedLocalizedText text="Or continue with email" />
               </span>
             </div>
           </div>
@@ -175,10 +174,10 @@ export const EnhancedAuthForm: React.FC = () => {
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">
-                <EnhancedLocalizedText text="Sign In" />
+                <UnifiedLocalizedText text="Sign In" />
               </TabsTrigger>
               <TabsTrigger value="signup">
-                <EnhancedLocalizedText text="Sign Up" />
+                <UnifiedLocalizedText text="Sign Up" />
               </TabsTrigger>
             </TabsList>
 
@@ -186,7 +185,7 @@ export const EnhancedAuthForm: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">
-                    <EnhancedLocalizedText text="Email" />
+                    <UnifiedLocalizedText text="Email" />
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -204,7 +203,7 @@ export const EnhancedAuthForm: React.FC = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="signin-password">
-                    <EnhancedLocalizedText text="Password" />
+                    <UnifiedLocalizedText text="Password" />
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -233,7 +232,7 @@ export const EnhancedAuthForm: React.FC = () => {
                   {isLoading ? (
                     <LoadingSpinner size="sm" />
                   ) : (
-                    <EnhancedLocalizedText text="Sign In" />
+                    <UnifiedLocalizedText text="Sign In" />
                   )}
                 </Button>
 
@@ -244,7 +243,7 @@ export const EnhancedAuthForm: React.FC = () => {
                   onClick={handlePasswordReset}
                   disabled={!formData.email}
                 >
-                  <EnhancedLocalizedText text="Forgot your password?" />
+                  <UnifiedLocalizedText text="Forgot your password?" />
                 </Button>
               </form>
             </TabsContent>
@@ -259,7 +258,7 @@ export const EnhancedAuthForm: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="first-name">
-                      <EnhancedLocalizedText text="First Name" />
+                      <UnifiedLocalizedText text="First Name" />
                     </Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -276,7 +275,7 @@ export const EnhancedAuthForm: React.FC = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="last-name">
-                      <EnhancedLocalizedText text="Last Name" />
+                      <UnifiedLocalizedText text="Last Name" />
                     </Label>
                     <Input
                       id="last-name"
@@ -290,7 +289,7 @@ export const EnhancedAuthForm: React.FC = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">
-                    <EnhancedLocalizedText text="Email" />
+                    <UnifiedLocalizedText text="Email" />
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -308,7 +307,7 @@ export const EnhancedAuthForm: React.FC = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">
-                    <EnhancedLocalizedText text="Password" />
+                    <UnifiedLocalizedText text="Password" />
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -332,7 +331,7 @@ export const EnhancedAuthForm: React.FC = () => {
                     </Button>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    <EnhancedLocalizedText text="Password must contain 8+ characters with uppercase, lowercase, numbers, and symbols" />
+                    <UnifiedLocalizedText text="Password must contain 8+ characters with uppercase, lowercase, numbers, and symbols" />
                   </div>
                 </div>
 
@@ -344,7 +343,7 @@ export const EnhancedAuthForm: React.FC = () => {
                   {isLoading ? (
                     <LoadingSpinner size="sm" />
                   ) : (
-                    <EnhancedLocalizedText text="Create Account" />
+                    <UnifiedLocalizedText text="Create Account" />
                   )}
                 </Button>
               </form>
@@ -354,7 +353,7 @@ export const EnhancedAuthForm: React.FC = () => {
           {authState.retryCount > 0 && (
             <div className="mt-4 text-center">
               <Badge variant="outline">
-                <EnhancedLocalizedText text={`Retry attempt: ${authState.retryCount}`} />
+                <UnifiedLocalizedText text={`Retry attempt: ${authState.retryCount}`} />
               </Badge>
             </div>
           )}

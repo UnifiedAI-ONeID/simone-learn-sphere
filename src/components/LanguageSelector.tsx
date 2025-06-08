@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Globe, Check, Bot, RefreshCw } from 'lucide-react';
-import { useLocalization, SUPPORTED_LANGUAGES } from '@/contexts/LocalizationContext';
+import { useLocalization, SUPPORTED_LANGUAGES } from '@/contexts/UnifiedLocalizationContext';
 import { usePlatformDetection } from '@/hooks/usePlatformDetection';
 
 export const LanguageSelector = () => {

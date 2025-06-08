@@ -1,8 +1,7 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { EnhancedLocalizationProvider } from '@/contexts/EnhancedLocalizationContext';
+import { UnifiedLocalizationProvider } from '@/contexts/UnifiedLocalizationContext';
 import { PlatformThemeProvider } from '@/contexts/PlatformThemeContext';
 import { GlobalErrorBoundary } from '@/components/GlobalErrorBoundary';
 import { TranslationErrorBoundary } from '@/components/TranslationErrorBoundary';
@@ -159,7 +158,7 @@ function App() {
   return (
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <EnhancedLocalizationProvider>
+        <UnifiedLocalizationProvider>
           <TranslationErrorBoundary>
             <PlatformThemeProvider>
               <AuthProvider>
@@ -194,7 +193,7 @@ function App() {
               </AuthProvider>
             </PlatformThemeProvider>
           </TranslationErrorBoundary>
-        </EnhancedLocalizationProvider>
+        </UnifiedLocalizationProvider>
       </QueryClientProvider>
     </GlobalErrorBoundary>
   );
