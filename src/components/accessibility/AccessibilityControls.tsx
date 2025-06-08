@@ -1,217 +1,343 @@
+
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { 
-  Accessibility,
-  Type,
-  Contrast,
-  Volume2,
-  Mouse,
-  Eye,
+  Accessibility, 
+  Eye, 
+  Volume2, 
+  Type, 
+  Contrast, 
+  MousePointer, 
   Keyboard,
   Monitor,
-  Palette,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  Play,
-  Pause,
+  Sun,
+  Moon,
   Settings,
-  Info,
-  CheckCircle,
-  AlertTriangle
+  RotateCcw
 } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useToast } from '@/hooks/use-toast';
 
-interface AccessibilityControlsProps {
-  onSettingsChange: (settings: any) => void;
-  initialSettings: any;
+interface AccessibilitySettings {
+  highContrast: boolean;
+  largeText: boolean;
+  reducedMotion: boolean;
+  screenReader: boolean;
+  keyboardNavigation: boolean;
+  fontSize: number;
+  colorScheme: 'light' | 'dark' | 'auto';
+  focusVisible: boolean;
+  audioDescriptions: boolean;
 }
 
-export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({ onSettingsChange, initialSettings }) => {
-  const [fontSize, setFontSize] = useState(initialSettings?.fontSize || 16);
-  const [highContrast, setHighContrast] = useState(initialSettings?.highContrast || false);
-  const [darkMode, setDarkMode] = useState(initialSettings?.darkMode || false);
-  const [cursorSize, setCursorSize] = useState(initialSettings?.cursorSize || 1);
-  const [keyboardNavigation, setKeyboardNavigation] = useState(initialSettings?.keyboardNavigation || false);
-  const [textToSpeech, setTextToSpeech] = useState(initialSettings?.textToSpeech || false);
-  const [language, setLanguage] = useState(initialSettings?.language || 'en');
-  const [isResetting, setIsResetting] = useState(false);
+export const AccessibilityControls: React.FC = () => {
   const { toast } = useToast();
+  const [settings, setSettings] = useState<AccessibilitySettings>({
+    highContrast: false,
+    largeText: false,
+    reducedMotion: false,
+    screenReader: false,
+    keyboardNavigation: true,
+    fontSize: 16,
+    colorScheme: 'auto',
+    focusVisible: true,
+    audioDescriptions: false
+  });
 
+  // Load settings from localStorage on mount
   useEffect(() => {
-    setFontSize(initialSettings?.fontSize || 16);
-    setHighContrast(initialSettings?.highContrast || false);
-    setDarkMode(initialSettings?.darkMode || false);
-    setCursorSize(initialSettings?.cursorSize || 1);
-    setKeyboardNavigation(initialSettings?.keyboardNavigation || false);
-    setTextToSpeech(initialSettings?.textToSpeech || false);
-    setLanguage(initialSettings?.language || 'en');
-  }, [initialSettings]);
+    const savedSettings = localStorage.getItem('accessibilitySettings');
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings);
+        setSettings(prev => ({ ...prev, ...parsed }));
+      } catch (error) {
+        console.error('Failed to parse accessibility settings:', error);
+      }
+    }
+  }, []);
 
+  // Save settings to localStorage and apply them
   useEffect(() => {
-    const settings = {
-      fontSize,
-      highContrast,
-      darkMode,
-      cursorSize,
-      keyboardNavigation,
-      textToSpeech,
-      language
+    localStorage.setItem('accessibilitySettings', JSON.stringify(settings));
+    applyAccessibilitySettings(settings);
+  }, [settings]);
+
+  const applyAccessibilitySettings = (newSettings: AccessibilitySettings) => {
+    const root = document.documentElement;
+
+    // High contrast
+    if (newSettings.highContrast) {
+      root.classList.add('high-contrast');
+    } else {
+      root.classList.remove('high-contrast');
+    }
+
+    // Large text
+    if (newSettings.largeText) {
+      root.classList.add('large-text');
+    } else {
+      root.classList.remove('large-text');
+    }
+
+    // Reduced motion
+    if (newSettings.reducedMotion) {
+      root.classList.add('reduce-motion');
+    } else {
+      root.classList.remove('reduce-motion');
+    }
+
+    // Font size
+    root.style.fontSize = `${newSettings.fontSize}px`;
+
+    // Focus visible
+    if (newSettings.focusVisible) {
+      root.classList.add('focus-visible');
+    } else {
+      root.classList.remove('focus-visible');
+    }
+
+    // Color scheme
+    if (newSettings.colorScheme === 'dark') {
+      root.classList.add('dark');
+    } else if (newSettings.colorScheme === 'light') {
+      root.classList.remove('dark');
+    }
+    // 'auto' is handled by system preference
+  };
+
+  const updateSetting = <K extends keyof AccessibilitySettings>(
+    key: K,
+    value: AccessibilitySettings[K]
+  ) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const resetSettings = () => {
+    const defaultSettings: AccessibilitySettings = {
+      highContrast: false,
+      largeText: false,
+      reducedMotion: false,
+      screenReader: false,
+      keyboardNavigation: true,
+      fontSize: 16,
+      colorScheme: 'auto',
+      focusVisible: true,
+      audioDescriptions: false
     };
-    onSettingsChange(settings);
-  }, [fontSize, highContrast, darkMode, cursorSize, keyboardNavigation, textToSpeech, language, onSettingsChange]);
-
-  const handleResetSettings = () => {
-    setIsResetting(true);
-    setFontSize(16);
-    setHighContrast(false);
-    setDarkMode(false);
-    setCursorSize(1);
-    setKeyboardNavigation(false);
-    setTextToSpeech(false);
-    setLanguage('en');
-    setIsResetting(false);
-
+    setSettings(defaultSettings);
     toast({
-      title: "Accessibility settings reset",
-      description: "All accessibility settings have been reset to their defaults.",
+      title: "Settings Reset",
+      description: "Accessibility settings have been reset to defaults.",
     });
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-2xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Accessibility className="h-5 w-5" />
-          <UnifiedLocalizedText text="Accessibility Settings" />
+          <UnifiedLocalizedText text="Accessibility Controls" />
         </CardTitle>
         <CardDescription>
-          <UnifiedLocalizedText text="Customize your experience" />
+          <UnifiedLocalizedText text="Customize your experience for better accessibility" />
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Font Size */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="font-size" className="flex items-center gap-2">
+      <CardContent className="space-y-6">
+        {/* Visual Settings */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <Eye className="h-4 w-4" />
+            <UnifiedLocalizedText text="Visual Settings" />
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="high-contrast" className="flex items-center gap-2">
+                <Contrast className="h-4 w-4" />
+                <UnifiedLocalizedText text="High Contrast" />
+              </Label>
+              <Switch
+                id="high-contrast"
+                checked={settings.highContrast}
+                onCheckedChange={(checked) => updateSetting('highContrast', checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="large-text" className="flex items-center gap-2">
+                <Type className="h-4 w-4" />
+                <UnifiedLocalizedText text="Large Text" />
+              </Label>
+              <Switch
+                id="large-text"
+                checked={settings.largeText}
+                onCheckedChange={(checked) => updateSetting('largeText', checked)}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
               <Type className="h-4 w-4" />
               <UnifiedLocalizedText text="Font Size" />
             </Label>
-            <Badge variant="secondary">{fontSize}px</Badge>
+            <div className="flex items-center gap-4">
+              <span className="text-sm">12px</span>
+              <Slider
+                value={[settings.fontSize]}
+                onValueChange={([value]) => updateSetting('fontSize', value)}
+                min={12}
+                max={24}
+                step={1}
+                className="flex-1"
+              />
+              <span className="text-sm">24px</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              <UnifiedLocalizedText text="Current size" />: {settings.fontSize}px
+            </p>
           </div>
-          <Slider
-            id="font-size"
-            defaultValue={[fontSize]}
-            max={30}
-            min={12}
-            step={1}
-            onValueChange={(value) => setFontSize(value[0])}
-          />
-        </div>
 
-        {/* High Contrast */}
-        <div className="flex items-center justify-between">
-          <Label htmlFor="high-contrast" className="flex items-center gap-2">
-            <Contrast className="h-4 w-4" />
-            <UnifiedLocalizedText text="High Contrast" />
-          </Label>
-          <Switch
-            id="high-contrast"
-            checked={highContrast}
-            onCheckedChange={setHighContrast}
-          />
-        </div>
-
-        {/* Dark Mode */}
-        <div className="flex items-center justify-between">
-          <Label htmlFor="dark-mode" className="flex items-center gap-2">
-            <Palette className="h-4 w-4" />
-            <UnifiedLocalizedText text="Dark Mode" />
-          </Label>
-          <Switch
-            id="dark-mode"
-            checked={darkMode}
-            onCheckedChange={setDarkMode}
-          />
-        </div>
-
-        {/* Cursor Size */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="cursor-size" className="flex items-center gap-2">
-              <Mouse className="h-4 w-4" />
-              <UnifiedLocalizedText text="Cursor Size" />
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Monitor className="h-4 w-4" />
+              <UnifiedLocalizedText text="Color Scheme" />
             </Label>
-            <Badge variant="secondary">{cursorSize}x</Badge>
+            <Select
+              value={settings.colorScheme}
+              onValueChange={(value: 'light' | 'dark' | 'auto') => 
+                updateSetting('colorScheme', value)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">
+                  <div className="flex items-center gap-2">
+                    <Sun className="h-4 w-4" />
+                    <UnifiedLocalizedText text="Light" />
+                  </div>
+                </SelectItem>
+                <SelectItem value="dark">
+                  <div className="flex items-center gap-2">
+                    <Moon className="h-4 w-4" />
+                    <UnifiedLocalizedText text="Dark" />
+                  </div>
+                </SelectItem>
+                <SelectItem value="auto">
+                  <div className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    <UnifiedLocalizedText text="System" />
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Slider
-            id="cursor-size"
-            defaultValue={[cursorSize]}
-            max={3}
-            min={1}
-            step={0.1}
-            onValueChange={(value) => setCursorSize(value[0])}
-          />
         </div>
 
-        {/* Keyboard Navigation */}
-        <div className="flex items-center justify-between">
-          <Label htmlFor="keyboard-navigation" className="flex items-center gap-2">
+        {/* Motion Settings */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <MousePointer className="h-4 w-4" />
+            <UnifiedLocalizedText text="Motion & Interaction" />
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="reduced-motion" className="flex items-center gap-2">
+                <UnifiedLocalizedText text="Reduced Motion" />
+              </Label>
+              <Switch
+                id="reduced-motion"
+                checked={settings.reducedMotion}
+                onCheckedChange={(checked) => updateSetting('reducedMotion', checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="focus-visible" className="flex items-center gap-2">
+                <UnifiedLocalizedText text="Focus Indicators" />
+              </Label>
+              <Switch
+                id="focus-visible"
+                checked={settings.focusVisible}
+                onCheckedChange={(checked) => updateSetting('focusVisible', checked)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Settings */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
             <Keyboard className="h-4 w-4" />
-            <UnifiedLocalizedText text="Keyboard Navigation" />
-          </Label>
-          <Switch
-            id="keyboard-navigation"
-            checked={keyboardNavigation}
-            onCheckedChange={setKeyboardNavigation}
-          />
+            <UnifiedLocalizedText text="Navigation" />
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="keyboard-navigation" className="flex items-center gap-2">
+                <UnifiedLocalizedText text="Keyboard Navigation" />
+              </Label>
+              <Switch
+                id="keyboard-navigation"
+                checked={settings.keyboardNavigation}
+                onCheckedChange={(checked) => updateSetting('keyboardNavigation', checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="screen-reader" className="flex items-center gap-2">
+                <UnifiedLocalizedText text="Screen Reader Support" />
+              </Label>
+              <Switch
+                id="screen-reader"
+                checked={settings.screenReader}
+                onCheckedChange={(checked) => updateSetting('screenReader', checked)}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Text-to-Speech */}
-        <div className="flex items-center justify-between">
-          <Label htmlFor="text-to-speech" className="flex items-center gap-2">
+        {/* Audio Settings */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
             <Volume2 className="h-4 w-4" />
-            <UnifiedLocalizedText text="Text-to-Speech" />
-          </Label>
-          <Switch
-            id="text-to-speech"
-            checked={textToSpeech}
-            onCheckedChange={setTextToSpeech}
-          />
+            <UnifiedLocalizedText text="Audio" />
+          </h3>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="audio-descriptions" className="flex items-center gap-2">
+              <UnifiedLocalizedText text="Audio Descriptions" />
+            </Label>
+            <Switch
+              id="audio-descriptions"
+              checked={settings.audioDescriptions}
+              onCheckedChange={(checked) => updateSetting('audioDescriptions', checked)}
+            />
+          </div>
         </div>
 
-        {/* Language Selection */}
-        <div className="space-y-2">
-          <Label htmlFor="language" className="flex items-center gap-2">
-            <Type className="h-4 w-4" />
-            <UnifiedLocalizedText text="Language" />
-          </Label>
-          <Select value={language} onValueChange={setLanguage}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a language" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="en">English</SelectItem>
-              <SelectItem value="es">Español</SelectItem>
-              <SelectItem value="fr">Français</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Status and Actions */}
+        <div className="flex items-center justify-between pt-4 border-t">
+          <Badge variant="outline" className="flex items-center gap-1">
+            <Accessibility className="h-3 w-3" />
+            <UnifiedLocalizedText text="Accessibility Enabled" />
+          </Badge>
+          
+          <Button onClick={resetSettings} variant="outline" size="sm">
+            <RotateCcw className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="Reset" />
+          </Button>
         </div>
-
-        <Separator />
-
-        {/* Reset Settings */}
-        <Button variant="outline" className="w-full" onClick={handleResetSettings} disabled={isResetting}>
-          <RotateCcw className="h-4 w-4 mr-2" />
-          <UnifiedLocalizedText text={isResetting ? "Resetting..." : "Reset to Defaults"} />
-        </Button>
       </CardContent>
     </Card>
   );

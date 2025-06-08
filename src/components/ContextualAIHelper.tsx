@@ -1,226 +1,191 @@
-import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Bot, 
-  Send, 
-  Lightbulb, 
   MessageCircle, 
-  HelpCircle,
-  Sparkles,
-  Brain,
-  User,
-  Loader2,
-  RefreshCw,
-  Minimize2,
-  Maximize2
+  BookOpen, 
+  BarChart3, 
+  Users, 
+  Settings, 
+  Shield, 
+  X, 
+  HelpCircle 
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
-import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useLocation } from 'react-router-dom';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
-interface AIHelpSuggestion {
-  title: string;
-  description: string;
-  action: string;
-  icon: React.ReactNode;
+interface ContextualAIHelperProps {
+  currentPage: string;
+  onSuggestionClick: (suggestion: string) => void;
+  className?: string;
 }
 
-export const ContextualAIHelper: React.FC = () => {
-  const { user } = useAuth();
+export const ContextualAIHelper: React.FC<ContextualAIHelperProps> = ({
+  currentPage,
+  onSuggestionClick,
+  className = ''
+}) => {
   const { role } = useUserRole();
-  const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
-  
-  const contextualHelp = useMemo(() => {
-    const suggestions: AIHelpSuggestion[] = [];
-    
-    // Role-based suggestions
+  const [isVisible, setIsVisible] = useState(true);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  const getContextualSuggestions = () => {
     if (role === 'student') {
-      if (location.pathname.includes('/dashboard')) {
-        suggestions.push({
-          title: 'Start Your Learning Journey',
-          description: 'Browse available courses and enroll in subjects that interest you',
-          action: 'Explore Courses',
-          icon: <BookOpen className="w-4 h-4" />
-        });
-        suggestions.push({
-          title: 'Track Your Progress',
-          description: 'View your learning analytics and achievement badges',
-          action: 'View Progress',
-          icon: <BarChart3 className="w-4 h-4" />
-        });
-        suggestions.push({
-          title: 'Get AI Tutoring',
-          description: 'Ask questions and get personalized help with your studies',
-          action: 'Ask AI Tutor',
-          icon: <Brain className="w-4 h-4" />
-        });
-      }
-    } else if (role === 'educator') {
-      if (location.pathname.includes('/dashboard')) {
-        suggestions.push({
-          title: 'Create Your First Course',
-          description: 'Use our AI-powered course builder to create engaging content',
-          action: 'Create Course',
-          icon: <BookOpen className="w-4 h-4" />
-        });
-        suggestions.push({
-          title: 'AI Content Generator',
-          description: 'Generate lesson plans, quizzes, and educational materials automatically',
-          action: 'Generate Content',
-          icon: <Brain className="w-4 h-4" />
-        });
-        suggestions.push({
-          title: 'Analyze Student Performance',
-          description: 'View detailed analytics on student engagement and progress',
-          action: 'View Analytics',
-          icon: <BarChart3 className="w-4 h-4" />
-        });
-      }
-    } else if (role === 'admin') {
-      if (location.pathname.includes('/dashboard')) {
-        suggestions.push({
-          title: 'User Management',
-          description: 'Manage user accounts, roles, and permissions',
-          action: 'Manage Users',
-          icon: <Users className="w-4 h-4" />
-        });
-        suggestions.push({
-          title: 'System Configuration',
-          description: 'Configure platform settings and security policies',
-          action: 'System Settings',
-          icon: <Settings className="w-4 h-4" />
-        });
-        suggestions.push({
-          title: 'Security Monitoring',
-          description: 'Monitor security events and maintain platform integrity',
-          action: 'Security Center',
-          icon: <Shield className="w-4 h-4" />
-        });
+      switch (currentPage) {
+        case 'dashboard':
+          return [
+            'How can I track my learning progress?',
+            'What courses are recommended for me?',
+            'How do I use the AI tutor effectively?'
+          ];
+        case 'courses':
+          return [
+            'How do I enroll in a new course?',
+            'What are the prerequisites for this course?',
+            'How can I see my course completion status?'
+          ];
+        case 'ai-tutor':
+          return [
+            'How can the AI tutor help me study?',
+            'Can you explain this concept in simpler terms?',
+            'What study techniques work best for this topic?'
+          ];
+        default:
+          return [
+            'How can I improve my learning experience?',
+            'What features are available to students?'
+          ];
       }
     }
 
-    // Context-specific suggestions
-    if (location.pathname.includes('/course')) {
-      suggestions.push({
-        title: 'Course Navigation Help',
-        description: 'Learn how to navigate lessons and complete assignments',
-        action: 'Navigation Guide',
-        icon: <HelpCircle className="w-4 h-4" />
-      });
+    if (role === 'educator') {
+      switch (currentPage) {
+        case 'dashboard':
+          return [
+            'How can I create engaging course content?',
+            'What analytics are available for my courses?',
+            'How do I track student progress?'
+          ];
+        case 'courses':
+          return [
+            'How do I create a new course?',
+            'What are best practices for course structure?',
+            'How can I make my content more interactive?'
+          ];
+        case 'analytics':
+          return [
+            'How do I interpret student engagement metrics?',
+            'What does the completion rate tell me?',
+            'How can I improve course performance?'
+          ];
+        default:
+          return [
+            'How can I enhance my teaching effectiveness?',
+            'What tools are available for educators?'
+          ];
+      }
     }
 
-    if (location.pathname.includes('/lesson')) {
-      suggestions.push({
-        title: 'Need Help with This Lesson?',
-        description: 'Get AI assistance with the current lesson content',
-        action: 'Ask About Lesson',
-        icon: <Brain className="w-4 h-4" />
-      });
+    if (role === 'admin') {
+      switch (currentPage) {
+        case 'dashboard':
+          return [
+            'How do I monitor platform health?',
+            'What security measures are in place?',
+            'How can I view user analytics?'
+          ];
+        case 'users':
+          return [
+            'How do I manage user accounts?',
+            'What user roles are available?',
+            'How can I handle user support requests?'
+          ];
+        case 'security':
+          return [
+            'How do I review security logs?',
+            'What are the current security threats?',
+            'How can I improve platform security?'
+          ];
+        case 'settings':
+          return [
+            'How do I configure platform settings?',
+            'What administrative controls are available?',
+            'How can I manage system preferences?'
+          ];
+        default:
+          return [
+            'How can I optimize platform performance?',
+            'What administrative features are available?'
+          ];
+      }
     }
 
-    return suggestions;
-  }, [role, location.pathname]);
+    return [
+      'How can I get started with this platform?',
+      'What features are available to me?'
+    ];
+  };
 
-  if (!user || contextualHelp.length === 0) return null;
+  useEffect(() => {
+    setSuggestions(getContextualSuggestions());
+  }, [currentPage, role]);
+
+  if (!isVisible) return null;
 
   return (
-    <>
-      {/* Floating Toggle Button */}
-      {!isOpen && (
-        <Button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 z-40"
-          size="sm"
-          aria-label="Open AI Helper"
-        >
-          <Brain className="w-6 h-6 text-white" />
-          <Badge className="absolute -top-2 -left-2 bg-orange-500 text-white text-xs px-1">
-            AI
-          </Badge>
-        </Button>
-      )}
-
-      {/* AI Helper Popup */}
-      {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 max-h-[600px] z-50">
-          <Card className="shadow-2xl border-2 border-purple-200 dark:border-purple-700">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-purple-600" />
-                  <UnifiedLocalizedText text="AI Assistant" />
-                </CardTitle>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => setIsOpen(false)}
-                  aria-label="Close AI helper"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                <Badge variant="outline" className="text-xs">
-                  <UnifiedLocalizedText text={`${role} Dashboard`} />
-                </Badge>
-                <span className="text-xs">
-                  <UnifiedLocalizedText text="Context-aware help" />
-                </span>
-              </div>
-            </CardHeader>
-            
-            <CardContent className="space-y-4 max-h-96 overflow-y-auto">
-              <div className="flex items-center gap-2 text-sm font-medium text-purple-700 dark:text-purple-300">
-                <Lightbulb className="w-4 h-4" />
-                <UnifiedLocalizedText text="Suggested Actions" />
-              </div>
-              
-              {contextualHelp.map((suggestion, index) => (
-                <div
-                  key={index}
-                  className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                      {suggestion.icon}
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">
-                        <UnifiedLocalizedText text={suggestion.title} />
-                      </h4>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        <UnifiedLocalizedText text={suggestion.description} />
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="mt-2 text-xs h-7"
-                      >
-                        <UnifiedLocalizedText text={suggestion.action} />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Button 
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  <UnifiedLocalizedText text="Chat with AI" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+    <Card className={`fixed bottom-4 right-4 w-80 z-50 shadow-lg ${className}`}>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bot className="h-5 w-5 text-primary" />
+            <CardTitle className="text-sm">
+              <UnifiedLocalizedText text="AI Assistant" />
+            </CardTitle>
+            <Badge variant="secondary" className="text-xs">
+              <UnifiedLocalizedText text="Smart Help" />
+            </Badge>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsVisible(false)}
+            className="h-6 w-6 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-      )}
-    </>
+        <CardDescription className="text-xs">
+          <UnifiedLocalizedText text="Contextual suggestions for your current page" />
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {suggestions.map((suggestion, index) => (
+          <Button
+            key={index}
+            variant="outline"
+            size="sm"
+            className="w-full text-left justify-start h-auto p-3"
+            onClick={() => onSuggestionClick(suggestion)}
+          >
+            <HelpCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="text-xs text-wrap">{suggestion}</span>
+          </Button>
+        ))}
+        
+        <div className="pt-2 border-t">
+          <Button
+            size="sm"
+            className="w-full"
+            onClick={() => onSuggestionClick('I need help with something else')}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="Ask Custom Question" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

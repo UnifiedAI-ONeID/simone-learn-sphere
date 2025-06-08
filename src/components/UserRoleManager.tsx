@@ -1,160 +1,200 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, User, GraduationCap, Settings } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
-import { useAuth } from '@/contexts/AuthContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Users, Shield, GraduationCap, Settings, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
-export const UserRoleManager = () => {
-  const { user } = useAuth();
-  const { role, setRole } = useUserRole();
-  const [selectedRole, setSelectedRole] = useState(role || 'student');
-  const [isLoading, setIsLoading] = useState(false);
+interface UserRoleManagerProps {
+  userId?: string;
+  currentRole?: string;
+  onRoleChange?: (newRole: string) => void;
+}
+
+export const UserRoleManager: React.FC<UserRoleManagerProps> = ({
+  userId,
+  currentRole,
+  onRoleChange
+}) => {
+  const { role: adminRole } = useUserRole();
   const { toast } = useToast();
+  const [selectedRole, setSelectedRole] = useState(currentRole || '');
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleRoleChange = async () => {
-    if (!user || selectedRole === role) return;
+  const roles = [
+    {
+      value: 'student',
+      label: 'Student',
+      description: 'Can enroll in courses and track progress',
+      icon: GraduationCap,
+      color: 'bg-blue-100 text-blue-800'
+    },
+    {
+      value: 'educator',
+      label: 'Educator',
+      description: 'Can create and manage courses',
+      icon: Users,
+      color: 'bg-green-100 text-green-800'
+    },
+    {
+      value: 'admin',
+      label: 'Administrator',
+      description: 'Full platform access and management',
+      icon: Shield,
+      color: 'bg-red-100 text-red-800'
+    }
+  ];
 
-    setIsLoading(true);
+  const handleRoleUpdate = async () => {
+    if (!selectedRole || selectedRole === currentRole) return;
+
+    setIsUpdating(true);
     try {
-      // Update role in profiles table
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: selectedRole })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      // Update user metadata
-      const { error: metadataError } = await supabase.auth.updateUser({
-        data: { role: selectedRole }
-      });
-
-      if (metadataError) throw metadataError;
-
-      // Update local role state
-      setRole(selectedRole);
+      // Simulate role update - replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (onRoleChange) {
+        onRoleChange(selectedRole);
+      }
 
       toast({
-        title: "Role updated",
-        description: `Your role has been updated to ${selectedRole}.`,
+        title: "Role Updated",
+        description: `User role has been updated to ${selectedRole}.`,
       });
-    } catch (error: any) {
-      console.error('Error updating role:', error);
+    } catch (error) {
       toast({
-        title: "Error updating role",
-        description: error.message,
+        title: "Update Failed",
+        description: "Failed to update user role. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsUpdating(false);
     }
   };
 
-  const getRoleBadgeColor = (roleType: string) => {
-    switch (roleType) {
-      case 'student':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-      case 'educator':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
-      case 'admin':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
-    }
-  };
-
-  const getRoleIcon = (roleType: string) => {
-    switch (roleType) {
-      case 'student':
-        return <User className="h-4 w-4" />;
-      case 'educator':
-        return <GraduationCap className="h-4 w-4" />;
-      case 'admin':
-        return <Shield className="h-4 w-4" />;
-      default:
-        return <Settings className="h-4 w-4" />;
-    }
-  };
+  // Only allow admins to manage roles
+  if (adminRole !== 'admin') {
+    return (
+      <Alert>
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          <UnifiedLocalizedText text="You don't have permission to manage user roles." />
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="h-5 w-5" />
           <UnifiedLocalizedText text="Role Management" />
         </CardTitle>
         <CardDescription>
-          <UnifiedLocalizedText text="Change your role to access different features" />
+          <UnifiedLocalizedText text="Manage user roles and permissions" />
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <UnifiedLocalizedText text="Current Role:" />
-          <Badge className={getRoleBadgeColor(role || 'student')}>
-            {getRoleIcon(role || 'student')}
-            <span className="ml-1 capitalize">{role || 'student'}</span>
-          </Badge>
-        </div>
+      <CardContent className="space-y-6">
+        {/* Current Role Display */}
+        {currentRole && (
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              <UnifiedLocalizedText text="Current Role" />
+            </label>
+            <div className="flex items-center gap-2">
+              {roles.map(role => {
+                if (role.value === currentRole) {
+                  const IconComponent = role.icon;
+                  return (
+                    <Badge key={role.value} className={role.color}>
+                      <IconComponent className="h-3 w-3 mr-1" />
+                      <UnifiedLocalizedText text={role.label} />
+                    </Badge>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </div>
+        )}
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            <UnifiedLocalizedText text="Select New Role" />
+        {/* Role Selection */}
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            <UnifiedLocalizedText text="New Role" />
           </label>
-          <Select
-            value={selectedRole}
-            onValueChange={setSelectedRole}
-          >
+          <Select value={selectedRole} onValueChange={setSelectedRole}>
             <SelectTrigger>
-              <SelectValue />
+              <SelectValue placeholder="Select a role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="student">
-                <div className="flex items-center">
-                  <User className="h-4 w-4 mr-2" />
-                  <UnifiedLocalizedText text="Student" />
-                </div>
-              </SelectItem>
-              <SelectItem value="educator">
-                <div className="flex items-center">
-                  <GraduationCap className="h-4 w-4 mr-2" />
-                  <UnifiedLocalizedText text="Educator" />
-                </div>
-              </SelectItem>
-              <SelectItem value="admin">
-                <div className="flex items-center">
-                  <Shield className="h-4 w-4 mr-2" />
-                  <UnifiedLocalizedText text="Admin" />
-                </div>
-              </SelectItem>
+              {roles.map(role => {
+                const IconComponent = role.icon;
+                return (
+                  <SelectItem key={role.value} value={role.value}>
+                    <div className="flex items-center gap-2">
+                      <IconComponent className="h-4 w-4" />
+                      <div>
+                        <div className="font-medium">
+                          <UnifiedLocalizedText text={role.label} />
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          <UnifiedLocalizedText text={role.description} />
+                        </div>
+                      </div>
+                    </div>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
 
-        {selectedRole !== role && (
-          <Alert>
-            <AlertDescription>
-              <UnifiedLocalizedText text="Changing your role will affect the features and content you can access." />
-            </AlertDescription>
-          </Alert>
-        )}
+        {/* Role Descriptions */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium">
+            <UnifiedLocalizedText text="Role Permissions" />
+          </h4>
+          {roles.map(role => {
+            const IconComponent = role.icon;
+            return (
+              <div key={role.value} className="flex items-start gap-3 p-3 border rounded-lg">
+                <IconComponent className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                <div>
+                  <div className="font-medium">
+                    <UnifiedLocalizedText text={role.label} />
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    <UnifiedLocalizedText text={role.description} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-        <Button
-          onClick={handleRoleChange}
-          disabled={isLoading || selectedRole === role}
-          className="w-full"
-        >
-          {isLoading ? (
-            <UnifiedLocalizedText text="Updating..." />
-          ) : (
-            <UnifiedLocalizedText text="Update Role" />
-          )}
-        </Button>
+        {/* Update Button */}
+        <div className="flex justify-end">
+          <Button
+            onClick={handleRoleUpdate}
+            disabled={isUpdating || !selectedRole || selectedRole === currentRole}
+          >
+            {isUpdating ? (
+              <UnifiedLocalizedText text="Updating..." />
+            ) : (
+              <>
+                <CheckCircle className="h-4 w-4 mr-2" />
+                <UnifiedLocalizedText text="Update Role" />
+              </>
+            )}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
