@@ -1,0 +1,24 @@
+
+{
+  "name": "SimoneLabs",
+  "short_name": "SimoneLabs",
+  "description": "AI-powered learning platform for indie educators",
+  "icons": [
+    {
+      "src": "/favicon-light.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-dark.svg",
+      "sizes": "any", 
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#7C3AED",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/"
+}
