@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useLocalization } from '@/contexts/UnifiedLocalizationContext';
 
 interface TranslationRequest {
@@ -8,90 +8,44 @@ interface TranslationRequest {
   targetLanguage: string;
   resolve: (translation: string) => void;
   reject: (error: any) => void;
-  priority: number;
+  timestamp: number;
 }
 
-const BATCH_SIZE = 5;
-const BATCH_DELAY = 100;
-const MAX_CONCURRENT = 3;
+const DEBOUNCE_DELAY = 200;
 
 export const useTranslationQueue = () => {
   const { getTranslation } = useLocalization();
-  const [queue, setQueue] = useState<TranslationRequest[]>([]);
-  const [processing, setProcessing] = useState(new Set<string>());
-  const processingRef = useRef(new Set<string>());
-  const batchTimeoutRef = useRef<NodeJS.Timeout>();
-
-  // Update ref when state changes
-  useEffect(() => {
-    processingRef.current = processing;
-  }, [processing]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const pendingRequests = useRef<Map<string, TranslationRequest>>(new Map());
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   const processQueue = useCallback(async () => {
-    if (queue.length === 0 || processingRef.current.size >= MAX_CONCURRENT) {
-      return;
-    }
+    if (pendingRequests.current.size === 0) return;
 
-    // Get batch of requests to process
-    const batch = queue
-      .filter(req => !processingRef.current.has(req.id))
-      .sort((a, b) => b.priority - a.priority)
-      .slice(0, Math.min(BATCH_SIZE, MAX_CONCURRENT - processingRef.current.size));
+    setIsProcessing(true);
+    const requests = Array.from(pendingRequests.current.values());
+    pendingRequests.current.clear();
 
-    if (batch.length === 0) return;
+    console.log('TranslationQueue: Processing', requests.length, 'requests');
 
-    // Mark as processing
-    const batchIds = batch.map(req => req.id);
-    setProcessing(prev => {
-      const newSet = new Set(prev);
-      batchIds.forEach(id => newSet.add(id));
-      return newSet;
-    });
-
-    // Remove from queue
-    setQueue(prev => prev.filter(req => !batchIds.includes(req.id)));
-
-    // Process batch
-    const promises = batch.map(async (request) => {
+    // Process requests with a small delay between each to avoid overwhelming the service
+    for (const request of requests) {
       try {
         const translation = await getTranslation(request.text, request.targetLanguage);
         request.resolve(translation);
       } catch (error) {
-        console.warn('Translation failed for:', request.text.substring(0, 30), error);
+        console.warn('TranslationQueue: Failed to translate:', request.text.substring(0, 30), error);
         request.reject(error);
-      } finally {
-        setProcessing(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(request.id);
-          return newSet;
-        });
       }
-    });
-
-    await Promise.all(promises);
-
-    // Process next batch if queue is not empty
-    if (queue.length > batchIds.length) {
-      setTimeout(processQueue, BATCH_DELAY);
-    }
-  }, [queue, getTranslation]);
-
-  // Auto-process queue when items are added
-  useEffect(() => {
-    if (batchTimeoutRef.current) {
-      clearTimeout(batchTimeoutRef.current);
+      
+      // Small delay between requests
+      if (requests.indexOf(request) < requests.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
     }
 
-    batchTimeoutRef.current = setTimeout(() => {
-      processQueue();
-    }, BATCH_DELAY);
-
-    return () => {
-      if (batchTimeoutRef.current) {
-        clearTimeout(batchTimeoutRef.current);
-      }
-    };
-  }, [queue.length, processQueue]);
+    setIsProcessing(false);
+  }, [getTranslation]);
 
   const queueTranslation = useCallback((
     text: string,
@@ -99,22 +53,37 @@ export const useTranslationQueue = () => {
     priority: number = 1
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const id = `${text}:${targetLanguage}:${Date.now()}:${Math.random()}`;
+      const requestKey = `${text.trim()}:${targetLanguage}`;
       
-      setQueue(prev => [...prev, {
-        id,
-        text,
+      // If already queued, replace with new request
+      if (pendingRequests.current.has(requestKey)) {
+        const existing = pendingRequests.current.get(requestKey)!;
+        existing.reject(new Error('Replaced by newer request'));
+      }
+
+      pendingRequests.current.set(requestKey, {
+        id: requestKey,
+        text: text.trim(),
         targetLanguage,
         resolve,
         reject,
-        priority
-      }]);
+        timestamp: Date.now()
+      });
+
+      // Clear existing timeout and set new one
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        processQueue();
+      }, DEBOUNCE_DELAY);
     });
-  }, []);
+  }, [processQueue]);
 
   return {
     queueTranslation,
-    queueSize: queue.length,
-    isProcessing: processing.size > 0
+    queueSize: pendingRequests.current.size,
+    isProcessing
   };
 };

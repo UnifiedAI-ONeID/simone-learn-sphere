@@ -23,12 +23,12 @@ export const UnifiedLocalizedText: React.FC<UnifiedLocalizedTextProps> = ({
   className,
   fallback,
   as: Component = 'span',
-  showLoadingSpinner = true,
+  showLoadingSpinner = false,
   showRetryButton = false,
   maxRetries = 3,
 }) => {
   const { currentLanguage, translationKey, getTranslation, isTranslating, translationError } = useLocalization();
-  const { isContentReady } = useContentReadyState({ delay: 300 });
+  const { isContentReady } = useContentReadyState({ delay: 100, timeout: 2000 });
   const [localizedText, setLocalizedText] = useState(text);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -45,13 +45,14 @@ export const UnifiedLocalizedText: React.FC<UnifiedLocalizedTextProps> = ({
       return;
     }
 
-    // Wait for content to be ready before translating
+    // Show original text immediately
+    setLocalizedText(textToTranslate);
+
+    // Don't translate if content isn't ready yet
     if (!isContentReady) {
-      setLocalizedText(textToTranslate);
       return;
     }
 
-    setLocalizedText(textToTranslate);
     setHasError(false);
     setIsLoading(true);
     
@@ -62,8 +63,8 @@ export const UnifiedLocalizedText: React.FC<UnifiedLocalizedTextProps> = ({
       setRetryCount(0);
       console.log('UnifiedLocalizedText: Translation result:', result.substring(0, 30));
     } catch (error) {
-      console.error('UnifiedLocalizedText: Translation error for:', textToTranslate.substring(0, 30), error);
-      setLocalizedText(textToTranslate);
+      console.warn('UnifiedLocalizedText: Translation error for:', textToTranslate.substring(0, 30), error);
+      setLocalizedText(textToTranslate); // Keep original text on error
       setHasError(true);
     } finally {
       setIsLoading(false);
@@ -80,15 +81,8 @@ export const UnifiedLocalizedText: React.FC<UnifiedLocalizedTextProps> = ({
 
   useEffect(() => {
     const target = targetLanguage || currentLanguage.code;
-    
-    // Only translate when content is ready
-    if (isContentReady) {
-      translateText(text, target);
-    } else {
-      // Show original text immediately
-      setLocalizedText(text);
-    }
-  }, [text, targetLanguage, currentLanguage.code, translationKey, translateText, isContentReady]);
+    translateText(text, target);
+  }, [text, targetLanguage, currentLanguage.code, translationKey, translateText]);
 
   if (isLoading && showLoadingSpinner) {
     return (

@@ -32,11 +32,11 @@ export const OptimizedLocalizedText: React.FC<OptimizedLocalizedTextProps> = ({
   showRetryButton = false,
   maxRetries = 3,
   priority = 1,
-  waitForContent = true,
-  lazy = true,
+  waitForContent = false,
+  lazy = false,
 }) => {
   const { currentLanguage, translationError } = useLocalization();
-  const { isContentReady } = useContentReadyState({ delay: 200 });
+  const { isContentReady } = useContentReadyState({ delay: 100, timeout: 2000 });
   const { queueTranslation } = useTranslationQueue();
   const { ref: visibilityRef, isVisible } = useVisibilityObserver({
     threshold: 0.1,
@@ -51,7 +51,7 @@ export const OptimizedLocalizedText: React.FC<OptimizedLocalizedTextProps> = ({
   const [hasTranslated, setHasTranslated] = useState(false);
 
   const targetLang = targetLanguage || currentLanguage.code;
-  const shouldTranslate = targetLang !== 'en' && text.trim().length > 0;
+  const shouldTranslate = targetLang !== 'en' && text && text.trim().length > 0;
   const canTranslate = !waitForContent || isContentReady;
   const isVisibleForTranslation = !lazy || isVisible;
 
@@ -100,7 +100,7 @@ export const OptimizedLocalizedText: React.FC<OptimizedLocalizedTextProps> = ({
   // Effect for translation
   useEffect(() => {
     if (shouldTranslate && canTranslate && isVisibleForTranslation && !hasTranslated) {
-      // Add a small delay to avoid overwhelming the queue
+      // Add a small random delay to avoid overwhelming the queue
       const timer = setTimeout(translateText, Math.random() * 100);
       return () => clearTimeout(timer);
     }
@@ -114,52 +114,73 @@ export const OptimizedLocalizedText: React.FC<OptimizedLocalizedTextProps> = ({
     setIsLoading(false);
   }, [translationKey, text]);
 
-  // Create a proper ref callback that handles both HTML and SVG elements
-  const setElementRef = useCallback((element: Element | null) => {
-    if (lazy && element instanceof HTMLElement) {
-      visibilityRef(element);
+  // Safe ref callback that handles both HTML and SVG elements
+  const setElementRef = useCallback((element: any) => {
+    if (lazy && element) {
+      try {
+        visibilityRef(element);
+      } catch (error) {
+        console.warn('OptimizedLocalizedText: Error setting visibility ref:', error);
+      }
     }
   }, [lazy, visibilityRef]);
 
+  // Render loading state
   if (isLoading && showLoadingSpinner) {
-    return React.createElement(Component, {
-      ref: setElementRef,
+    const props: any = {
       className: cn(className, "inline-flex items-center space-x-1")
-    }, fallback || [
+    };
+    if (lazy) props.ref = setElementRef;
+
+    const children = fallback || [
       React.createElement(Loader2, { key: "loader", className: "h-3 w-3 animate-spin" }),
       React.createElement("span", { key: "text" }, text)
-    ]);
+    ];
+
+    return React.createElement(Component, props, children);
   }
 
+  // Render error state
   if (hasError || translationError) {
-    return React.createElement(Component, {
-      ref: setElementRef,
+    const props: any = {
       className: cn(className, "inline-flex items-center space-x-1"),
       title: hasError ? 'Translation failed, showing original text' : translationError || undefined
-    }, [
+    };
+    if (lazy) props.ref = setElementRef;
+
+    const children = [
       React.createElement("span", { 
         key: "text",
         className: hasError ? "text-orange-600" : undefined 
-      }, localizedText),
-      showRetryButton && retryCount < maxRetries && React.createElement(Button, {
+      }, localizedText)
+    ];
+
+    if (showRetryButton && retryCount < maxRetries) {
+      children.push(React.createElement(Button, {
         key: "retry",
         variant: "ghost",
         size: "sm",
         onClick: handleRetry,
         className: "h-4 w-4 p-0 ml-1",
         title: "Retry translation"
-      }, React.createElement(RefreshCw, { className: "h-3 w-3" })),
-      hasError && React.createElement(AlertTriangle, { 
+      }, React.createElement(RefreshCw, { className: "h-3 w-3" })));
+    }
+
+    if (hasError) {
+      children.push(React.createElement(AlertTriangle, { 
         key: "error", 
         className: "h-3 w-3 text-orange-500" 
-      })
-    ]);
+      }));
+    }
+
+    return React.createElement(Component, props, children);
   }
 
-  return React.createElement(Component, {
-    ref: setElementRef,
-    className
-  }, localizedText);
+  // Render normal state
+  const props: any = { className };
+  if (lazy) props.ref = setElementRef;
+
+  return React.createElement(Component, props, localizedText);
 };
 
 // Export with legacy names for compatibility

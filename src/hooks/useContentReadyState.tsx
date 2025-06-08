@@ -5,77 +5,71 @@ interface ContentReadyOptions {
   delay?: number;
   waitForImages?: boolean;
   waitForFonts?: boolean;
+  timeout?: number;
 }
 
 export const useContentReadyState = (options: ContentReadyOptions = {}) => {
-  const { delay = 300, waitForImages = true, waitForFonts = true } = options;
+  const { delay = 300, waitForImages = false, waitForFonts = false, timeout = 5000 } = options;
   const [isContentReady, setIsContentReady] = useState(false);
   const [isContentVisible, setIsContentVisible] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const forceTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
+    // Force ready after timeout to prevent infinite loading
+    forceTimeoutRef.current = setTimeout(() => {
+      console.log('ContentReadyState: Force ready after timeout');
+      setIsContentReady(true);
+      setIsContentVisible(true);
+    }, timeout);
+
     const checkContentReady = async () => {
       try {
-        // Wait for DOM to be ready
-        if (document.readyState !== 'complete') {
-          await new Promise(resolve => {
-            const handler = () => {
-              if (document.readyState === 'complete') {
-                document.removeEventListener('readystatechange', handler);
-                resolve(void 0);
-              }
-            };
-            document.addEventListener('readystatechange', handler);
-          });
+        // Basic DOM ready check
+        if (document.readyState === 'complete') {
+          markAsReady();
+          return;
         }
 
-        // Wait for images if requested
-        if (waitForImages) {
-          const images = document.querySelectorAll('img');
-          await Promise.all(
-            Array.from(images).map(img => {
-              if (img.complete) return Promise.resolve();
-              return new Promise(resolve => {
-                img.onload = img.onerror = () => resolve(void 0);
-              });
-            })
-          );
-        }
-
-        // Wait for fonts if requested
-        if (waitForFonts && 'fonts' in document) {
-          await document.fonts.ready;
-        }
-
-        // Add a small delay to ensure everything is settled
-        timeoutRef.current = setTimeout(() => {
-          setIsContentReady(true);
-          setIsContentVisible(true);
-        }, delay);
+        // Wait for DOM to be complete
+        const handleReadyStateChange = () => {
+          if (document.readyState === 'complete') {
+            document.removeEventListener('readystatechange', handleReadyStateChange);
+            markAsReady();
+          }
+        };
+        document.addEventListener('readystatechange', handleReadyStateChange);
 
       } catch (error) {
-        console.warn('Content ready check failed:', error);
-        // Fallback - mark as ready after delay
-        timeoutRef.current = setTimeout(() => {
-          setIsContentReady(true);
-          setIsContentVisible(true);
-        }, delay);
+        console.warn('ContentReadyState: Error checking ready state, marking as ready:', error);
+        markAsReady();
       }
+    };
+
+    const markAsReady = () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (forceTimeoutRef.current) clearTimeout(forceTimeoutRef.current);
+      
+      timeoutRef.current = setTimeout(() => {
+        setIsContentReady(true);
+        setIsContentVisible(true);
+      }, delay);
     };
 
     checkContentReady();
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (forceTimeoutRef.current) clearTimeout(forceTimeoutRef.current);
     };
-  }, [delay, waitForImages, waitForFonts]);
+  }, [delay, timeout]);
 
   return {
     isContentReady,
     isContentVisible,
     forceReady: () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (forceTimeoutRef.current) clearTimeout(forceTimeoutRef.current);
       setIsContentReady(true);
       setIsContentVisible(true);
     }
