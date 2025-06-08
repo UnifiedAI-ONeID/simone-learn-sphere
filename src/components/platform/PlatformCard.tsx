@@ -24,21 +24,21 @@ export const PlatformCard: React.FC<PlatformCardProps> = ({
       case 'ios':
         return cn(
           "bg-[var(--platform-surface)] border border-[var(--platform-border)]",
-          "rounded-[var(--platform-border-radius)] backdrop-blur-sm",
+          "rounded-xl backdrop-blur-sm",
           "shadow-sm"
         );
       
       case 'android':
         return cn(
           "bg-[var(--platform-surface)] border-0",
-          "rounded-[var(--platform-border-radius)]",
+          "rounded-3xl",
           theme.elevation.medium
         );
       
       case 'desktop':
         return cn(
           "bg-[var(--platform-surface)] border border-[var(--platform-border)]",
-          "rounded-[var(--platform-border-radius)]",
+          "rounded-lg",
           "hover:shadow-lg transition-shadow duration-200",
           theme.elevation.low
         );
@@ -48,17 +48,36 @@ export const PlatformCard: React.FC<PlatformCardProps> = ({
     }
   };
 
+  const getHeaderStyles = () => {
+    switch (platform) {
+      case 'ios':
+        return "pb-3";
+      case 'android':
+        return "pb-4";
+      default:
+        return "";
+    }
+  };
+
+  const getTitleStyles = () => {
+    switch (platform) {
+      case 'ios':
+        return "text-lg font-semibold text-[var(--platform-text)]";
+      case 'android':
+        return "text-xl font-medium text-[var(--platform-text)]";
+      case 'desktop':
+        return "text-lg font-semibold text-[var(--platform-text)]";
+      default:
+        return "text-[var(--platform-text)]";
+    }
+  };
+
   return (
     <Card className={cn(getCardStyles(), className)} style={{ fontFamily: theme.typography.fontFamily }}>
       {(title || description) && (
-        <CardHeader className={platform === 'android' ? 'pb-3' : ''}>
+        <CardHeader className={getHeaderStyles()}>
           {title && (
-            <CardTitle className={cn(
-              "text-[var(--platform-text)]",
-              platform === 'ios' && "text-lg font-semibold",
-              platform === 'android' && "text-xl font-medium",
-              platform === 'desktop' && "text-lg font-semibold"
-            )}>
+            <CardTitle className={getTitleStyles()}>
               {title}
             </CardTitle>
           )}
@@ -69,7 +88,7 @@ export const PlatformCard: React.FC<PlatformCardProps> = ({
           )}
         </CardHeader>
       )}
-      <CardContent className={platform === 'ios' ? 'pt-0' : ''}>
+      <CardContent className={platform === 'ios' ? 'pt-0' : platform === 'android' ? 'pt-2' : ''}>
         {children}
       </CardContent>
     </Card>

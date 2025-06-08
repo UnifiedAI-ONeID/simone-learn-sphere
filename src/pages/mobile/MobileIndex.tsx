@@ -63,8 +63,8 @@ export const MobileIndex = () => {
     },
     {
       icon: BookOpen,
-      title: `${platform === 'ios' ? 'iOS' : platform === 'android' ? 'Android' : 'Mobile'}-First Courses`,
-      description: "Learn anywhere, anytime on your device"
+      title: `${platform === 'ios' ? 'Native iOS' : platform === 'android' ? 'Material Design' : 'Mobile'} Experience`,
+      description: "Learn anywhere with platform-native design"
     },
     {
       icon: Users,
@@ -73,42 +73,90 @@ export const MobileIndex = () => {
     },
     {
       icon: Trophy,
-      title: "Gamified Progress",
-      description: "Earn badges and track achievements"
+      title: "Achievement System",
+      description: "Earn badges and track your progress"
     }
   ];
+
+  const getHeroIconStyles = () => {
+    switch (platform) {
+      case 'ios':
+        return "rounded-2xl shadow-xl bg-[var(--platform-primary)]";
+      case 'android':
+        return "rounded-full shadow-2xl bg-[var(--platform-primary)]";
+      default:
+        return "rounded-xl shadow-xl bg-[var(--platform-primary)]";
+    }
+  };
+
+  const getBadgeStyles = () => {
+    switch (platform) {
+      case 'ios':
+        return "px-4 py-2 bg-[var(--platform-primary)]/10 text-[var(--platform-primary)] rounded-full";
+      case 'android':
+        return "px-4 py-2 bg-[var(--platform-primary)]/10 text-[var(--platform-primary)] rounded-full uppercase tracking-wide text-xs";
+      default:
+        return "px-4 py-2 bg-[var(--platform-primary)]/10 text-[var(--platform-primary)]";
+    }
+  };
+
+  const getHeadingStyles = () => {
+    switch (platform) {
+      case 'ios':
+        return "text-4xl tracking-tight text-[var(--platform-text)] font-semibold";
+      case 'android':
+        return "text-4xl tracking-tight text-[var(--platform-text)] font-medium";
+      default:
+        return "text-4xl tracking-tight text-[var(--platform-text)] font-bold";
+    }
+  };
+
+  const getFeatureCardStyles = () => {
+    switch (platform) {
+      case 'ios':
+        return "active:scale-95 transition-transform duration-200 rounded-xl";
+      case 'android':
+        return "active:scale-95 transition-transform duration-200 rounded-3xl";
+      default:
+        return "active:scale-95 transition-transform duration-200";
+    }
+  };
+
+  const getFeatureIconStyles = () => {
+    switch (platform) {
+      case 'ios':
+        return "w-10 h-10 bg-[var(--platform-primary)] flex items-center justify-center text-white rounded-lg";
+      case 'android':
+        return "w-12 h-12 bg-[var(--platform-primary)] flex items-center justify-center text-white rounded-2xl";
+      default:
+        return "w-10 h-10 bg-[var(--platform-primary)] flex items-center justify-center text-white rounded-lg";
+    }
+  };
 
   return (
     <PlatformLayout>
       {/* Hero Section */}
       <div className="px-4 pt-12 pb-8">
         <div className="text-center space-y-6">
-          <div className={`flex h-20 w-20 items-center justify-center mx-auto ${
-            platform === 'ios' ? 'rounded-2xl' : platform === 'android' ? 'rounded-full' : 'rounded-xl'
-          } bg-[var(--platform-primary)] shadow-xl`}>
+          <div className={`flex h-20 w-20 items-center justify-center mx-auto ${getHeroIconStyles()}`}>
             <Brain className="h-10 w-10 text-white" />
           </div>
           
           <div className="space-y-4">
-            <Badge variant="secondary" className={`px-4 py-2 bg-[var(--platform-primary)]/10 text-[var(--platform-primary)] ${
-              platform === 'android' ? 'rounded-full uppercase tracking-wide text-xs' : ''
-            }`}>
+            <Badge variant="secondary" className={getBadgeStyles()}>
               <Smartphone className="w-4 h-4 mr-2" />
               <LocalizedText text={`${platform.charAt(0).toUpperCase() + platform.slice(1)} Learning Platform`} />
             </Badge>
             
-            <h1 className={`text-4xl tracking-tight text-[var(--platform-text)] ${
-              platform === 'ios' ? 'font-semibold' : 
-              platform === 'android' ? 'font-medium' : 'font-bold'
-            }`}>
+            <h1 className={getHeadingStyles()}>
               <LocalizedText text="Learn & Teach" />
               <span className="block bg-gradient-to-r from-[var(--platform-primary)] to-[var(--platform-secondary)] bg-clip-text text-transparent">
-                <LocalizedText text="On Your Phone" />
+                <LocalizedText text="Anywhere" />
               </span>
             </h1>
             
             <p className="text-lg text-[var(--platform-text-secondary)] max-w-sm mx-auto leading-relaxed">
-              <LocalizedText text="Access powerful educational tools designed specifically for mobile. Create, learn, and connect with a global community." />
+              <LocalizedText text="Access powerful educational tools designed for your device. Create, learn, and connect with a global community." />
             </p>
           </div>
           
@@ -137,25 +185,19 @@ export const MobileIndex = () => {
       {/* Features Grid */}
       <div className="px-4 py-8">
         <div className="text-center mb-8">
-          <h2 className={`text-2xl text-[var(--platform-text)] mb-2 ${
-            platform === 'ios' ? 'font-semibold' : 
-            platform === 'android' ? 'font-medium' : 'font-bold'
-          }`}>
+          <h2 className={getHeadingStyles().replace('text-4xl', 'text-2xl')}>
             <LocalizedText text="Everything You Need" />
           </h2>
-          <p className="text-[var(--platform-text-secondary)]">
+          <p className="text-[var(--platform-text-secondary)] mt-2">
             <LocalizedText text="Powerful features designed for mobile learning" />
           </p>
         </div>
         
         <div className="grid grid-cols-1 gap-4">
           {features.map((feature, index) => (
-            <PlatformCard key={index} className="active:scale-95 transition-transform duration-200">
-              <div className="flex items-center space-x-3 p-2">
-                <div className={`w-10 h-10 bg-[var(--platform-primary)] flex items-center justify-center text-white ${
-                  platform === 'ios' ? 'rounded-lg' : 
-                  platform === 'android' ? 'rounded-xl' : 'rounded-lg'
-                }`}>
+            <PlatformCard key={index} className={getFeatureCardStyles()}>
+              <div className="flex items-center space-x-4 p-2">
+                <div className={getFeatureIconStyles()}>
                   <feature.icon className="h-5 w-5" />
                 </div>
                 <div className="flex-1">

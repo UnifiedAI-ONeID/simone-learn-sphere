@@ -2,7 +2,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.8b13bb6e316042ad894d9f11c5b47b28',
+  appId: 'com.simonelabs.app',
   appName: 'SimoneLabs',
   webDir: 'dist',
   server: {

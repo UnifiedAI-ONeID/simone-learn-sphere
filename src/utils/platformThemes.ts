@@ -64,7 +64,7 @@ const iosTheme: PlatformTheme = {
     },
   },
   typography: {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif',
     headingWeight: '600',
     bodyWeight: '400',
   },
@@ -73,9 +73,9 @@ const iosTheme: PlatformTheme = {
     borderRadius: '10px',
   },
   elevation: {
-    low: '0 1px 3px rgba(0,0,0,0.1)',
-    medium: '0 4px 12px rgba(0,0,0,0.15)',
-    high: '0 8px 24px rgba(0,0,0,0.2)',
+    low: 'none',
+    medium: '0 1px 3px rgba(0,0,0,0.1)',
+    high: '0 4px 12px rgba(0,0,0,0.15)',
   },
 };
 
@@ -103,7 +103,7 @@ const androidTheme: PlatformTheme = {
     },
   },
   typography: {
-    fontFamily: 'Roboto, "Noto Sans", sans-serif',
+    fontFamily: 'Roboto, "Noto Sans", "Droid Sans", sans-serif',
     headingWeight: '500',
     bodyWeight: '400',
   },
