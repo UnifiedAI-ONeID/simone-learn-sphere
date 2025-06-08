@@ -36,7 +36,7 @@ export const LandingPageAssistant: React.FC = () => {
       setMessages([{
         id: '1',
         type: 'assistant',
-        content: "Hi! I'm here to help you learn about SimoneLabs. Ask me about our features, pricing, how to get started, or anything else about our platform!",
+        content: "Hi! I'm Simone Helper, here to help you learn about SimoneLabs. Ask me about our features, pricing, how to get started, or anything else about our platform!",
         timestamp: new Date()
       }]);
     }
@@ -140,7 +140,7 @@ export const LandingPageAssistant: React.FC = () => {
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 z-40"
         size="sm"
-        aria-label="Open platform assistant"
+        aria-label="Open Simone Helper"
       >
         <Brain className="w-6 h-6 text-white" />
       </Button>
@@ -154,7 +154,7 @@ export const LandingPageAssistant: React.FC = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center space-x-2">
               <Brain className="w-5 h-5 text-purple-600" />
-              <span><LocalizedText text="Platform Assistant" /></span>
+              <span><LocalizedText text="Simone Helper" /></span>
             </CardTitle>
             <div className="flex items-center space-x-1">
               <Button 
@@ -169,7 +169,7 @@ export const LandingPageAssistant: React.FC = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setIsOpen(false)}
-                aria-label="Close assistant"
+                aria-label="Close Simone Helper"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -195,7 +195,7 @@ export const LandingPageAssistant: React.FC = () => {
                     >
                       <div className="flex items-start justify-between mb-1">
                         <span className="text-sm font-medium">
-                          {message.type === 'user' ? 'You' : 'Assistant'}
+                          {message.type === 'user' ? 'You' : 'Simone Helper'}
                         </span>
                       </div>
                       <p className="text-sm">{message.content}</p>
@@ -208,7 +208,7 @@ export const LandingPageAssistant: React.FC = () => {
                     <div className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-3 rounded-lg">
                       <div className="flex items-center space-x-2">
                         <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-purple-600"></div>
-                        <span className="text-sm">Assistant is thinking...</span>
+                        <span className="text-sm">Simone Helper is thinking...</span>
                       </div>
                     </div>
                   </div>
@@ -224,7 +224,7 @@ export const LandingPageAssistant: React.FC = () => {
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask about SimoneLabs..."
+                  placeholder="Ask Simone Helper about SimoneLabs..."
                   disabled={isLoading}
                   className="flex-1"
                 />
