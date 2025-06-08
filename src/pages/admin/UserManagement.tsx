@@ -52,6 +52,10 @@ export const UserManagement = () => {
     }
   };
 
+  const handleSearch = () => {
+    fetchUsers();
+  };
+
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
       const { error } = await supabase
@@ -135,7 +139,7 @@ export const UserManagement = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer"
                 onClick={handleSearch}
               />
             </div>

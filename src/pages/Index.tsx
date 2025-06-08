@@ -1,4 +1,3 @@
-
 import { isMobile, isTablet } from 'react-device-detect';
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -147,8 +146,8 @@ const Index = () => {
               activeCourses={1200}
               completionRate={85}
               aiUsage={95}
-              userGrowth={15}
-              engagementScore={92}
+              userEngagement={92}
+              securityScore={98}
             />
           </Suspense>
         </div>
