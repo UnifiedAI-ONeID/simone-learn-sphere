@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -253,7 +252,7 @@ export const EnhancedAuthForm: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <RoleSelector
                   selectedRole={selectedRole}
-                  onRoleSelect={setSelectedRole}
+                  onRoleChange={setSelectedRole}
                 />
 
                 <div className="grid grid-cols-2 gap-3">

@@ -112,15 +112,9 @@ export const EnhancedLocalizationProvider: React.FC<{ children: React.ReactNode 
     setTranslationError(null);
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), TRANSLATION_TIMEOUT);
-
       const { data, error } = await supabase.functions.invoke('translate-text-fixed', {
-        body: { text, targetLanguage },
-        signal: controller.signal
+        body: { text, targetLanguage }
       });
-
-      clearTimeout(timeoutId);
 
       if (error) {
         console.warn('Translation service error:', error);
@@ -144,13 +138,7 @@ export const EnhancedLocalizationProvider: React.FC<{ children: React.ReactNode 
       return translatedText;
     } catch (error: any) {
       console.warn('Translation failed:', error);
-      
-      if (error.name === 'AbortError') {
-        setTranslationError('Translation timeout');
-      } else {
-        setTranslationError('Translation service unavailable');
-      }
-      
+      setTranslationError('Translation service unavailable');
       return text; // Return original text as fallback
     } finally {
       setIsTranslating(false);

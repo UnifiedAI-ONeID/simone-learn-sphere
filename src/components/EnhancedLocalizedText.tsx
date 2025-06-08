@@ -107,7 +107,7 @@ export const EnhancedLocalizedText: React.FC<EnhancedLocalizedTextProps> = ({
           </Button>
         )}
         {hasError && (
-          <AlertTriangle className="h-3 w-3 text-orange-500" title="Translation failed" />
+          <AlertTriangle className="h-3 w-3 text-orange-500" />
         )}
       </Component>
     );
