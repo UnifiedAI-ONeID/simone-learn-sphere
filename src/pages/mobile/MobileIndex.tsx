@@ -25,7 +25,9 @@ export const MobileIndex = () => {
   useEffect(() => {
     if (!authLoading && !roleLoading && user && role) {
       console.log('MobileIndex: Authenticated user detected, redirecting to dashboard');
-      const redirectRoute = getRoleBasedRoute(role);
+      console.log('MobileIndex: User role:', role);
+      const redirectRoute = getRoleBasedRoute(role, true);
+      console.log('MobileIndex: Redirecting to:', redirectRoute);
       navigate(redirectRoute, { replace: true });
     }
   }, [user, role, authLoading, roleLoading, navigate]);
