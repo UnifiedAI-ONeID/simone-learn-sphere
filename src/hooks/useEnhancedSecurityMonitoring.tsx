@@ -4,12 +4,22 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { generateSessionFingerprint, generateSecureSessionToken } from '@/utils/enhancedSecurityHeaders';
 
+interface SecurityAlert {
+  id: string;
+  alert_type: string;
+  alert_details: any;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  created_at: string;
+  resolved: boolean;
+}
+
 interface SecurityState {
   threatLevel: 'low' | 'medium' | 'high' | 'critical';
   sessionFingerprint: string;
   lastSecurityCheck: Date;
   activeSessions: number;
   securityThreats: string[];
+  alerts: SecurityAlert[];
 }
 
 export const useEnhancedSecurityMonitoring = () => {
@@ -19,7 +29,8 @@ export const useEnhancedSecurityMonitoring = () => {
     sessionFingerprint: '',
     lastSecurityCheck: new Date(),
     activeSessions: 0,
-    securityThreats: []
+    securityThreats: [],
+    alerts: []
   });
   const [loading, setLoading] = useState(false);
 
@@ -45,6 +56,26 @@ export const useEnhancedSecurityMonitoring = () => {
       console.error('Error logging security event:', error);
     }
   }, [user]);
+
+  const resolveSecurityAlert = useCallback(async (alertId: string) => {
+    if (!user) return;
+
+    try {
+      // Since we don't have the security_alerts table in current schema,
+      // we'll just remove it from local state and log the resolution
+      setSecurityState(prev => ({
+        ...prev,
+        alerts: prev.alerts.filter(alert => alert.id !== alertId)
+      }));
+
+      await logSecurityEvent('security_alert_resolved', {
+        alert_id: alertId,
+        resolved_by: user.id
+      }, 'low');
+    } catch (error) {
+      console.error('Error resolving security alert:', error);
+    }
+  }, [user, logSecurityEvent]);
 
   const initializeSessionSecurity = useCallback(async () => {
     if (!user) return;
@@ -118,10 +149,21 @@ export const useEnhancedSecurityMonitoring = () => {
       // Update request counter
       sessionStorage.setItem('securityRequestCount', (requestCount + 1).toString());
 
+      // Create alerts from threats
+      const newAlerts: SecurityAlert[] = threats.map((threat, index) => ({
+        id: `alert_${Date.now()}_${index}`,
+        alert_type: threat.toLowerCase().replace(/\s+/g, '_'),
+        alert_details: { description: threat },
+        severity: threat.includes('automated') ? 'critical' : 'high' as any,
+        created_at: new Date().toISOString(),
+        resolved: false
+      }));
+
       // Update security state
       setSecurityState(prev => ({
         ...prev,
         securityThreats: threats,
+        alerts: [...prev.alerts, ...newAlerts],
         threatLevel: threats.length > 0 ? (threats.some(t => t.includes('automated')) ? 'critical' : 'high') : 'low',
         lastSecurityCheck: new Date()
       }));
@@ -150,6 +192,7 @@ export const useEnhancedSecurityMonitoring = () => {
     securityState,
     loading,
     logSecurityEvent,
-    performSecurityScan
+    performSecurityScan,
+    resolveSecurityAlert
   };
 };

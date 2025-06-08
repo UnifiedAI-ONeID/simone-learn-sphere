@@ -55,7 +55,7 @@ function App() {
                             <Route path="/student-dashboard" element={<StudentDashboard />} />
                             <Route path="/educator-dashboard" element={<EducatorDashboard />} />
                             <Route path="/admin-dashboard" element={<AdminDashboard />} />
-                            {platform === 'mobile' && (
+                            {(platform === 'ios' || platform === 'android') && (
                               <>
                                 <Route path="/mobile" element={<MobileIndex />} />
                                 <Route path="/mobile/auth/callback" element={<MobileAuthCallback />} />

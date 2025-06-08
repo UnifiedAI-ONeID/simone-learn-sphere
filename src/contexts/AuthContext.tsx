@@ -43,6 +43,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const validateSessionSecurity = async (userId: string) => {
+    try {
+      // Check basic session security without calling non-existent functions
+      const sessionCount = parseInt(sessionStorage.getItem('activeSessionCount') || '0');
+      
+      if (sessionCount > 5) {
+        await logAuthEvent('excessive_sessions_detected', {
+          user_id: userId,
+          session_count: sessionCount
+        }, 'high');
+        
+        // Clear excess sessions
+        sessionStorage.setItem('activeSessionCount', '1');
+        return false;
+      }
+      
+      // Increment session counter
+      sessionStorage.setItem('activeSessionCount', (sessionCount + 1).toString());
+      return true;
+    } catch (error) {
+      console.error('Session security validation failed:', error);
+      return true; // Allow login to proceed
+    }
+  };
+
   useEffect(() => {
     console.log('AuthProvider: Initializing auth state');
     
@@ -69,22 +94,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(initialSession?.user ?? null);
           
           if (initialSession?.user) {
-            // Log successful session restoration
-            await logAuthEvent('session_restored', {
-              user_id: initialSession.user.id,
-              session_fingerprint: generateSessionFingerprint().slice(0, 8)
-            }, 'low');
+            // Validate session security
+            const isSecure = await validateSessionSecurity(initialSession.user.id);
             
-            // Defer profile creation to avoid blocking
-            setTimeout(() => {
-              if (mounted) {
-                ensureProfileExists(
-                  initialSession.user.id, 
-                  initialSession.user, 
-                  initialSession.user.user_metadata?.role
-                ).catch(console.error);
-              }
-            }, 100);
+            if (isSecure) {
+              // Log successful session restoration
+              await logAuthEvent('session_restored', {
+                user_id: initialSession.user.id,
+                session_fingerprint: generateSessionFingerprint().slice(0, 8)
+              }, 'low');
+              
+              // Defer profile creation to avoid blocking
+              setTimeout(() => {
+                if (mounted) {
+                  ensureProfileExists(
+                    initialSession.user.id, 
+                    initialSession.user, 
+                    initialSession.user.user_metadata?.role
+                  ).catch(console.error);
+                }
+              }, 100);
+            }
           }
         }
       } catch (error) {
@@ -113,26 +143,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (event === 'SIGNED_IN' && newSession?.user) {
           console.log('AuthProvider: User signed in, ensuring profile exists');
           
-          await logAuthEvent('user_signed_in', {
-            user_id: newSession.user.id,
-            email: newSession.user.email,
-            provider: newSession.user.app_metadata?.provider,
-            session_fingerprint: generateSessionFingerprint().slice(0, 8)
-          }, 'low');
+          // Validate session security
+          const isSecure = await validateSessionSecurity(newSession.user.id);
           
-          // Defer to prevent potential deadlocks
-          setTimeout(() => {
-            if (mounted) {
-              ensureProfileExists(
-                newSession.user.id, 
-                newSession.user, 
-                newSession.user.user_metadata?.role
-              ).catch(console.error);
-            }
-          }, 100);
+          if (isSecure) {
+            await logAuthEvent('user_signed_in', {
+              user_id: newSession.user.id,
+              email: newSession.user.email,
+              provider: newSession.user.app_metadata?.provider,
+              session_fingerprint: generateSessionFingerprint().slice(0, 8)
+            }, 'low');
+            
+            // Defer to prevent potential deadlocks
+            setTimeout(() => {
+              if (mounted) {
+                ensureProfileExists(
+                  newSession.user.id, 
+                  newSession.user, 
+                  newSession.user.user_metadata?.role
+                ).catch(console.error);
+              }
+            }, 100);
+          }
         }
 
         if (event === 'SIGNED_OUT') {
+          // Clear session counter
+          sessionStorage.removeItem('activeSessionCount');
           await logAuthEvent('user_signed_out', {
             timestamp: new Date().toISOString()
           }, 'low');
@@ -176,6 +213,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Clean up auth state first
       cleanupAuthState();
+      
+      // Clear session counter
+      sessionStorage.removeItem('activeSessionCount');
       
       // Sign out from Supabase
       const { error } = await supabase.auth.signOut({ scope: 'global' });

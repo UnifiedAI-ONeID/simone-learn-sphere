@@ -121,15 +121,16 @@ export const ensureProfileExists = async (userId: string, userData: any, selecte
       throw error;
     }
     
-    // Log successful profile creation
-    await supabase.rpc('log_enhanced_security_event', {
+    // Log successful profile creation using the existing function
+    await supabase.rpc('log_security_event', {
       event_type: 'profile_created',
       event_details: {
         user_id: userId,
         role: roleToAssign,
         email_domain: userData.email.split('@')[1]
       },
-      severity: 'low'
+      ip_address: null,
+      user_agent: navigator.userAgent
     });
     
     console.log('Profile created/updated successfully with role:', roleToAssign);
@@ -138,14 +139,15 @@ export const ensureProfileExists = async (userId: string, userData: any, selecte
     console.error('Failed to ensure profile exists:', error);
     
     // Log security event for profile creation failure
-    await supabase.rpc('log_enhanced_security_event', {
+    await supabase.rpc('log_security_event', {
       event_type: 'profile_creation_failed',
       event_details: {
         user_id: userId,
         error: error.message,
         email: userData.email
       },
-      severity: 'medium'
+      ip_address: null,
+      user_agent: navigator.userAgent
     });
     
     throw error;
@@ -163,10 +165,11 @@ export const sanitizeUserInput = (input: string): string => {
 
 export const logAuthEvent = async (eventType: string, details: any, severity: 'low' | 'medium' | 'high' | 'critical' = 'low') => {
   try {
-    await supabase.rpc('log_enhanced_security_event', {
+    await supabase.rpc('log_security_event', {
       event_type: eventType,
       event_details: details,
-      severity
+      ip_address: null,
+      user_agent: navigator.userAgent
     });
   } catch (error) {
     console.error('Failed to log auth event:', error);
