@@ -31,7 +31,9 @@ const Index = () => {
   useEffect(() => {
     if (!authLoading && !roleLoading && user && role) {
       console.log('Index: Authenticated user detected, redirecting to dashboard');
-      const redirectRoute = getRoleBasedRoute(role);
+      console.log('Index: User role:', role);
+      const redirectRoute = getRoleBasedRoute(role, true);
+      console.log('Index: Redirecting to:', redirectRoute);
       navigate(redirectRoute, { replace: true });
     }
   }, [user, role, authLoading, roleLoading, navigate]);

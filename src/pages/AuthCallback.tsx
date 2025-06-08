@@ -38,13 +38,14 @@ const AuthCallback = () => {
           
           // Determine role
           const userRole = pendingUserRole || data.session.user.user_metadata?.role || 'student';
+          console.log('AuthCallback: User role determined as:', userRole);
           
           toast({
             title: "Welcome!",
             description: `Successfully signed in as ${userRole}.`,
           });
           
-          // Redirect to appropriate dashboard
+          // Redirect to appropriate dashboard using isLoginContext=true for proper prioritization
           const redirectRoute = getRoleBasedRoute(userRole, true);
           console.log('AuthCallback: Redirecting to:', redirectRoute);
           

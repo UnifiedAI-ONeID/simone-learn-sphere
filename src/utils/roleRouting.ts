@@ -15,10 +15,13 @@ export const getRoleBasedRoute = (role: string | null, isLoginContext: boolean =
 
   // Handle combined roles - prioritize in order: admin > educator > student
   if (role.includes('admin')) {
+    console.log('Routing admin to admin dashboard');
     return '/admin-dashboard';
   } else if (role.includes('educator')) {
+    console.log('Routing educator to educator dashboard');
     return '/educator-dashboard';
   } else if (role.includes('student')) {
+    console.log('Routing student to student dashboard');
     return '/student-dashboard';
   }
   

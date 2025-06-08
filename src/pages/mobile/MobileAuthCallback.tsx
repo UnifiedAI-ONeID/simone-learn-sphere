@@ -35,10 +35,11 @@ export const MobileAuthCallback = () => {
           
           // Determine role
           const userRole = pendingUserRole || data.session.user.user_metadata?.role || 'student';
+          console.log('MobileAuthCallback: User role determined as:', userRole);
           
           toast.success(`Welcome! Successfully signed in as ${userRole}.`);
           
-          // Redirect to appropriate dashboard
+          // Redirect to appropriate dashboard using isLoginContext=true for proper prioritization
           const redirectRoute = getRoleBasedRoute(userRole, true);
           console.log('MobileAuthCallback: Redirecting to:', redirectRoute);
           

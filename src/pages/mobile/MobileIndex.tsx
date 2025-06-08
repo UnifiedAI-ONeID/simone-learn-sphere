@@ -9,7 +9,6 @@ import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { Badge } from '@/components/ui/badge';
 
 // Lazy load heavy components
-const Haptics = lazy(() => import('@capacitor/haptics').then(m => ({ default: m.Haptics })));
 const PlatformButton = lazy(() => import('@/components/platform/PlatformButton').then(m => ({ default: m.PlatformButton })));
 const PlatformCard = lazy(() => import('@/components/platform/PlatformCard').then(m => ({ default: m.PlatformCard })));
 const PlatformLayout = lazy(() => import('@/components/platform/PlatformLayout').then(m => ({ default: m.PlatformLayout })));
@@ -25,6 +24,7 @@ export const MobileIndex = () => {
   // Redirect authenticated users
   useEffect(() => {
     if (!authLoading && !roleLoading && user && role) {
+      console.log('MobileIndex: Authenticated user detected, redirecting to dashboard');
       const redirectRoute = getRoleBasedRoute(role);
       navigate(redirectRoute, { replace: true });
     }
