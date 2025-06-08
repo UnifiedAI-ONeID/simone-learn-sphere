@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,13 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Brain, User, GraduationCap, Linkedin } from 'lucide-react';
+import { Brain, User, GraduationCap, Linkedin, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, SignUpFormData, SignInFormData } from '@/schemas/authSchemas';
 import { LocalizedText } from '@/components/LocalizedText';
 import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { handleAuthError, cleanupAuthState } from '@/utils/authUtils';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +21,8 @@ const Auth = () => {
   const [signInData, setSignInData] = useState<Partial<SignInFormData>>({});
   const [signUpData, setSignUpData] = useState<Partial<SignUpFormData>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -61,118 +65,6 @@ const Auth = () => {
     }
   };
 
-  const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
-    setIsLoading(true);
-    console.log(`Starting ${provider} OAuth signin`);
-    
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
-        },
-      });
-
-      console.log('OAuth response:', { data, error });
-
-      if (error) {
-        console.error('OAuth error:', error);
-        
-        let errorMessage = 'Authentication failed. Please try again.';
-        
-        if (error.message?.includes('Provider not enabled')) {
-          errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication is not configured. Please contact support.`;
-        } else if (error.message?.includes('Invalid redirect URL')) {
-          errorMessage = 'OAuth configuration error. The redirect URL may not be properly configured in Supabase.';
-        } else if (error.message?.includes('unauthorized_client')) {
-          errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} OAuth client is not properly configured. Please check the OAuth settings.`;
-        }
-        
-        toast({
-          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
-          description: errorMessage,
-          variant: "destructive",
-        });
-      }
-      
-    } catch (error: any) {
-      console.error('OAuth signin error:', error);
-      
-      toast({
-        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
-        description: 'Authentication failed. Please try again.',
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleOAuthSignUp = async (provider: 'google' | 'linkedin_oidc') => {
-    setIsLoading(true);
-    console.log(`Starting ${provider} OAuth signup with role:`, userRole);
-    
-    try {
-      // Store the selected role in localStorage to use after OAuth callback
-      localStorage.setItem('pendingUserRole', userRole);
-      console.log('Stored pendingUserRole in localStorage:', userRole);
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
-        },
-      });
-
-      console.log('OAuth response:', { data, error });
-
-      if (error) {
-        console.error('OAuth error:', error);
-        
-        let errorMessage = 'Authentication failed. Please try again.';
-        
-        if (error.message?.includes('Provider not enabled')) {
-          errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} authentication is not configured. Please contact support.`;
-        } else if (error.message?.includes('Invalid redirect URL')) {
-          errorMessage = 'OAuth configuration error. The redirect URL may not be properly configured in Supabase.';
-        } else if (error.message?.includes('unauthorized_client')) {
-          errorMessage = `${provider === 'google' ? 'Google' : 'LinkedIn'} OAuth client is not properly configured. Please check the OAuth settings.`;
-        }
-        
-        toast({
-          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign up failed`,
-          description: errorMessage,
-          variant: "destructive",
-        });
-        
-        // Clean up pending role on error
-        localStorage.removeItem('pendingUserRole');
-      }
-      
-    } catch (error: any) {
-      console.error('OAuth signup error:', error);
-      
-      // Clean up pending role on error
-      localStorage.removeItem('pendingUserRole');
-      
-      toast({
-        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign up failed`,
-        description: 'Authentication failed. Please try again.',
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleSignIn = async () => {
     const validated = validateSignIn(signInData);
     if (!validated) return;
@@ -181,6 +73,9 @@ const Auth = () => {
     console.log('Starting email signin for:', validated.email);
     
     try {
+      // Clean up any existing auth state
+      cleanupAuthState();
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: validated.email,
         password: validated.password,
@@ -189,16 +84,7 @@ const Auth = () => {
       console.log('Email signin response:', { data, error });
 
       if (error) {
-        console.error('Email signin error:', error);
-        
-        let errorMessage = 'Sign in failed. Please check your credentials.';
-        
-        if (error.message?.includes('Email not confirmed')) {
-          errorMessage = 'Please check your email and confirm your account before signing in.';
-        } else if (error.message?.includes('Invalid login credentials')) {
-          errorMessage = 'Invalid email or password. Please try again.';
-        }
-        
+        const errorMessage = handleAuthError(error);
         toast({
           title: "Sign in failed",
           description: errorMessage,
@@ -215,7 +101,7 @@ const Auth = () => {
           description: "Welcome back!",
         });
         
-        // Get user role and redirect immediately, prioritizing admin role
+        // Get user role and redirect
         try {
           const { data: profile } = await supabase
             .from('profiles')
@@ -224,7 +110,7 @@ const Auth = () => {
             .single();
           
           const userRole = profile?.role || 'student';
-          const redirectRoute = getRoleBasedRoute(userRole, true); // Pass true for login context
+          const redirectRoute = getRoleBasedRoute(userRole, true);
           console.log('Redirecting to:', redirectRoute);
           navigate(redirectRoute, { replace: true });
         } catch (error) {
@@ -234,10 +120,10 @@ const Auth = () => {
       }
     } catch (error: any) {
       console.error('Signin error:', error);
-      
+      const errorMessage = handleAuthError(error);
       toast({
         title: "Sign in failed",
-        description: 'An unexpected error occurred. Please try again.',
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -253,6 +139,9 @@ const Auth = () => {
     console.log('Starting email signup for:', validated.email, 'with role:', validated.role);
     
     try {
+      // Clean up any existing auth state
+      cleanupAuthState();
+      
       const { data, error } = await supabase.auth.signUp({
         email: validated.email,
         password: validated.password,
@@ -269,18 +158,7 @@ const Auth = () => {
       console.log('Email signup response:', { data, error });
 
       if (error) {
-        console.error('Email signup error:', error);
-        
-        let errorMessage = 'Sign up failed. Please try again.';
-        
-        if (error.message?.includes('User already registered')) {
-          errorMessage = 'An account with this email already exists. Please sign in instead.';
-        } else if (error.message?.includes('Password should be at least')) {
-          errorMessage = 'Password must be at least 6 characters long.';
-        } else if (error.message?.includes('rate limit')) {
-          errorMessage = 'Too many attempts. Please wait a few minutes and try again.';
-        }
-        
+        const errorMessage = handleAuthError(error);
         toast({
           title: "Sign up failed",
           description: errorMessage,
@@ -301,7 +179,7 @@ const Auth = () => {
           return;
         }
         
-        // If logged in immediately, redirect with login context
+        // If logged in immediately, redirect
         toast({
           title: "Success",
           description: "Account created successfully!",
@@ -312,10 +190,96 @@ const Auth = () => {
       }
     } catch (error: any) {
       console.error('Signup error:', error);
-      
+      const errorMessage = handleAuthError(error);
       toast({
         title: "Sign up failed",
-        description: 'An unexpected error occurred. Please try again.',
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
+    setIsLoading(true);
+    console.log(`Starting ${provider} OAuth signin`);
+    
+    try {
+      // Clean up any existing auth state
+      cleanupAuthState();
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        },
+      });
+
+      if (error) {
+        const errorMessage = handleAuthError(error, provider);
+        toast({
+          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+      
+    } catch (error: any) {
+      const errorMessage = handleAuthError(error, provider);
+      toast({
+        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign in failed`,
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOAuthSignUp = async (provider: 'google' | 'linkedin_oidc') => {
+    setIsLoading(true);
+    console.log(`Starting ${provider} OAuth signup with role:`, userRole);
+    
+    try {
+      // Store the selected role in localStorage to use after OAuth callback
+      localStorage.setItem('pendingUserRole', userRole);
+      console.log('Stored pendingUserRole in localStorage:', userRole);
+      
+      // Clean up any existing auth state
+      cleanupAuthState();
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        },
+      });
+
+      if (error) {
+        localStorage.removeItem('pendingUserRole');
+        const errorMessage = handleAuthError(error, provider);
+        toast({
+          title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign up failed`,
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+      
+    } catch (error: any) {
+      localStorage.removeItem('pendingUserRole');
+      const errorMessage = handleAuthError(error, provider);
+      toast({
+        title: `${provider === 'google' ? 'Google' : 'LinkedIn'} sign up failed`,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -443,15 +407,30 @@ const Auth = () => {
                   <Label htmlFor="login-password">
                     <LocalizedText text="Password" />
                   </Label>
-                  <Input 
-                    id="login-password" 
-                    type="password" 
-                    placeholder="Enter your password"
-                    value={signInData.password || ''}
-                    onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
-                    disabled={isLoading}
-                    className={validationErrors.password ? 'border-red-500' : ''}
-                  />
+                  <div className="relative">
+                    <Input 
+                      id="login-password" 
+                      type={showSignInPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={signInData.password || ''}
+                      onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
+                      disabled={isLoading}
+                      className={validationErrors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowSignInPassword(!showSignInPassword)}
+                    >
+                      {showSignInPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </Button>
+                  </div>
                   {validationErrors.password && (
                     <p className="text-sm text-red-600">
                       <LocalizedText text={validationErrors.password} />
@@ -556,41 +535,43 @@ const Auth = () => {
                 </div>
 
                 {/* Name, Email, Password Form Fields */}
-                <div className="space-y-2">
-                  <Label htmlFor="firstname">
-                    <LocalizedText text="First Name" />
-                  </Label>
-                  <Input 
-                    id="firstname" 
-                    placeholder="First name"
-                    value={signUpData.firstName || ''}
-                    onChange={(e) => setSignUpData(prev => ({ ...prev, firstName: e.target.value }))}
-                    disabled={isLoading}
-                    className={validationErrors.firstName ? 'border-red-500' : ''}
-                  />
-                  {validationErrors.firstName && (
-                    <p className="text-xs text-red-600">
-                      <LocalizedText text={validationErrors.firstName} />
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastname">
-                    <LocalizedText text="Last Name" />
-                  </Label>
-                  <Input 
-                    id="lastname" 
-                    placeholder="Last name"
-                    value={signUpData.lastName || ''}
-                    onChange={(e) => setSignUpData(prev => ({ ...prev, lastName: e.target.value }))}
-                    disabled={isLoading}
-                    className={validationErrors.lastName ? 'border-red-500' : ''}
-                  />
-                  {validationErrors.lastName && (
-                    <p className="text-xs text-red-600">
-                      <LocalizedText text={validationErrors.lastName} />
-                    </p>
-                  )}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstname">
+                      <LocalizedText text="First Name" />
+                    </Label>
+                    <Input 
+                      id="firstname" 
+                      placeholder="First name"
+                      value={signUpData.firstName || ''}
+                      onChange={(e) => setSignUpData(prev => ({ ...prev, firstName: e.target.value }))}
+                      disabled={isLoading}
+                      className={validationErrors.firstName ? 'border-red-500' : ''}
+                    />
+                    {validationErrors.firstName && (
+                      <p className="text-xs text-red-600">
+                        <LocalizedText text={validationErrors.firstName} />
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastname">
+                      <LocalizedText text="Last Name" />
+                    </Label>
+                    <Input 
+                      id="lastname" 
+                      placeholder="Last name"
+                      value={signUpData.lastName || ''}
+                      onChange={(e) => setSignUpData(prev => ({ ...prev, lastName: e.target.value }))}
+                      disabled={isLoading}
+                      className={validationErrors.lastName ? 'border-red-500' : ''}
+                    />
+                    {validationErrors.lastName && (
+                      <p className="text-xs text-red-600">
+                        <LocalizedText text={validationErrors.lastName} />
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">
@@ -615,15 +596,30 @@ const Auth = () => {
                   <Label htmlFor="signup-password">
                     <LocalizedText text="Password" />
                   </Label>
-                  <Input 
-                    id="signup-password" 
-                    type="password" 
-                    placeholder="Create a password"
-                    value={signUpData.password || ''}
-                    onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
-                    disabled={isLoading}
-                    className={validationErrors.password ? 'border-red-500' : ''}
-                  />
+                  <div className="relative">
+                    <Input 
+                      id="signup-password" 
+                      type={showSignUpPassword ? "text" : "password"}
+                      placeholder="Create a password"
+                      value={signUpData.password || ''}
+                      onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
+                      disabled={isLoading}
+                      className={validationErrors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                    >
+                      {showSignUpPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </Button>
+                  </div>
                   {validationErrors.password && (
                     <p className="text-sm text-red-600">
                       <LocalizedText text={validationErrors.password} />
@@ -643,21 +639,6 @@ const Auth = () => {
               </CardContent>
             </TabsContent>
           </Tabs>
-        </Card>
-
-        {/* Configuration Instructions */}
-        <Card className="border-amber-200 bg-amber-50">
-          <CardContent className="pt-6">
-            <div className="text-center text-sm text-amber-800">
-              <p className="font-medium mb-2">⚙️ Configuration Status</p>
-              <div className="space-y-1 text-xs">
-                <p>• OAuth: Check Supabase Dashboard → Authentication → Providers</p>
-                <p>• SMTP: Configure email delivery in Authentication → Settings</p>
-                <p>• Site URL: Must match your application domain</p>
-                <p>• Redirect URLs: Should include /auth/callback</p>
-              </div>
-            </div>
-          </CardContent>
         </Card>
       </div>
     </div>

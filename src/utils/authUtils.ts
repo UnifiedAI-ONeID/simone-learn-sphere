@@ -16,11 +16,13 @@ export const cleanupAuthState = () => {
   });
   
   // Remove from sessionStorage if in use
-  Object.keys(sessionStorage || {}).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-      sessionStorage.removeItem(key);
-    }
-  });
+  if (typeof sessionStorage !== 'undefined') {
+    Object.keys(sessionStorage).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  }
 };
 
 export const handleAuthError = (error: any, provider?: string) => {
@@ -42,6 +44,8 @@ export const handleAuthError = (error: any, provider?: string) => {
     errorMessage = 'An account with this email already exists. Please sign in instead.';
   } else if (error.message?.includes('rate limit')) {
     errorMessage = 'Too many attempts. Please wait a few minutes and try again.';
+  } else if (error.message?.includes('Password should be at least')) {
+    errorMessage = 'Password must be at least 6 characters long.';
   }
   
   return errorMessage;
@@ -62,6 +66,18 @@ export const ensureProfileExists = async (userId: string, userData: any, selecte
                  userData.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
       role: roleToAssign
     };
+    
+    // Check if profile already exists
+    const { data: existingProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('id, role')
+      .eq('id', userId)
+      .single();
+    
+    if (existingProfile && !fetchError) {
+      console.log('Profile already exists:', existingProfile);
+      return existingProfile.role;
+    }
     
     // Use upsert to handle both creation and updates
     const { error } = await supabase

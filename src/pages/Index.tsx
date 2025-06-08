@@ -1,3 +1,4 @@
+
 import { isMobile, isTablet } from 'react-device-detect';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -40,7 +41,12 @@ const Index = () => {
   if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="text-gray-600">
+            <LocalizedText text="Loading..." />
+          </p>
+        </div>
       </div>
     );
   }
@@ -134,6 +140,9 @@ const Index = () => {
               aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
             >
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+            <Button onClick={handleGetStarted} variant="outline">
+              <LocalizedText text="Sign In" />
             </Button>
           </div>
         </nav>
