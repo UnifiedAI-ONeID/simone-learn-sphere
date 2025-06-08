@@ -10,6 +10,9 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 
+// Define UserRole type locally since it's not exported from supabase types
+type UserRole = 'student' | 'educator' | 'admin';
+
 export const MobileIndex = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -20,7 +23,7 @@ export const MobileIndex = () => {
   useEffect(() => {
     if (!authLoading && !roleLoading && user && role) {
       console.log('MobileIndex: Authenticated user detected, redirecting to dashboard');
-      const redirectRoute = getMobileRoleBasedRoute(role, true);
+      const redirectRoute = getMobileRoleBasedRoute(role as UserRole, true);
       console.log('MobileIndex: Redirecting to:', redirectRoute);
       navigate(redirectRoute, { replace: true });
     }
