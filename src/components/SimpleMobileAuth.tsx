@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,8 +17,7 @@ import {
   Chrome,
   Linkedin,
   GraduationCap,
-  Users,
-  Shield
+  Users
 } from 'lucide-react';
 
 interface SimpleMobileAuthProps {
@@ -101,12 +99,6 @@ export const SimpleMobileAuth: React.FC<SimpleMobileAuthProps> = ({ onSuccess })
       label: 'Educator',
       description: 'Create and manage courses',
       icon: Users
-    },
-    {
-      value: 'admin',
-      label: 'Administrator',
-      description: 'Manage platform and users',
-      icon: Shield
     }
   ];
 
