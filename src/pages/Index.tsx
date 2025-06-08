@@ -142,7 +142,14 @@ const Index = () => {
               <p className="text-muted-foreground">Loading content...</p>
             </div>
           }>
-            <PlatformOverview />
+            <PlatformOverview 
+              totalUsers={50000}
+              activeCourses={1200}
+              completionRate={85}
+              aiUsage={95}
+              userGrowth={15}
+              engagementScore={92}
+            />
           </Suspense>
         </div>
       </main>

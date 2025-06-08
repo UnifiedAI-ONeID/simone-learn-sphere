@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +9,9 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
+import { ProfilePictureUpload } from '@/components/ProfilePictureUpload';
+import { UserRoleManager } from '@/components/UserRoleManager';
+import { TwoFactorSetup } from '@/components/TwoFactorSetup';
 
 const ProfileSettings = () => {
   const { user, signOut } = useAuth();

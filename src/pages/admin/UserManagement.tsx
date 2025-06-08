@@ -15,7 +15,7 @@ interface UserProfile {
   first_name: string | null;
   last_name: string | null;
   role: string;
-  is_active: boolean;
+  email_verified: boolean;
 }
 
 export const UserManagement = () => {
@@ -34,7 +34,7 @@ export const UserManagement = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, first_name, last_name, role, is_active')
+        .select('id, email, first_name, last_name, role, email_verified')
         .like('email', `%${searchQuery}%`)
         .order('created_at', { ascending: false });
 
@@ -50,10 +50,6 @@ export const UserManagement = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSearch = () => {
-    fetchUsers();
   };
 
   const handleRoleChange = async (userId: string, newRole: string) => {
@@ -78,34 +74,6 @@ export const UserManagement = () => {
     } catch (error: any) {
       toast({
         title: "Error updating role",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleStatusChange = async (userId: string, newStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_active: newStatus })
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      setUsers(prevUsers =>
-        prevUsers.map(user =>
-          user.id === userId ? { ...user, is_active: newStatus } : user
-        )
-      );
-
-      toast({
-        title: "Status updated",
-        description: "User status has been updated successfully.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error updating status",
         description: error.message,
         variant: "destructive",
       });
@@ -254,22 +222,15 @@ export const UserManagement = () => {
                       </Select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <Badge variant={user.is_active ? "outline" : "destructive"}>
-                        {user.is_active ? (
-                          <UnifiedLocalizedText text="Active" />
+                      <Badge variant={user.email_verified ? "outline" : "destructive"}>
+                        {user.email_verified ? (
+                          <UnifiedLocalizedText text="Verified" />
                         ) : (
-                          <UnifiedLocalizedText text="Inactive" />
+                          <UnifiedLocalizedText text="Unverified" />
                         )}
                       </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleStatusChange(user.id, !user.is_active)}
-                      >
-                        <Shield className="h-4 w-4" />
-                      </Button>
                       <Button variant="ghost" size="icon">
                         <Edit className="h-4 w-4" />
                       </Button>

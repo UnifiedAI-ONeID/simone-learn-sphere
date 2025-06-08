@@ -9,7 +9,10 @@ export const DesktopLayout = () => {
     <div className="min-h-screen bg-background flex">
       <DesktopSidebar />
       <div className="flex-1 flex flex-col">
-        <DesktopHeader />
+        <DesktopHeader 
+          title="Dashboard"
+          subtitle="Welcome to your learning platform"
+        />
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>

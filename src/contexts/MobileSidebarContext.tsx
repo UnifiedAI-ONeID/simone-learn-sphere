@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface MobileSidebarContextType {
   isOpen: boolean;
   toggle: () => void;
+  toggleSidebar: () => void;
   close: () => void;
 }
 
@@ -21,10 +22,11 @@ export const MobileSidebarProvider: React.FC<{ children: ReactNode }> = ({ child
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
+  const toggleSidebar = () => setIsOpen(!isOpen);
   const close = () => setIsOpen(false);
 
   return (
-    <MobileSidebarContext.Provider value={{ isOpen, toggle, close }}>
+    <MobileSidebarContext.Provider value={{ isOpen, toggle, toggleSidebar, close }}>
       {children}
     </MobileSidebarContext.Provider>
   );

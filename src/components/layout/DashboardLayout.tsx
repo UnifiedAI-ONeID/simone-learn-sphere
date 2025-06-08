@@ -15,6 +15,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   subtitle,
   children
 }) => {
+  const handleSuggestionClick = (suggestion: string) => {
+    console.log('AI suggestion clicked:', suggestion);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <DashboardHeader 
@@ -33,7 +37,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </div>
         {children}
       </main>
-      <ContextualAIHelper />
+      <ContextualAIHelper 
+        currentPage={title}
+        onSuggestionClick={handleSuggestionClick}
+      />
     </div>
   );
 };

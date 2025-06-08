@@ -251,8 +251,8 @@ export const EnhancedAuthForm: React.FC = () => {
             <TabsContent value="signup" className="space-y-4">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <RoleSelector
-                  selectedRole={selectedRole}
-                  onRoleChange={setSelectedRole}
+                  value={selectedRole}
+                  onValueChange={setSelectedRole}
                 />
 
                 <div className="grid grid-cols-2 gap-3">

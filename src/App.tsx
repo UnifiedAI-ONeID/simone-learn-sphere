@@ -1,9 +1,10 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UnifiedLocalizationProvider } from '@/contexts/UnifiedLocalizationContext';
 import { PlatformThemeProvider } from '@/contexts/PlatformThemeContext';
-import { GlobalErrorBoundary } from '@/components/GlobalErrorBoundary';
+import GlobalErrorBoundary from '@/components/GlobalErrorBoundary';
 import { TranslationErrorBoundary } from '@/components/TranslationErrorBoundary';
 import { SecurityProvider } from '@/components/SecurityProvider';
 import { Toaster } from 'react-hot-toast';
