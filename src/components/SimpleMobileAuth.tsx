@@ -7,6 +7,7 @@ import { PlatformButton } from '@/components/platform/PlatformButton';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { PasskeyAuth } from '@/components/PasskeyAuth';
 import { RoleSelector } from '@/components/auth/RoleSelector';
+import { Mobile2FASetupFlow } from '@/components/mobile/Mobile2FASetupFlow';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 import { validatePasswordStrength } from '@/utils/authUtils';
@@ -31,11 +32,13 @@ export const SimpleMobileAuth = () => {
     error, 
     setError, 
     showEmailVerification,
+    show2FASetup,
     pendingVerificationEmail,
     signUpWithEmail, 
     signInWithEmail, 
     signInWithOAuth,
-    handleEmailVerificationSuccess
+    handleEmailVerificationSuccess,
+    handle2FASetupComplete
   } = useEnhancedAuth();
 
   // Validate password in real-time for signup
@@ -65,6 +68,17 @@ export const SimpleMobileAuth = () => {
       <div className="w-full max-w-sm">
         <PasswordResetRequest
           onBack={() => setShowPasswordReset(false)}
+        />
+      </div>
+    );
+  }
+
+  if (show2FASetup) {
+    return (
+      <div className="w-full max-w-sm">
+        <Mobile2FASetupFlow
+          onComplete={handle2FASetupComplete}
+          isOnboarding={true}
         />
       </div>
     );

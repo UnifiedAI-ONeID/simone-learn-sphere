@@ -36,34 +36,39 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
         return false;
       }
 
-      // Generate challenge
-      const challenge = new Uint8Array(32);
-      crypto.getRandomValues(challenge);
+      // Get registration challenge from edge function
+      const { data: challengeData, error: challengeError } = await supabase.functions.invoke(
+        'webauthn-register-challenge',
+        {
+          body: { userId: user.id, email }
+        }
+      );
+
+      if (challengeError || !challengeData?.success) {
+        throw new Error(challengeError?.message || 'Failed to get registration challenge');
+      }
+
+      const options = challengeData.options;
+
+      // Convert challenge from base64 to ArrayBuffer
+      const challenge = Uint8Array.from(atob(options.challenge), c => c.charCodeAt(0));
+      
+      // Convert user ID to ArrayBuffer
+      const userId = new TextEncoder().encode(user.id);
 
       // Create credential options
       const credentialCreationOptions: CredentialCreationOptions = {
         publicKey: {
           challenge,
-          rp: {
-            name: 'SimoneLabs',
-            id: window.location.hostname,
-          },
+          rp: options.rp,
           user: {
-            id: new TextEncoder().encode(user.id),
-            name: email,
-            displayName: email,
+            ...options.user,
+            id: userId,
           },
-          pubKeyCredParams: [
-            { alg: -7, type: 'public-key' }, // ES256
-            { alg: -257, type: 'public-key' }, // RS256
-          ],
-          authenticatorSelection: {
-            authenticatorAttachment: 'platform',
-            userVerification: 'preferred',
-            requireResidentKey: false,
-          },
-          timeout: 60000,
-          attestation: 'direct',
+          pubKeyCredParams: options.pubKeyCredParams,
+          authenticatorSelection: options.authenticatorSelection,
+          timeout: options.timeout,
+          attestation: options.attestation as AttestationConveyancePreference,
         },
       };
 
@@ -82,7 +87,7 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
         // Convert ArrayBuffer to base64 string for storage
         const publicKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(publicKeyBuffer)));
         
-        // Store credential info in the new webauthn_credentials table
+        // Store credential info in the webauthn_credentials table
         const { error: insertError } = await supabase
           .from('webauthn_credentials')
           .insert({
@@ -138,56 +143,48 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
     setError(null);
 
     try {
-      // Get user's credentials from the new table
-      const { data: userCredentials, error: fetchError } = await supabase
-        .from('webauthn_credentials')
-        .select('credential_id, user_id')
-        .eq('is_active', true)
-        .in('user_id', [
-          // We need to get the user_id first by email
-          supabase
-            .from('profiles')
-            .select('id')
-            .eq('email', email)
-            .single()
-            .then(result => result.data?.id)
-        ]);
+      // Get authentication challenge from edge function
+      const { data: challengeData, error: challengeError } = await supabase.functions.invoke(
+        'webauthn-auth-challenge',
+        {
+          body: { email }
+        }
+      );
 
-      if (fetchError) {
-        console.error('Error fetching credentials:', fetchError);
-        setError('Failed to fetch passkeys');
-        return false;
+      if (challengeError || !challengeData?.success) {
+        throw new Error(challengeError?.message || 'Failed to get authentication challenge');
       }
 
-      if (!userCredentials || userCredentials.length === 0) {
-        setError('No passkeys found for this email');
-        return false;
-      }
+      const options = challengeData.options;
 
-      // Generate challenge
-      const challenge = new Uint8Array(32);
-      crypto.getRandomValues(challenge);
+      // Convert challenge from base64 to ArrayBuffer
+      const challenge = Uint8Array.from(atob(options.challenge), c => c.charCodeAt(0));
+      
+      // Convert credential IDs from strings to ArrayBuffers
+      const allowCredentials = options.allowCredentials.map((cred: any) => ({
+        ...cred,
+        id: Uint8Array.from(atob(cred.id), c => c.charCodeAt(0)),
+      }));
 
       const credentialRequestOptions: CredentialRequestOptions = {
         publicKey: {
           challenge,
-          allowCredentials: userCredentials.map(cred => ({
-            id: new TextEncoder().encode(cred.credential_id),
-            type: 'public-key' as const,
-          })),
-          userVerification: 'preferred',
-          timeout: 60000,
+          allowCredentials,
+          userVerification: options.userVerification as UserVerificationRequirement,
+          timeout: options.timeout,
         },
       };
 
-      const assertion = await navigator.credentials.get(credentialRequestOptions);
+      const assertion = await navigator.credentials.get(credentialRequestOptions) as PublicKeyCredential;
       
       if (assertion) {
-        // Update last used timestamp
+        // Update last used timestamp for the credential
+        const credentialId = btoa(String.fromCharCode(...new Uint8Array(assertion.rawId)));
+        
         await supabase
           .from('webauthn_credentials')
           .update({ last_used_at: new Date().toISOString() })
-          .in('credential_id', userCredentials.map(c => c.credential_id));
+          .eq('credential_id', credentialId);
 
         return true;
       }
