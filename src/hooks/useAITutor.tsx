@@ -78,20 +78,29 @@ export const useAITutor = () => {
       throw new Error(isLocked ? 'AI Tutor is temporarily unavailable' : 'Authentication required');
     }
 
-    const { data, error } = await supabase.functions.invoke('ai-tutor', {
-      body: {
-        question,
-        lessonId,
-        quizContext
-      }
-    });
+    if (!question.trim()) {
+      throw new Error('Question cannot be empty');
+    }
 
-    if (error) throw error;
-    
-    // Refresh sessions after asking a question
-    await fetchSessions(lessonId);
-    
-    return data;
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-tutor', {
+        body: {
+          question: question.trim(),
+          lessonId,
+          quizContext
+        }
+      });
+
+      if (error) throw error;
+      
+      // Refresh sessions after asking a question
+      await fetchSessions(lessonId);
+      
+      return data;
+    } catch (error) {
+      console.error('Error asking AI tutor question:', error);
+      throw error;
+    }
   };
 
   const getSessionStats = () => {

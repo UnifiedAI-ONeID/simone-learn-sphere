@@ -40,7 +40,7 @@ export const LandingPageAssistant: React.FC = () => {
         timestamp: new Date()
       }]);
     }
-  }, [isOpen]);
+  }, [isOpen, messages.length]);
 
   const handleSendQuestion = async () => {
     if (!question.trim() || isLoading) return;
@@ -53,12 +53,13 @@ export const LandingPageAssistant: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentQuestion = question.trim();
     setQuestion('');
     setIsLoading(true);
 
     try {
       // For now, provide predefined responses based on common questions
-      const response = getPlatformResponse(question.trim());
+      const response = getPlatformResponse(currentQuestion);
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),

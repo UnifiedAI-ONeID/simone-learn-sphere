@@ -7,8 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Send, AlertTriangle, HelpCircle, Lightbulb } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAITutor } from '@/hooks/useAITutor';
 
 interface Message {
   id: string;
@@ -31,12 +30,11 @@ export const AITutor: React.FC<AITutorProps> = ({
   quizContext = false, 
   className = '' 
 }) => {
-  const { user } = useAuth();
   const { toast } = useToast();
+  const { askQuestion, isLocked } = useAITutor();
   const [messages, setMessages] = useState<Message[]>([]);
   const [question, setQuestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -59,10 +57,10 @@ export const AITutor: React.FC<AITutorProps> = ({
         timestamp: new Date()
       }]);
     }
-  }, [quizContext]);
+  }, [quizContext, messages.length]);
 
   const handleSendQuestion = async () => {
-    if (!question.trim() || !user || isLoading) return;
+    if (!question.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -72,23 +70,15 @@ export const AITutor: React.FC<AITutorProps> = ({
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentQuestion = question.trim();
     setQuestion('');
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('ai-tutor', {
-        body: {
-          question: question.trim(),
-          lessonId,
-          quizContext
-        }
-      });
-
-      if (error) throw error;
+      const data = await askQuestion(currentQuestion, lessonId, quizContext);
 
       if (!data.success) {
         if (data.locked) {
-          setIsLocked(true);
           toast({
             title: "AI Tutor Temporarily Unavailable",
             description: data.message,
@@ -162,11 +152,11 @@ export const AITutor: React.FC<AITutorProps> = ({
 
   if (isLocked) {
     return (
-      <Card className={`bg-red-50 border-red-200 ${className}`}>
+      <Card className={`bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-800 ${className}`}>
         <CardContent className="p-6 text-center">
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="font-semibold text-red-800 mb-2">AI Tutor Temporarily Unavailable</h3>
-          <p className="text-red-600">Please try again later or contact your instructor for help.</p>
+          <h3 className="font-semibold text-red-800 dark:text-red-400 mb-2">AI Tutor Temporarily Unavailable</h3>
+          <p className="text-red-600 dark:text-red-400">Please try again later or contact your instructor for help.</p>
         </CardContent>
       </Card>
     );
@@ -199,7 +189,7 @@ export const AITutor: React.FC<AITutorProps> = ({
                   className={`max-w-[80%] p-3 rounded-lg ${
                     message.type === 'user'
                       ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 text-gray-900'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-1">
@@ -211,13 +201,13 @@ export const AITutor: React.FC<AITutorProps> = ({
                   <p className="text-sm">{message.content}</p>
                   
                   {message.followUpQuestion && (
-                    <div className="mt-2 p-2 bg-blue-50 rounded text-blue-800 text-sm">
+                    <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-blue-800 dark:text-blue-200 text-sm">
                       <strong>Think about this:</strong> {message.followUpQuestion}
                     </div>
                   )}
                   
                   {message.suggestion && (
-                    <div className="mt-2 p-2 bg-green-50 rounded text-green-800 text-sm">
+                    <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-green-800 dark:text-green-200 text-sm">
                       <strong>Tip:</strong> {message.suggestion}
                     </div>
                   )}
@@ -227,7 +217,7 @@ export const AITutor: React.FC<AITutorProps> = ({
             
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-900 p-3 rounded-lg">
+                <div className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-3 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-purple-600"></div>
                     <span className="text-sm">AI Tutor is thinking...</span>
@@ -262,7 +252,7 @@ export const AITutor: React.FC<AITutorProps> = ({
             </Button>
           </div>
           {quizContext && (
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
               I'll help you understand concepts, but won't give direct answers to quiz questions.
             </p>
           )}

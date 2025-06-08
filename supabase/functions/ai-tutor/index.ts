@@ -180,7 +180,7 @@ serve(async (req) => {
 });
 
 async function classifyIntent(question: string, quizContext: boolean): Promise<IntentClassification> {
-  const lowerQuestion = question.toLowerCase();
+  const lowerQuestion = question.toLowerCase().trim();
   
   // Direct answer seeking patterns
   const cheatPatterns = [
@@ -190,7 +190,9 @@ async function classifyIntent(question: string, quizContext: boolean): Promise<I
     /give me the answer/i,
     /correct answer/i,
     /solution to/i,
-    /just tell me/i
+    /just tell me/i,
+    /what should i choose/i,
+    /which option is correct/i
   ];
 
   // Learning-oriented patterns
@@ -201,7 +203,9 @@ async function classifyIntent(question: string, quizContext: boolean): Promise<I
     /help me understand/i,
     /what does.*mean/i,
     /difference between/i,
-    /example of/i
+    /example of/i,
+    /how to/i,
+    /what is the concept/i
   ];
 
   if (cheatPatterns.some(pattern => pattern.test(question))) {
@@ -221,7 +225,7 @@ async function classifyIntent(question: string, quizContext: boolean): Promise<I
   }
 
   // If in quiz context and asking specific questions, be more cautious
-  if (quizContext && lowerQuestion.includes('question')) {
+  if (quizContext && (lowerQuestion.includes('question') || lowerQuestion.includes('quiz'))) {
     return {
       intent: 'cheat-attempt',
       confidence: 0.7,
@@ -252,6 +256,10 @@ async function moderateContent(content: string): Promise<{ flagged: boolean; cat
         input: content
       }),
     });
+
+    if (!response.ok) {
+      throw new Error(`Moderation API error: ${response.status}`);
+    }
 
     const data = await response.json();
     const result = data.results[0];
@@ -295,6 +303,7 @@ ${contextPrompt}Guidelines:
 - Encourage exploration and deeper understanding
 - Be encouraging and supportive
 - If they're stuck, offer to break down the problem into smaller parts
+- Keep responses concise but helpful
 
 Student question: ${question}
 
@@ -317,6 +326,10 @@ Provide your response in a helpful, educational tone that promotes learning.`;
         temperature: 0.7,
       }),
     });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
 
     const data = await response.json();
     const explanation = data.choices[0].message.content;
