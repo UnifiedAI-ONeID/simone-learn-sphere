@@ -80,6 +80,42 @@ export type Database = {
           },
         ]
       }
+      auth_analytics: {
+        Row: {
+          created_at: string | null
+          error_code: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          provider: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          provider?: string | null
+          success: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          provider?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           created_at: string
@@ -343,6 +379,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_service_config: {
+        Row: {
+          config: Json
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          service_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          config: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          service_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          config?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          service_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       impersonation_sessions: {
         Row: {
@@ -952,6 +1015,16 @@ export type Database = {
           abuse_user_id: string
           abuse_type_param: string
           severity_param?: number
+        }
+        Returns: undefined
+      }
+      log_auth_event: {
+        Args: {
+          event_type: string
+          provider?: string
+          success?: boolean
+          error_code?: string
+          error_message?: string
         }
         Returns: undefined
       }
