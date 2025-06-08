@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,8 @@ import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Clock, Award, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CheckCircle, XCircle, Clock, Award, ArrowRight, ArrowLeft, RefreshCw } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface Question {
@@ -60,7 +62,6 @@ export const QuizView = () => {
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // Quiz is completed, calculate score
       calculateScore();
       setQuizCompleted(true);
     }
@@ -161,14 +162,14 @@ export const QuizView = () => {
                   <UnifiedLocalizedText text="Question" /> {currentQuestionIndex + 1}: <UnifiedLocalizedText text={currentQuestion.text} />
                 </h4>
                 {isCorrect ? (
-                  <Alert type="success">
+                  <Alert>
                     <CheckCircle className="h-4 w-4" />
                     <AlertDescription>
                       <UnifiedLocalizedText text="Correct!" /> {currentQuestion.explanation}
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  <Alert type="error">
+                  <Alert variant="destructive">
                     <XCircle className="h-4 w-4" />
                     <AlertDescription>
                       <UnifiedLocalizedText text="Incorrect." /> <UnifiedLocalizedText text="The correct answer is" /> {currentQuestion.correctAnswer}. {currentQuestion.explanation}
@@ -188,9 +189,3 @@ export const QuizView = () => {
     </div>
   );
 };
-
-const Alert = ({ children, type }: { children: React.ReactNode; type: 'success' | 'error' }) => (
-  <div className={`p-3 rounded-md flex items-center space-x-2 ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-    {children}
-  </div>
-);

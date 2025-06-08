@@ -1,41 +1,22 @@
 
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole } from '@/hooks/useUserRole';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
+import React, { useState } from 'react';
 import { DesktopAuth } from '@/components/auth/DesktopAuth';
-import { AuthLoadingState } from '@/components/auth/AuthLoadingState';
+import { MobileAuth } from '@/components/auth/MobileAuth';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
-const Auth = () => {
-  const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
-  const { role, loading: roleLoading } = useUserRole();
+export const Auth = () => {
   const isMobile = useIsMobile();
+  const [isOpen, setIsOpen] = useState(true);
 
-  // Redirect mobile users to mobile auth
-  useEffect(() => {
-    if (isMobile) {
-      navigate('/auth', { replace: true });
-      return;
-    }
-  }, [isMobile, navigate]);
+  const handleClose = () => {
+    setIsOpen(false);
+  };
 
-  // Redirect authenticated users
-  useEffect(() => {
-    if (!authLoading && !roleLoading && user && role) {
-      const redirectRoute = getRoleBasedRoute(role, true);
-      navigate(redirectRoute, { replace: true });
-    }
-  }, [user, role, authLoading, roleLoading, navigate]);
-
-  // Show loading state while checking auth
-  if (authLoading || roleLoading) {
-    return <AuthLoadingState message="Checking authentication..." />;
+  if (isMobile) {
+    return <MobileAuth />;
   }
 
-  return <DesktopAuth />;
+  return <DesktopAuth onClose={handleClose} />;
 };
 
 export default Auth;

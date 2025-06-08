@@ -14,8 +14,14 @@ import {
   ChevronRight, 
   Calendar,
   Target,
-  Sparkles,
-  Plus
+  Users,
+  Heart,
+  Trophy,
+  Zap,
+  Activity,
+  MessageSquare,
+  Brain,
+  PlusCircle
 } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
@@ -291,7 +297,7 @@ export const StudentDashboardContent = () => {
                 <UnifiedLocalizedText text="My Courses" />
               </CardTitle>
               <Button size="sm" onClick={() => navigate('/student/courses')}>
-                <Plus className="h-4 w-4 mr-2" />
+                <PlusCircle className="h-4 w-4 mr-2" />
                 Browse More
               </Button>
             </div>

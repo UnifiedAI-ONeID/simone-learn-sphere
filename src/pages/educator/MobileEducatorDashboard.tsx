@@ -8,7 +8,7 @@ import { useEducatorAnalytics } from '@/hooks/useEducatorAnalytics';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const MobileEducatorDashboard = () => {
-  const { totalCourses, activeStudents, averageRating, engagementRate } = useEducatorAnalytics();
+  const { totalCourses, totalStudents, avgRating, totalRevenue } = useEducatorAnalytics();
 
   const quickActions = [
     { label: 'Create New Course', icon: Plus, description: 'Start building your next course' },
@@ -47,14 +47,14 @@ export const MobileEducatorDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="Active Students" />
+              <UnifiedLocalizedText text="Total Students" />
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Students currently enrolled in your courses" />
+              <UnifiedLocalizedText text="Number of students currently enrolled in your courses" />
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{activeStudents}</div>
+            <div className="text-3xl font-bold">{totalStudents}</div>
           </CardContent>
         </Card>
 
@@ -68,21 +68,21 @@ export const MobileEducatorDashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{averageRating}</div>
+            <div className="text-3xl font-bold">{avgRating}</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="Engagement Rate" />
+              <UnifiedLocalizedText text="Total Revenue" />
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Student engagement with your course content" />
+              <UnifiedLocalizedText text="Total revenue generated from your courses" />
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{engagementRate}%</div>
+            <div className="text-3xl font-bold">{totalRevenue}</div>
           </CardContent>
         </Card>
       </div>

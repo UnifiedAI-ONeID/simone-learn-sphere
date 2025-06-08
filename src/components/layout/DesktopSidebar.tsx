@@ -2,11 +2,10 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Brain, Home, BookOpen, Users, BarChart3, Shield, Settings, Bot } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 

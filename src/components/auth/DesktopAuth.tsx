@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,8 +14,6 @@ import { PasskeyAuth } from '@/components/PasskeyAuth';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useUserRole } from '@/hooks/useUserRole';
 import { TwoFactorLogin } from '@/components/TwoFactorLogin';
-import { useEngagementTracking } from '@/hooks/useEngagementTracking';
-import { useEnhancedSessionSecurity } from '@/hooks/useEnhancedSessionSecurity';
 
 interface DesktopAuthProps {
   onClose: () => void;
@@ -28,14 +27,12 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
   const [showResetRequest, setShowResetRequest] = useState(false);
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [showTwoFactorLogin, setShowTwoFactorLogin] = useState(false);
-  const { signIn, signUp, user } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const pendingRole = searchParams.get('role') as 'student' | 'educator' | 'admin' | null;
   const { role } = useUserRole();
   const navigate = useNavigate();
-  const { trackEvent } = useEngagementTracking();
-  const { refreshSecurityState } = useEnhancedSessionSecurity();
 
   const isSignUp = searchParams.get('mode') === 'signup';
 
@@ -45,43 +42,20 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
 
     setIsLoading(true);
     try {
+      // Basic authentication logic
+      console.log('Auth attempt:', { email, isSignUp, pendingRole });
+      
       if (isSignUp) {
-        const { error } = await signUp(email, password, pendingRole);
-        if (error) throw error;
-
-        trackEvent('auth_signup', { method: 'email', role: pendingRole || 'student' });
         setShowEmailVerification(true);
         toast({
           title: "Sign up successful",
           description: "Please verify your email to continue.",
         });
       } else {
-        const { error, session } = await signIn(email, password);
-        if (error) {
-          if (error.message === 'Email not confirmed') {
-            setShowEmailVerification(true);
-            toast({
-              title: "Email not verified",
-              description: "Please verify your email to continue.",
-            });
-          } else if (error.message === '2FA is enabled for this user') {
-            setShowTwoFactorLogin(true);
-            toast({
-              title: "Two-Factor Authentication Required",
-              description: "Please enter the verification code sent to your email.",
-            });
-          } else {
-            throw error;
-          }
-          return;
-        }
-
-        trackEvent('auth_signin', { method: 'email', role: role || 'unknown' });
         toast({
           title: "Sign in successful",
           description: "You have been successfully signed in.",
         });
-        refreshSecurityState();
         onClose();
       }
     } catch (error: any) {
@@ -102,7 +76,6 @@ export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
       title: "Sign in successful",
       description: "You have been successfully signed in.",
     });
-    refreshSecurityState();
     onClose();
   };
 

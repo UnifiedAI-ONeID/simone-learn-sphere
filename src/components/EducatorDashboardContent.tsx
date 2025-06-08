@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,11 +12,14 @@ import {
   BookOpen, 
   DollarSign, 
   Star,
-  Rocket,
-  Lightbulb,
-  Bot,
-  Sparkles,
-  Heart
+  Heart,
+  Trophy,
+  Zap,
+  PlusCircle,
+  Edit,
+  Eye,
+  MessageSquare,
+  Calendar
 } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
