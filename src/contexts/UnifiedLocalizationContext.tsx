@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -254,15 +253,24 @@ export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }
 
     try {
       const translationOperation = async () => {
+        console.log('UnifiedLocalization: Calling translate-text-fixed for:', text.substring(0, 30), 'to', target);
+        
         const { data, error } = await supabase.functions.invoke('translate-text-fixed', {
           body: { text: text.trim(), targetLanguage: target }
         });
 
         if (error) {
+          console.error('UnifiedLocalization: Translation service error:', error);
           throw new Error(`Translation service error: ${error.message}`);
         }
 
-        return data?.translatedText || text;
+        if (!data || !data.translatedText) {
+          console.warn('UnifiedLocalization: No translation data received for:', text.substring(0, 30));
+          throw new Error('No translation data received');
+        }
+
+        console.log('UnifiedLocalization: Translation successful for:', text.substring(0, 30), '→', data.translatedText.substring(0, 30));
+        return data.translatedText;
       };
 
       const translatedText = await retryOperation(translationOperation);
@@ -295,10 +303,12 @@ export const UnifiedLocalizationProvider: React.FC<{ children: React.ReactNode }
       
       const fallbackTranslation = getOfflineTranslation(text, target);
       if (fallbackTranslation) {
+        console.log('UnifiedLocalization: Using offline fallback for:', text.substring(0, 30));
         return fallbackTranslation;
       }
       
       setTranslationError('Translation service temporarily unavailable');
+      console.log('UnifiedLocalization: Returning original text due to translation failure:', text.substring(0, 30));
       return text;
     } finally {
       setIsTranslating(false);

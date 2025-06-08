@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { useLocalization } from '@/contexts/LocalizationContext';
+import { useLocalization } from '@/contexts/UnifiedLocalizationContext';
 
 interface UseAutoTranslateOptions {
   enabled?: boolean;
