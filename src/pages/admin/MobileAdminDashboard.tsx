@@ -1,11 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Users, Shield, Activity, AlertTriangle, Settings, Database, BarChart3, UserCheck, Lock, Server, Globe, FileText, TrendingUp, Zap, Monitor, Clock, DollarSign } from 'lucide-react';
+import { Users, Shield, Activity, AlertTriangle, Settings, Database, BarChart3, UserCheck, Lock, Server, Globe, FileText, TrendingUp, Zap, Monitor, Clock, DollarSign, BookOpen } from 'lucide-react';
 import { useEngagementTracking } from '@/hooks/useEngagementTracking';
 import { useSessionTracking } from '@/hooks/useSessionTracking';
 import { LocalizedText } from '@/components/LocalizedText';
