@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle, Shield } from 'lucide-react';
@@ -157,7 +158,7 @@ export const SimpleMobileAuth = () => {
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       <PlatformButton
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
                         onClick={handleGoogleAuth}
                         disabled={isLoading}
@@ -166,7 +167,7 @@ export const SimpleMobileAuth = () => {
                         <LocalizedText text="Google Login" />
                       </PlatformButton>
                       <PlatformButton
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
                         onClick={handleLinkedInAuth}
                         disabled={isLoading}
@@ -190,7 +191,7 @@ export const SimpleMobileAuth = () => {
             </label>
             <RoleSelector
               selectedRole={selectedRole}
-              onRoleSelect={setSelectedRole}
+              onRoleChange={setSelectedRole}
               disabled={isLoading}
             />
           </div>
@@ -339,7 +340,7 @@ export const SimpleMobileAuth = () => {
 
           <div className="grid grid-cols-2 gap-3">
             <PlatformButton
-              variant="outline"
+              variant="secondary"
               onClick={handleGoogleAuth}
               disabled={isLoading}
               className="flex items-center justify-center space-x-2"
@@ -354,7 +355,7 @@ export const SimpleMobileAuth = () => {
             </PlatformButton>
 
             <PlatformButton
-              variant="outline"
+              variant="secondary"
               onClick={handleLinkedInAuth}
               disabled={isLoading}
               className="flex items-center justify-center space-x-2"

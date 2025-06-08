@@ -123,6 +123,65 @@ export const cleanupAuthState = (): void => {
   }
 };
 
+export const ensureProfileExists = async (userId: string, user: any, role?: string): Promise<any> => {
+  if (!userId || !user) return null;
+  
+  try {
+    // Check if profile exists
+    const { data: existingProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (existingProfile && !fetchError) {
+      console.log('Profile exists:', existingProfile);
+      return existingProfile;
+    }
+    
+    // If profile doesn't exist, create it
+    console.log('Creating new profile for user:', userId);
+    const profileData = {
+      id: userId,
+      email: user.email,
+      first_name: user.user_metadata?.first_name || '',
+      last_name: user.user_metadata?.last_name || '',
+      role: role || user.user_metadata?.role || 'student'
+    };
+    
+    const { data: newProfile, error: createError } = await supabase
+      .from('profiles')
+      .insert(profileData)
+      .select()
+      .single();
+    
+    if (createError) {
+      console.error('Failed to create profile:', createError);
+      // Return a default profile structure
+      return {
+        id: userId,
+        role: role || 'student',
+        email: user.email,
+        first_name: user.user_metadata?.first_name || '',
+        last_name: user.user_metadata?.last_name || ''
+      };
+    }
+    
+    console.log('Profile created successfully:', newProfile);
+    return newProfile;
+  } catch (error) {
+    console.error('Error ensuring profile exists:', error);
+    // Return default profile on error
+    return {
+      id: userId,
+      role: role || 'student',
+      email: user.email,
+      first_name: user.user_metadata?.first_name || '',
+      last_name: user.user_metadata?.last_name || ''
+    };
+  }
+};
+
 export const retryAuthOperation = async <T>(
   operation: () => Promise<T>,
   maxRetries: number = 3,
