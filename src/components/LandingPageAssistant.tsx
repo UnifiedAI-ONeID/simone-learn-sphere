@@ -138,7 +138,7 @@ export const LandingPageAssistant: React.FC = () => {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 w-14 h-14 rounded-full shadow-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 z-40"
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 z-40"
         size="sm"
         aria-label="Open platform assistant"
       >
@@ -148,7 +148,7 @@ export const LandingPageAssistant: React.FC = () => {
   }
 
   return (
-    <div className={`fixed bottom-6 left-6 z-50 ${isMinimized ? 'w-80' : 'w-96'}`}>
+    <div className={`fixed bottom-6 right-6 z-50 ${isMinimized ? 'w-80' : 'w-96'}`}>
       <Card className={`shadow-2xl border-2 border-purple-200 dark:border-purple-700 ${isMinimized ? 'h-16' : 'h-[600px]'} transition-all duration-300`}>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
