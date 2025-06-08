@@ -1,95 +1,63 @@
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { PlatformThemeProvider } from '@/contexts/PlatformThemeContext';
-import { LocalizationProvider } from '@/contexts/LocalizationContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as HotToaster } from 'react-hot-toast';
-import { isMobile, isTablet } from 'react-device-detect';
-import { usePlatformDetection } from '@/hooks/usePlatformDetection';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { LocalizationProvider } from '@/contexts/LocalizationContext';
+import { PlatformThemeProvider } from '@/contexts/PlatformThemeContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { TranslationErrorBoundary } from '@/components/TranslationErrorBoundary';
+import { SecurityProvider } from '@/components/SecurityProvider';
+import { Toaster } from 'react-hot-toast';
+import { usePlatformDetection } from '@/hooks/usePlatformDetection';
+import { useOptimizedPerformance } from '@/hooks/useOptimizedPerformance';
 
-// Import pages
+// Mobile Pages
+import MobileAuth from '@/pages/mobile/MobileAuth';
+import MobileAuthCallback from '@/pages/mobile/MobileAuthCallback';
+import MobileIndex from '@/pages/mobile/MobileIndex';
+import MobileProfileSettings from '@/pages/mobile/MobileProfileSettings';
+import MobileNotFound from '@/pages/mobile/MobileNotFound';
+import MobileStudentDashboard from '@/pages/student/MobileStudentDashboard';
+import MobileEducatorDashboard from '@/pages/educator/MobileEducatorDashboard';
+import MobileAdminDashboard from '@/pages/admin/MobileAdminDashboard';
+
+// Desktop Pages
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
 import AuthCallback from '@/pages/AuthCallback';
 import StudentDashboard from '@/pages/StudentDashboard';
 import EducatorDashboard from '@/pages/EducatorDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
+import CourseBuilder from '@/pages/CourseBuilder';
 import ProfileSettings from '@/pages/ProfileSettings';
 import NotFound from '@/pages/NotFound';
-import CourseBuilder from '@/pages/CourseBuilder';
 
-// Mobile pages
-import { MobileIndex } from '@/pages/mobile/MobileIndex';
-import { MobileAuth } from '@/pages/mobile/MobileAuth';
-import { MobileAuthCallback } from '@/pages/mobile/MobileAuthCallback';
-import { MobileStudentDashboard } from '@/pages/student/MobileStudentDashboard';
-import { MobileEducatorDashboard } from '@/pages/educator/MobileEducatorDashboard';
-import { MobileAdminDashboard } from '@/pages/admin/MobileAdminDashboard';
-import { MobileProfileSettings } from '@/pages/mobile/MobileProfileSettings';
-import { MobileNotFound } from '@/pages/mobile/MobileNotFound';
-
-// Layout components
-import { DesktopLayout } from '@/components/layout/DesktopLayout';
-import { MobileLayout } from '@/components/layout/MobileLayout';
-import { RoleProtectedRoute } from '@/components/RoleProtectedRoute';
+import '@/App.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 30 * 60 * 1000, // 30 minutes
     },
   },
 });
 
-function AppContent() {
-  const isMobileDevice = isMobile || isTablet;
-  usePlatformDetection();
-
-  if (isMobileDevice) {
+function AppRoutes() {
+  const { isMobile } = usePlatformDetection();
+  
+  if (isMobile) {
     return (
       <Routes>
         <Route path="/" element={<MobileIndex />} />
         <Route path="/auth" element={<MobileAuth />} />
         <Route path="/auth/callback" element={<MobileAuthCallback />} />
-        <Route path="*" element={<MobileLayout />}>
-          <Route 
-            path="student-dashboard" 
-            element={
-              <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
-                <MobileStudentDashboard />
-              </RoleProtectedRoute>
-            } 
-          />
-          <Route 
-            path="educator-dashboard" 
-            element={
-              <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
-                <MobileEducatorDashboard />
-              </RoleProtectedRoute>
-            } 
-          />
-          <Route 
-            path="admin-dashboard" 
-            element={
-              <RoleProtectedRoute allowedRoles={['admin']}>
-                <MobileAdminDashboard />
-              </RoleProtectedRoute>
-            } 
-          />
-          <Route 
-            path="profile-settings" 
-            element={
-              <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
-                <MobileProfileSettings />
-              </RoleProtectedRoute>
-            } 
-          />
-          <Route path="*" element={<MobileNotFound />} />
-        </Route>
+        <Route path="/profile" element={<MobileProfileSettings />} />
+        <Route path="/student/*" element={<MobileStudentDashboard />} />
+        <Route path="/educator/*" element={<MobileEducatorDashboard />} />
+        <Route path="/admin/*" element={<MobileAdminDashboard />} />
+        <Route path="/404" element={<MobileNotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
     );
   }
@@ -99,78 +67,46 @@ function AppContent() {
       <Route path="/" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="*" element={<DesktopLayout />}>
-        <Route 
-          path="student-dashboard" 
-          element={
-            <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
-              <StudentDashboard />
-            </RoleProtectedRoute>
-          } 
-        />
-        <Route 
-          path="educator-dashboard" 
-          element={
-            <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
-              <EducatorDashboard />
-            </RoleProtectedRoute>
-          } 
-        />
-        <Route 
-          path="admin-dashboard" 
-          element={
-            <RoleProtectedRoute allowedRoles={['admin']}>
-              <AdminDashboard />
-            </RoleProtectedRoute>
-          } 
-        />
-        <Route 
-          path="course-builder" 
-          element={
-            <RoleProtectedRoute allowedRoles={['educator', 'admin']}>
-              <CourseBuilder />
-            </RoleProtectedRoute>
-          } 
-        />
-        <Route 
-          path="profile-settings" 
-          element={
-            <RoleProtectedRoute allowedRoles={['student', 'educator', 'admin']}>
-              <ProfileSettings />
-            </RoleProtectedRoute>
-          } 
-        />
-        <Route path="*" element={<NotFound />} />
-      </Route>
+      <Route path="/student" element={<StudentDashboard />} />
+      <Route path="/educator" element={<EducatorDashboard />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/course-builder" element={<CourseBuilder />} />
+      <Route path="/profile" element={<ProfileSettings />} />
+      <Route path="/404" element={<NotFound />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );
 }
 
 function App() {
+  useOptimizedPerformance();
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <PlatformThemeProvider>
-          <LocalizationProvider>
-            <AuthProvider>
-              <Router>
-                <AppContent />
-                <Toaster />
-                <HotToaster 
-                  position="top-right"
-                  toastOptions={{
-                    duration: 4000,
-                    style: {
-                      background: 'hsl(var(--card))',
-                      color: 'hsl(var(--card-foreground))',
-                      border: '1px solid hsl(var(--border))',
-                    },
-                  }}
-                />
-              </Router>
-            </AuthProvider>
-          </LocalizationProvider>
-        </PlatformThemeProvider>
+        <LocalizationProvider>
+          <TranslationErrorBoundary>
+            <PlatformThemeProvider>
+              <AuthProvider>
+                <SecurityProvider>
+                  <Router>
+                    <AppRoutes />
+                    <Toaster 
+                      position="top-right"
+                      toastOptions={{
+                        duration: 4000,
+                        style: {
+                          background: '#363636',
+                          color: '#fff',
+                        },
+                      }}
+                    />
+                  </Router>
+                </SecurityProvider>
+              </AuthProvider>
+            </PlatformThemeProvider>
+          </TranslationErrorBoundary>
+        </LocalizationProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

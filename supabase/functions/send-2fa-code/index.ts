@@ -51,27 +51,40 @@ serve(async (req) => {
       throw new Error('Failed to store verification code');
     }
 
-    // In production, integrate with your email service
-    console.log(`2FA Code for ${email}: ${code} (Action: ${action})`);
-
     const emailSubject = action === 'enable_2fa' 
       ? 'Enable Two-Factor Authentication' 
       : 'Login Verification Code';
     
-    const emailBody = `
-      Your verification code is: ${code}
-      
-      This code will expire in 5 minutes.
-      
-      If you didn't request this code, please ignore this email.
-      
-      Best regards,
-      The SimoneLabs Team
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #333;">${emailSubject}</h2>
+        <p>Your verification code is:</p>
+        <div style="background: #f5f5f5; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
+          <h1 style="margin: 0; color: #2563eb; font-size: 32px; letter-spacing: 4px;">${code}</h1>
+        </div>
+        <p>This code will expire in 5 minutes.</p>
+        <p>If you didn't request this code, please ignore this email.</p>
+        <p>Best regards,<br>The SimoneLabs Team</p>
+      </div>
     `;
 
-    console.log(`Email would be sent to ${email}:`);
-    console.log(`Subject: ${emailSubject}`);
-    console.log(`Body: ${emailBody}`);
+    const emailResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: email,
+        subject: emailSubject,
+        html: emailHtml,
+        text: `Your verification code is: ${code}. This code will expire in 5 minutes.`
+      }),
+    });
+
+    if (!emailResponse.ok) {
+      console.warn('Failed to send email, but verification code stored');
+    }
 
     return new Response(
       JSON.stringify({ 

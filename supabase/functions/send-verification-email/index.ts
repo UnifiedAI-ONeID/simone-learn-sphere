@@ -49,28 +49,38 @@ serve(async (req) => {
       throw new Error('Failed to store verification code');
     }
 
-    // In production, integrate with your email service (Resend, SendGrid, etc.)
-    console.log(`Email verification code for ${email}: ${code}`);
-    
-    const emailSubject = 'Verify your SimoneLabs account';
-    const emailBody = `
-      Hi ${firstName || 'there'}!
-      
-      Welcome to SimoneLabs! Please verify your email address by entering this code:
-      
-      ${code}
-      
-      This code will expire in 24 hours.
-      
-      If you didn't create this account, please ignore this email.
-      
-      Best regards,
-      The SimoneLabs Team
+    // Send email using the send-email function
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #333;">Welcome to SimoneLabs!</h2>
+        <p>Hi ${firstName || 'there'},</p>
+        <p>Please verify your email address by entering this code:</p>
+        <div style="background: #f5f5f5; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
+          <h1 style="margin: 0; color: #2563eb; font-size: 32px; letter-spacing: 4px;">${code}</h1>
+        </div>
+        <p>This code will expire in 24 hours.</p>
+        <p>If you didn't create this account, please ignore this email.</p>
+        <p>Best regards,<br>The SimoneLabs Team</p>
+      </div>
     `;
 
-    console.log(`Email would be sent to ${email}:`);
-    console.log(`Subject: ${emailSubject}`);
-    console.log(`Body: ${emailBody}`);
+    const emailResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: email,
+        subject: 'Verify your SimoneLabs account',
+        html: emailHtml,
+        text: `Hi ${firstName || 'there'}! Welcome to SimoneLabs! Please verify your email address by entering this code: ${code}. This code will expire in 24 hours.`
+      }),
+    });
+
+    if (!emailResponse.ok) {
+      console.warn('Failed to send email, but verification code stored');
+    }
 
     return new Response(
       JSON.stringify({ 

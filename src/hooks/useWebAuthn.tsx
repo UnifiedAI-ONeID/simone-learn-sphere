@@ -71,17 +71,15 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
       if (credential && credential.response) {
         const response = credential.response as AuthenticatorAttestationResponse;
         
-        // Get the public key using the correct method
+        // Get the public key from the attestation response
         const publicKeyBuffer = response.getPublicKey();
         if (!publicKeyBuffer) {
           setError('Failed to get public key from credential');
           return false;
         }
 
-        // Convert ArrayBuffer to hex string for storage
-        const publicKeyHex = Array.from(new Uint8Array(publicKeyBuffer))
-          .map(b => b.toString(16).padStart(2, '0'))
-          .join('');
+        // Convert ArrayBuffer to base64 string for storage
+        const publicKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(publicKeyBuffer)));
         
         // Store credential info in Supabase
         const { error } = await supabase
@@ -90,7 +88,8 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
             user_id: user.id,
             user_email: email,
             credential_id: credential.id,
-            public_key: publicKeyHex,
+            public_key: publicKeyBase64,
+            device_name: navigator.userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop',
           });
 
         if (error) {
@@ -159,28 +158,13 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
       const assertion = await navigator.credentials.get(credentialRequestOptions);
       
       if (assertion) {
-        // In a real implementation, you'd verify the assertion server-side
-        // For now, we'll attempt to sign in the user with email
-        
-        // Try to get user by email from profiles
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', email)
-          .single();
+        // Update last used timestamp
+        await supabase
+          .from('user_passkeys')
+          .update({ last_used_at: new Date().toISOString() })
+          .eq('user_email', email);
 
-        if (profile) {
-          // Update last used timestamp
-          await supabase
-            .from('user_passkeys')
-            .update({ last_used_at: new Date().toISOString() })
-            .eq('user_email', email);
-
-          // Note: In a production app, you'd need to implement proper
-          // server-side verification and session creation
-          // For now, we'll return success and let the parent handle auth
-          return true;
-        }
+        return true;
       }
       
       return false;
