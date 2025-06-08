@@ -1,35 +1,45 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { AlertTriangle, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Home, ArrowLeft } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const MobileNotFound = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
-      <Card className="bg-white/80 backdrop-blur-sm border-purple-100 max-w-sm w-full">
-        <CardContent className="p-8 text-center">
-          <div className="w-16 h-16 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
-            <AlertTriangle className="h-8 w-8 text-red-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="text-center space-y-6 max-w-sm">
+        <div className="space-y-2">
+          <h1 className="text-6xl font-bold text-muted-foreground">404</h1>
+          <h2 className="text-xl font-semibold">
             <UnifiedLocalizedText text="Page Not Found" />
-          </h1>
-          <p className="text-gray-600 mb-6">
-            <UnifiedLocalizedText text="The page you're looking for doesn't exist." />
+          </h2>
+          <p className="text-muted-foreground">
+            <UnifiedLocalizedText text="The page you're looking for doesn't exist or has been moved." />
           </p>
-          <Button
+        </div>
+
+        <div className="space-y-3">
+          <Button 
             onClick={() => navigate('/')}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            className="w-full"
           >
             <Home className="h-4 w-4 mr-2" />
             <UnifiedLocalizedText text="Go Home" />
           </Button>
-        </CardContent>
-      </Card>
+          
+          <Button 
+            variant="outline"
+            onClick={() => navigate(-1)}
+            className="w-full"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="Go Back" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

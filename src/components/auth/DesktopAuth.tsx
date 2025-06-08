@@ -3,194 +3,316 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
-import { Mail, Lock, Eye, EyeOff, Brain } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { PasswordResetRequest } from '@/components/PasswordResetRequest';
-import { EmailVerification } from '@/components/EmailVerification';
-import { PasskeyAuth } from '@/components/PasskeyAuth';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useUserRole } from '@/hooks/useUserRole';
-import { TwoFactorLogin } from '@/components/TwoFactorLogin';
+import { RoleSelector } from './RoleSelector';
+import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
+import { 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  Brain, 
+  AlertTriangle,
+  Chrome,
+  Linkedin,
+  User
+} from 'lucide-react';
 
 interface DesktopAuthProps {
   onClose: () => void;
 }
 
 export const DesktopAuth: React.FC<DesktopAuthProps> = ({ onClose }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showResetRequest, setShowResetRequest] = useState(false);
-  const [showEmailVerification, setShowEmailVerification] = useState(false);
-  const [showTwoFactorLogin, setShowTwoFactorLogin] = useState(false);
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [searchParams] = useSearchParams();
-  const pendingRole = searchParams.get('role') as 'student' | 'educator' | 'admin' | null;
-  const { role } = useUserRole();
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: ''
+  });
 
-  const isSignUp = searchParams.get('mode') === 'signup';
+  const {
+    isLoading,
+    error,
+    setError,
+    signUpWithEmail,
+    signInWithEmail,
+    signInWithOAuth
+  } = useEnhancedAuth();
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (error) setError('');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
-
-    setIsLoading(true);
-    try {
-      // Basic authentication logic
-      console.log('Auth attempt:', { email, isSignUp, pendingRole });
-      
-      if (isSignUp) {
-        setShowEmailVerification(true);
-        toast({
-          title: "Sign up successful",
-          description: "Please verify your email to continue.",
-        });
-      } else {
-        toast({
-          title: "Sign in successful",
-          description: "You have been successfully signed in.",
-        });
+    
+    if (activeTab === 'signup') {
+      if (!selectedRole) {
+        setError('Please select a role before continuing');
+        return;
+      }
+      const result = await signUpWithEmail(
+        formData.email,
+        formData.password,
+        formData.firstName,
+        formData.lastName,
+        selectedRole
+      );
+      if (result.success) {
         onClose();
       }
-    } catch (error: any) {
-      console.error('Authentication error:', error);
-      toast({
-        title: isSignUp ? "Sign up failed" : "Sign in failed",
-        description: error.message || "Please check your credentials and try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+    } else {
+      const result = await signInWithEmail(formData.email, formData.password);
+      if (result.success) {
+        onClose();
+      }
     }
   };
 
-  const handle2FASuccess = (sessionToken?: string) => {
-    setShowTwoFactorLogin(false);
-    toast({
-      title: "Sign in successful",
-      description: "You have been successfully signed in.",
-    });
-    onClose();
+  const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
+    const role = activeTab === 'signup' ? selectedRole : undefined;
+    if (activeTab === 'signup' && !selectedRole) {
+      setError('Please select a role before continuing');
+      return;
+    }
+    
+    await signInWithOAuth(provider, role);
   };
 
-  if (showEmailVerification && email) {
-    return (
-      <EmailVerification
-        email={email}
-        onVerificationSuccess={onClose}
-        onBack={() => setShowEmailVerification(false)}
-      />
-    );
-  }
-
-  if (showTwoFactorLogin && email) {
-    return (
-      <TwoFactorLogin
-        email={email}
-        onVerificationSuccess={handle2FASuccess}
-        onBack={() => setShowTwoFactorLogin(false)}
-      />
-    );
-  }
-
-  if (showResetRequest) {
-    return <PasswordResetRequest onBack={() => setShowResetRequest(false)} />;
-  }
-
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-center">
-          <Brain className="h-5 w-5" />
-          <UnifiedLocalizedText text={isSignUp ? "Create an Account" : "Sign In"} />
-        </CardTitle>
-        <CardDescription className="text-center">
-          <UnifiedLocalizedText text={isSignUp ? "Join our platform and start learning" : "Enter your credentials to access your account"} />
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+    <div className="min-h-screen flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="flex items-center gap-2 justify-center text-2xl">
+            <Brain className="h-6 w-6" />
+            <UnifiedLocalizedText text="Welcome to SimoneLabs" />
+          </CardTitle>
+          <CardDescription>
+            <UnifiedLocalizedText text="Sign in to your account or create a new one" />
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          {error && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* OAuth Buttons */}
+          <div className="space-y-3">
+            <Button
+              variant="outline"
+              onClick={() => handleOAuthSignIn('google')}
+              disabled={isLoading}
+              className="w-full"
+            >
+              <Chrome className="h-4 w-4 mr-2" />
+              <UnifiedLocalizedText text="Continue with Google" />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleOAuthSignIn('linkedin_oidc')}
+              disabled={isLoading}
+              className="w-full"
+            >
+              <Linkedin className="h-4 w-4 mr-2" />
+              <UnifiedLocalizedText text="Continue with LinkedIn" />
+            </Button>
           </div>
 
-          <div className="space-y-2">
-            <div className="relative">
-              <Input
-                type={isPasswordVisible ? "text" : "password"}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-0"
-                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-              >
-                {isPasswordVisible ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </Button>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                <UnifiedLocalizedText text="Or continue with email" />
+              </span>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Button
-              type="submit"
-              disabled={isLoading || !email || !password}
-              className="w-full"
-            >
-              <UnifiedLocalizedText text={isLoading ? "Loading..." : (isSignUp ? "Sign Up" : "Sign In")} />
-            </Button>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="signin">
+                <UnifiedLocalizedText text="Sign In" />
+              </TabsTrigger>
+              <TabsTrigger value="signup">
+                <UnifiedLocalizedText text="Sign Up" />
+              </TabsTrigger>
+            </TabsList>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => setShowResetRequest(true)}
+            <TabsContent value="signin" className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signin-email">
+                    <UnifiedLocalizedText text="Email" />
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signin-email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signin-password">
+                    <UnifiedLocalizedText text="Password" />
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signin-password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={(e) => handleInputChange('password', e.target.value)}
+                      className="pl-10 pr-10"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Signing in...' : <UnifiedLocalizedText text="Sign In" />}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="signup" className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <RoleSelector
+                  value={selectedRole}
+                  onValueChange={setSelectedRole}
+                />
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="first-name">
+                      <UnifiedLocalizedText text="First Name" />
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="first-name"
+                        placeholder="John"
+                        value={formData.firstName}
+                        onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="last-name">
+                      <UnifiedLocalizedText text="Last Name" />
+                    </Label>
+                    <Input
+                      id="last-name"
+                      placeholder="Doe"
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email">
+                    <UnifiedLocalizedText text="Email" />
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="john@example.com"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signup-password">
+                    <UnifiedLocalizedText text="Password" />
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Create a strong password"
+                      value={formData.password}
+                      onChange={(e) => handleInputChange('password', e.target.value)}
+                      className="pl-10 pr-10"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    <UnifiedLocalizedText text="8+ characters with uppercase, lowercase, numbers, and symbols" />
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoading || !selectedRole}
+                >
+                  {isLoading ? 'Creating account...' : <UnifiedLocalizedText text="Create Account" />}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+
+          <div className="text-center text-sm text-muted-foreground">
+            <Button 
+              variant="link" 
+              onClick={onClose}
+              className="text-muted-foreground hover:text-foreground"
             >
-              <UnifiedLocalizedText text="Forgot Password?" />
+              <UnifiedLocalizedText text="Back to home" />
             </Button>
           </div>
-        </form>
-
-        <Separator className="my-4" />
-
-        <div className="text-center text-sm text-muted-foreground">
-          <UnifiedLocalizedText text={isSignUp ? "Already have an account?" : "Don't have an account?"} />
-          <Button variant="link" onClick={() => {
-            const newMode = isSignUp ? 'signin' : 'signup';
-            navigate(`/?mode=${newMode}`);
-          }}>
-            <UnifiedLocalizedText text={isSignUp ? "Sign In" : "Sign Up"} />
-          </Button>
-        </div>
-
-        <Separator className="my-4" />
-
-        <PasskeyAuth
-          email={email}
-          onSuccess={onClose}
-          isSignUp={isSignUp}
-        />
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };

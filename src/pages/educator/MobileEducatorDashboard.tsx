@@ -1,26 +1,18 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Users, BookOpen, TrendingUp, Plus, Eye, Edit } from 'lucide-react';
-import { useEducatorAnalytics } from '@/hooks/useEducatorAnalytics';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen, Users, DollarSign, TrendingUp, Plus, BarChart3 } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const MobileEducatorDashboard = () => {
-  const { totalCourses, totalStudents, avgRating, totalRevenue } = useEducatorAnalytics();
-
-  const quickActions = [
-    { label: 'Create New Course', icon: Plus, description: 'Start building your next course' },
-    { label: 'Edit Existing Course', icon: Edit, description: 'Update course content and settings' },
-    { label: 'View Course Analytics', icon: Eye, description: 'Track student progress and engagement' },
-  ];
-
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="container mx-auto p-4 space-y-4">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl font-bold">
           <UnifiedLocalizedText text="Educator Dashboard" />
         </h1>
         <p className="text-muted-foreground">
@@ -28,102 +20,116 @@ export const MobileEducatorDashboard = () => {
         </p>
       </div>
 
-      {/* Analytics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <UnifiedLocalizedText text="Total Courses" />
-            </CardTitle>
-            <CardDescription>
-              <UnifiedLocalizedText text="Number of courses you've created" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{totalCourses}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <UnifiedLocalizedText text="Total Students" />
-            </CardTitle>
-            <CardDescription>
-              <UnifiedLocalizedText text="Number of students currently enrolled in your courses" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{totalStudents}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <UnifiedLocalizedText text="Average Rating" />
-            </CardTitle>
-            <CardDescription>
-              <UnifiedLocalizedText text="Average rating across all your courses" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{avgRating}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <UnifiedLocalizedText text="Total Revenue" />
-            </CardTitle>
-            <CardDescription>
-              <UnifiedLocalizedText text="Total revenue generated from your courses" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{totalRevenue}</div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Quick Actions */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">
-          <UnifiedLocalizedText text="Quick Actions" />
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {quickActions.map((action, index) => (
-            <Card key={index} className="hover:bg-secondary/10 cursor-pointer">
-              <CardContent className="flex items-center space-x-4">
-                <action.icon className="h-5 w-5 text-primary" />
-                <div>
-                  <h3 className="text-lg font-medium">
-                    <UnifiedLocalizedText text={action.label} />
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    <UnifiedLocalizedText text={action.description} />
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Button className="h-20 flex flex-col items-center justify-center space-y-2">
+          <Plus className="h-6 w-6" />
+          <span className="text-sm">
+            <UnifiedLocalizedText text="New Course" />
+          </span>
+        </Button>
+        <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
+          <BarChart3 className="h-6 w-6" />
+          <span className="text-sm">
+            <UnifiedLocalizedText text="Analytics" />
+          </span>
+        </Button>
       </div>
 
-      {/* Recent Activity */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">
-          <UnifiedLocalizedText text="Recent Activity" />
-        </h2>
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <CardContent>
-            <p className="text-muted-foreground">
-              <UnifiedLocalizedText text="No recent activity to display." />
-            </p>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">
+                  <UnifiedLocalizedText text="Active Courses" />
+                </h3>
+                <p className="text-2xl font-bold text-blue-600">0</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <Users className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">
+                  <UnifiedLocalizedText text="Total Students" />
+                </h3>
+                <p className="text-2xl font-bold text-green-600">0</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">
+                  <UnifiedLocalizedText text="Revenue" />
+                </h3>
+                <p className="text-2xl font-bold text-purple-600">$0</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Getting Started */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <TrendingUp className="h-5 w-5" />
+            <UnifiedLocalizedText text="Get Started" />
+          </CardTitle>
+          <CardDescription>
+            <UnifiedLocalizedText text="Create your first course to start teaching" />
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <h4 className="font-medium">
+                  <UnifiedLocalizedText text="Create Your First Course" />
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  <UnifiedLocalizedText text="Use our AI-powered course builder" />
+                </p>
+              </div>
+              <Button size="sm">
+                <UnifiedLocalizedText text="Start" />
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <h4 className="font-medium">
+                  <UnifiedLocalizedText text="Set Up Your Profile" />
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  <UnifiedLocalizedText text="Add bio and teaching experience" />
+                </p>
+              </div>
+              <Button variant="outline" size="sm">
+                <UnifiedLocalizedText text="Setup" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

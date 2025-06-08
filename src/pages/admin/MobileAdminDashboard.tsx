@@ -1,134 +1,161 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Users, BookOpen, TrendingUp, AlertTriangle, Settings, Shield } from 'lucide-react';
-import { useAdminAnalytics } from '@/hooks/useAdminAnalytics';
+import { Badge } from '@/components/ui/badge';
+import { Users, BookOpen, DollarSign, Shield, Settings, BarChart3 } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const MobileAdminDashboard = () => {
-  const { totalUsers, activeCourses, engagementRate, securityAlerts } = useAdminAnalytics();
-
-  const quickActions = [
-    { label: 'Manage Users', description: 'Add, edit, or remove user accounts', icon: Users },
-    { label: 'Create Course', description: 'Design and publish new learning content', icon: BookOpen },
-    { label: 'Review Analytics', description: 'Monitor platform performance and user engagement', icon: TrendingUp },
-    { label: 'Check Security', description: 'Review security logs and threat alerts', icon: Shield },
-    { label: 'System Settings', description: 'Configure system-wide settings and preferences', icon: Settings },
-  ];
-
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">
-          <UnifiedLocalizedText text="Mobile Admin Dashboard" />
+    <div className="container mx-auto p-4 space-y-4">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl font-bold">
+          <UnifiedLocalizedText text="Admin Dashboard" />
         </h1>
         <p className="text-muted-foreground">
-          <UnifiedLocalizedText text="Overview of platform performance and key metrics" />
+          <UnifiedLocalizedText text="Manage platform and monitor activity" />
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 gap-3">
+        <Button className="h-20 flex flex-col items-center justify-center space-y-2">
+          <Users className="h-6 w-6" />
+          <span className="text-sm">
+            <UnifiedLocalizedText text="Users" />
+          </span>
+        </Button>
+        <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
+          <BarChart3 className="h-6 w-6" />
+          <span className="text-sm">
+            <UnifiedLocalizedText text="Analytics" />
+          </span>
+        </Button>
+      </div>
+
+      {/* Platform Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle>
-              <UnifiedLocalizedText text="Total Users" />
-            </CardTitle>
-            <CardDescription>
-              <UnifiedLocalizedText text="Number of registered users" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{totalUsers}</div>
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <TrendingUp className="h-4 w-4" />
-              <span>+12% this month</span>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">
+                  <UnifiedLocalizedText text="Total Users" />
+                </h3>
+                <p className="text-2xl font-bold text-blue-600">0</p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>
-              <UnifiedLocalizedText text="Active Courses" />
-            </CardTitle>
-            <CardDescription>
-              <UnifiedLocalizedText text="Number of courses currently active" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{activeCourses}</div>
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <BookOpen className="h-4 w-4" />
-              <span><UnifiedLocalizedText text="5 new courses added" /></span>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">
+                  <UnifiedLocalizedText text="Active Courses" />
+                </h3>
+                <p className="text-2xl font-bold text-green-600">0</p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>
-              <UnifiedLocalizedText text="Engagement Rate" />
-            </CardTitle>
-            <CardDescription>
-              <UnifiedLocalizedText text="User engagement with platform content" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{engagementRate}%</div>
-            <Progress value={engagementRate} className="mb-2" />
-            <div className="text-sm text-muted-foreground">
-              <UnifiedLocalizedText text="Target: 80%" />
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">
+                  <UnifiedLocalizedText text="Revenue" />
+                </h3>
+                <p className="text-2xl font-bold text-purple-600">$0</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <Shield className="h-5 w-5 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">
+                  <UnifiedLocalizedText text="Security Score" />
+                </h3>
+                <p className="text-2xl font-bold text-orange-600">100%</p>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {securityAlerts > 0 && (
-        <Card className="border-destructive text-destructive">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <AlertTriangle className="h-4 w-4" />
+      {/* System Health */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Shield className="h-5 w-5" />
+            <UnifiedLocalizedText text="System Status" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm">
+              <UnifiedLocalizedText text="Platform Status" />
+            </span>
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+              <UnifiedLocalizedText text="Operational" />
+            </Badge>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <span className="text-sm">
               <UnifiedLocalizedText text="Security Alerts" />
-            </CardTitle>
-            <CardDescription>
-              <UnifiedLocalizedText text="Review and address security concerns" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{securityAlerts}</div>
-            <Button variant="destructive" className="mt-4">
-              <UnifiedLocalizedText text="View Security Logs" />
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+            </span>
+            <Badge variant="outline">
+              <UnifiedLocalizedText text="None" />
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">
-          <UnifiedLocalizedText text="Quick Actions" />
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {quickActions.map((action) => (
-            <Card key={action.label} className="hover:bg-secondary/10 cursor-pointer">
-              <CardContent className="flex items-center space-x-4">
-                <div className="rounded-md bg-muted p-2">
-                  <action.icon className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium">
-                    <UnifiedLocalizedText text={action.label} />
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    <UnifiedLocalizedText text={action.description} />
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      {/* Admin Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Settings className="h-5 w-5" />
+            <UnifiedLocalizedText text="Quick Actions" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button variant="outline" className="w-full justify-start">
+            <Users className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="Manage Users" />
+          </Button>
+          
+          <Button variant="outline" className="w-full justify-start">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="View Analytics" />
+          </Button>
+          
+          <Button variant="outline" className="w-full justify-start">
+            <Settings className="h-4 w-4 mr-2" />
+            <UnifiedLocalizedText text="System Settings" />
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
