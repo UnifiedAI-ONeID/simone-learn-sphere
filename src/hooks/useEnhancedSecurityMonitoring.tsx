@@ -4,31 +4,22 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { generateSessionFingerprint, generateSecureSessionToken } from '@/utils/enhancedSecurityHeaders';
 
-interface SecurityAlert {
-  id: string;
-  alert_type: string;
-  alert_details: any;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  resolved: boolean;
-  created_at: string;
-}
-
 interface SecurityState {
-  alerts: SecurityAlert[];
   threatLevel: 'low' | 'medium' | 'high' | 'critical';
   sessionFingerprint: string;
   lastSecurityCheck: Date;
   activeSessions: number;
+  securityThreats: string[];
 }
 
 export const useEnhancedSecurityMonitoring = () => {
   const { user } = useAuth();
   const [securityState, setSecurityState] = useState<SecurityState>({
-    alerts: [],
     threatLevel: 'low',
     sessionFingerprint: '',
     lastSecurityCheck: new Date(),
-    activeSessions: 0
+    activeSessions: 0,
+    securityThreats: []
   });
   const [loading, setLoading] = useState(false);
 
@@ -40,10 +31,11 @@ export const useEnhancedSecurityMonitoring = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase.rpc('log_enhanced_security_event', {
+      const { error } = await supabase.rpc('log_security_event', {
         event_type: eventType,
         event_details: eventDetails || null,
-        severity
+        ip_address: null,
+        user_agent: navigator.userAgent
       });
 
       if (error) {
@@ -53,91 +45,6 @@ export const useEnhancedSecurityMonitoring = () => {
       console.error('Error logging security event:', error);
     }
   }, [user]);
-
-  const checkSessionLimits = useCallback(async () => {
-    if (!user) return true;
-
-    try {
-      const { data, error } = await supabase.rpc('check_session_limits', {
-        check_user_id: user.id
-      });
-
-      if (error) {
-        console.error('Failed to check session limits:', error);
-        return true;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error checking session limits:', error);
-      return true;
-    }
-  }, [user]);
-
-  const fetchSecurityAlerts = useCallback(async () => {
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('security_alerts')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('resolved', false)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (error) {
-        console.error('Failed to fetch security alerts:', error);
-        return;
-      }
-
-      const alerts = data || [];
-      const maxSeverity = alerts.reduce((max, alert) => {
-        const severityLevels = { low: 1, medium: 2, high: 3, critical: 4 };
-        const currentLevel = severityLevels[alert.severity];
-        const maxLevel = severityLevels[max];
-        return currentLevel > maxLevel ? alert.severity : max;
-      }, 'low');
-
-      setSecurityState(prev => ({
-        ...prev,
-        alerts,
-        threatLevel: maxSeverity,
-        lastSecurityCheck: new Date()
-      }));
-    } catch (error) {
-      console.error('Error fetching security alerts:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  const resolveSecurityAlert = useCallback(async (alertId: string) => {
-    try {
-      const { error } = await supabase
-        .from('security_alerts')
-        .update({ 
-          resolved: true, 
-          resolved_at: new Date().toISOString() 
-        })
-        .eq('id', alertId);
-
-      if (error) {
-        console.error('Failed to resolve security alert:', error);
-        return;
-      }
-
-      setSecurityState(prev => ({
-        ...prev,
-        alerts: prev.alerts.filter(alert => alert.id !== alertId)
-      }));
-
-      await logSecurityEvent('security_alert_resolved', { alert_id: alertId });
-    } catch (error) {
-      console.error('Error resolving security alert:', error);
-    }
-  }, [logSecurityEvent]);
 
   const initializeSessionSecurity = useCallback(async () => {
     if (!user) return;
@@ -150,35 +57,6 @@ export const useEnhancedSecurityMonitoring = () => {
         ...prev,
         sessionFingerprint: fingerprint
       }));
-
-      // Check session limits
-      const canCreateSession = await checkSessionLimits();
-      if (!canCreateSession) {
-        await logSecurityEvent(
-          'session_creation_blocked', 
-          { reason: 'session_limit_exceeded' },
-          'high'
-        );
-        return;
-      }
-
-      // Update session with fingerprint
-      const { error } = await supabase
-        .from('user_sessions')
-        .update({
-          session_fingerprint: fingerprint,
-          last_activity: new Date().toISOString(),
-          security_flags: {
-            secure_initialization: true,
-            fingerprint_verified: true
-          }
-        })
-        .eq('user_id', user.id)
-        .eq('is_active', true);
-
-      if (error) {
-        console.error('Failed to update session security:', error);
-      }
 
       await logSecurityEvent('secure_session_initialized', {
         fingerprint_hash: btoa(fingerprint.slice(0, 8)),
@@ -193,7 +71,7 @@ export const useEnhancedSecurityMonitoring = () => {
         'high'
       );
     }
-  }, [user, checkSessionLimits, logSecurityEvent]);
+  }, [user, logSecurityEvent]);
 
   const performSecurityScan = useCallback(async () => {
     if (!user) return;
@@ -240,44 +118,38 @@ export const useEnhancedSecurityMonitoring = () => {
       // Update request counter
       sessionStorage.setItem('securityRequestCount', (requestCount + 1).toString());
 
-      if (threats.length > 0) {
-        await fetchSecurityAlerts(); // Refresh alerts
-      }
+      // Update security state
+      setSecurityState(prev => ({
+        ...prev,
+        securityThreats: threats,
+        threatLevel: threats.length > 0 ? (threats.some(t => t.includes('automated')) ? 'critical' : 'high') : 'low',
+        lastSecurityCheck: new Date()
+      }));
 
     } catch (error) {
       console.error('Error performing security scan:', error);
     }
-  }, [user, securityState.sessionFingerprint, logSecurityEvent, fetchSecurityAlerts]);
+  }, [user, securityState.sessionFingerprint, logSecurityEvent]);
 
   useEffect(() => {
     if (user) {
       initializeSessionSecurity();
-      fetchSecurityAlerts();
 
       // Set up periodic security monitoring
       const securityInterval = setInterval(() => {
         performSecurityScan();
       }, 30000); // Every 30 seconds
 
-      // Set up periodic alert refresh
-      const alertInterval = setInterval(() => {
-        fetchSecurityAlerts();
-      }, 60000); // Every minute
-
       return () => {
         clearInterval(securityInterval);
-        clearInterval(alertInterval);
       };
     }
-  }, [user, initializeSessionSecurity, fetchSecurityAlerts, performSecurityScan]);
+  }, [user, initializeSessionSecurity, performSecurityScan]);
 
   return {
     securityState,
     loading,
     logSecurityEvent,
-    checkSessionLimits,
-    resolveSecurityAlert,
-    refreshAlerts: fetchSecurityAlerts,
     performSecurityScan
   };
 };

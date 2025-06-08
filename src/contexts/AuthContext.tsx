@@ -75,17 +75,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               session_fingerprint: generateSessionFingerprint().slice(0, 8)
             }, 'low');
             
-            // Check session limits
-            const { data: canProceed } = await supabase.rpc('check_session_limits', {
-              check_user_id: initialSession.user.id
-            });
-            
-            if (!canProceed) {
-              console.warn('Session limit exceeded, signing out');
-              await supabase.auth.signOut();
-              return;
-            }
-            
             // Defer profile creation to avoid blocking
             setTimeout(() => {
               if (mounted) {
@@ -130,17 +119,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             provider: newSession.user.app_metadata?.provider,
             session_fingerprint: generateSessionFingerprint().slice(0, 8)
           }, 'low');
-          
-          // Check session limits
-          const { data: canProceed } = await supabase.rpc('check_session_limits', {
-            check_user_id: newSession.user.id
-          });
-          
-          if (!canProceed) {
-            console.warn('Session limit exceeded during sign in');
-            await supabase.auth.signOut();
-            return;
-          }
           
           // Defer to prevent potential deadlocks
           setTimeout(() => {

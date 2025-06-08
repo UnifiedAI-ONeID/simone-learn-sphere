@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
@@ -15,10 +16,9 @@ import Auth from '@/pages/Auth';
 import StudentDashboard from '@/pages/StudentDashboard';
 import EducatorDashboard from '@/pages/EducatorDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
-import Profile from '@/pages/Profile';
-import MobileIndex from '@/pages/mobile/MobileIndex';
-import MobileAuthCallback from '@/pages/mobile/MobileAuthCallback';
-import { usePlatform } from '@/hooks/usePlatform';
+import { MobileIndex } from '@/pages/mobile/MobileIndex';
+import { MobileAuthCallback } from '@/pages/mobile/MobileAuthCallback';
+import { usePlatformDetection } from '@/hooks/usePlatformDetection';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,7 +35,7 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const platform = usePlatform();
+  const platform = usePlatformDetection();
 
   return (
     <ErrorBoundary>
@@ -55,7 +55,6 @@ function App() {
                             <Route path="/student-dashboard" element={<StudentDashboard />} />
                             <Route path="/educator-dashboard" element={<EducatorDashboard />} />
                             <Route path="/admin-dashboard" element={<AdminDashboard />} />
-                            <Route path="/profile" element={<Profile />} />
                             {platform === 'mobile' && (
                               <>
                                 <Route path="/mobile" element={<MobileIndex />} />

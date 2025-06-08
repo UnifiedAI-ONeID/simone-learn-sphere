@@ -1,166 +1,109 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useEnhancedSecurityMonitoring } from '@/hooks/useEnhancedSecurityMonitoring';
 import { useToast } from '@/hooks/use-toast';
 
-interface SessionSecurityState {
-  isSessionValid: boolean;
-  timeUntilExpiry: number;
+const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+const WARNING_TIME = 5 * 60 * 1000; // 5 minutes before timeout
+
+interface EnhancedSecurityState {
   sessionWarning: boolean;
+  timeUntilExpiry: number;
   securityThreats: string[];
+  lastActivity: number;
 }
 
 export const useEnhancedSessionSecurity = () => {
   const { user, signOut } = useAuth();
+  const { securityState, logSecurityEvent } = useEnhancedSecurityMonitoring();
   const { toast } = useToast();
-  const [securityState, setSecurityState] = useState<SessionSecurityState>({
-    isSessionValid: true,
-    timeUntilExpiry: 0,
-    sessionWarning: false,
-    securityThreats: []
-  });
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [sessionWarning, setSessionWarning] = useState(false);
 
-  // Validate session integrity
-  const validateSession = async () => {
-    if (!user) return;
+  const updateActivity = useCallback(() => {
+    setLastActivity(Date.now());
+    setSessionWarning(false);
+  }, []);
 
-    try {
-      // Check if session is still valid in Supabase
-      const { data: session, error } = await supabase.auth.getSession();
-      
-      if (error || !session.session) {
-        setSecurityState(prev => ({
-          ...prev,
-          isSessionValid: false,
-          securityThreats: [...prev.securityThreats, 'Invalid session detected']
-        }));
-        
-        toast({
-          title: "Session Security Alert",
-          description: "Your session is invalid. Please sign in again.",
-          variant: "destructive",
-        });
-        
-        await signOut();
-        return;
-      }
-
-      // Check session expiry
-      const expiresAt = new Date(session.session.expires_at! * 1000);
-      const now = new Date();
-      const timeUntilExpiry = expiresAt.getTime() - now.getTime();
-      
-      // Show warning 10 minutes before expiry
-      const warningThreshold = 10 * 60 * 1000; // 10 minutes
-      
-      setSecurityState(prev => ({
-        ...prev,
-        isSessionValid: true,
-        timeUntilExpiry,
-        sessionWarning: timeUntilExpiry <= warningThreshold && timeUntilExpiry > 0
-      }));
-
-      // Auto-logout if session expired
-      if (timeUntilExpiry <= 0) {
-        toast({
-          title: "Session Expired",
-          description: "Your session has expired for security reasons.",
-          variant: "destructive",
-        });
-        await signOut();
-      }
-
-    } catch (error) {
-      console.error('Session validation error:', error);
-      setSecurityState(prev => ({
-        ...prev,
-        securityThreats: [...prev.securityThreats, 'Session validation failed']
-      }));
-    }
-  };
-
-  // Monitor for suspicious activity
-  const detectSuspiciousActivity = () => {
-    const threats: string[] = [];
-    
-    // Check for multiple tabs (basic detection)
-    if (typeof window !== 'undefined') {
-      const tabId = sessionStorage.getItem('tabId');
-      if (!tabId) {
-        sessionStorage.setItem('tabId', Date.now().toString());
-      }
-      
-      // Check for tab hijacking
-      window.addEventListener('storage', (e) => {
-        if (e.key === 'auth-token' && e.newValue !== e.oldValue) {
-          threats.push('Potential session hijacking detected');
-        }
+  const handleSessionTimeout = useCallback(async () => {
+    if (user) {
+      await logSecurityEvent('session_timeout', {
+        user_id: user.id,
+        last_activity: new Date(lastActivity).toISOString()
       });
       
-      // Check for suspicious user agent changes
-      const storedUA = localStorage.getItem('userAgent');
-      const currentUA = navigator.userAgent;
-      
-      if (storedUA && storedUA !== currentUA) {
-        threats.push('User agent change detected');
-      } else if (!storedUA) {
-        localStorage.setItem('userAgent', currentUA);
-      }
-    }
-    
-    if (threats.length > 0) {
-      setSecurityState(prev => ({
-        ...prev,
-        securityThreats: [...prev.securityThreats, ...threats]
-      }));
-    }
-  };
-
-  // Extend session if user is active
-  const extendSession = async () => {
-    try {
-      const { error } = await supabase.auth.refreshSession();
-      if (error) throw error;
-      
       toast({
-        title: "Session Extended",
-        description: "Your session has been extended for security.",
-      });
-      
-      setSecurityState(prev => ({
-        ...prev,
-        sessionWarning: false
-      }));
-      
-    } catch (error) {
-      console.error('Failed to extend session:', error);
-      toast({
-        title: "Session Extension Failed",
-        description: "Unable to extend session. Please sign in again.",
+        title: "Session Expired",
+        description: "Your session has expired due to inactivity. Please sign in again.",
         variant: "destructive",
       });
+      
+      await signOut();
     }
-  };
+  }, [user, lastActivity, logSecurityEvent, toast, signOut]);
+
+  const handleTimeoutWarning = useCallback(() => {
+    setSessionWarning(true);
+    toast({
+      title: "Session Expiring Soon",
+      description: "Your session will expire in 5 minutes due to inactivity.",
+      variant: "destructive",
+    });
+  }, [toast]);
+
+  const extendSession = useCallback(() => {
+    updateActivity();
+    toast({
+      title: "Session Extended",
+      description: "Your session has been extended.",
+    });
+  }, [updateActivity, toast]);
 
   useEffect(() => {
-    if (user) {
-      // Initial validation
-      validateSession();
-      detectSuspiciousActivity();
+    if (!user) return;
+
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    events.forEach(event => {
+      document.addEventListener(event, updateActivity, true);
+    });
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, updateActivity, true);
+      });
+    };
+  }, [user, updateActivity]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const checkSession = () => {
+      const timeSinceActivity = Date.now() - lastActivity;
       
-      // Set up periodic validation
-      const interval = setInterval(() => {
-        validateSession();
-      }, 60000); // Check every minute
-      
-      return () => clearInterval(interval);
-    }
-  }, [user]);
+      if (timeSinceActivity >= SESSION_TIMEOUT) {
+        handleSessionTimeout();
+      } else if (timeSinceActivity >= SESSION_TIMEOUT - WARNING_TIME && !sessionWarning) {
+        handleTimeoutWarning();
+      }
+    };
+
+    const interval = setInterval(checkSession, 60000); // Check every minute
+    
+    return () => clearInterval(interval);
+  }, [user, lastActivity, sessionWarning, handleSessionTimeout, handleTimeoutWarning]);
+
+  const enhancedSecurityState: EnhancedSecurityState = {
+    sessionWarning,
+    timeUntilExpiry: Math.max(0, SESSION_TIMEOUT - (Date.now() - lastActivity)),
+    securityThreats: securityState.securityThreats,
+    lastActivity
+  };
 
   return {
-    securityState,
+    securityState: enhancedSecurityState,
     extendSession,
-    validateSession
+    logSecurityEvent,
+    performSecurityScan: () => {} // Placeholder for compatibility
   };
 };
