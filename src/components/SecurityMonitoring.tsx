@@ -1,273 +1,238 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Progress } from '@/components/ui/progress';
 import { 
   Shield, 
   AlertTriangle, 
-  Eye, 
+  CheckCircle, 
   Lock, 
-  UserCheck, 
+  Eye,
   Activity,
   Clock,
-  CheckCircle
+  Zap,
+  Globe,
+  Users,
+  Database,
+  Wifi,
+  Settings,
+  RefreshCw,
+  Bell
 } from 'lucide-react';
-import { useSecurityAudit } from '@/hooks/useSecurityAudit';
-import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
+
+interface SecurityEvent {
+  id: string;
+  timestamp: string;
+  type: 'login' | 'access' | 'data_change' | 'threat';
+  description: string;
+  severity: 'low' | 'medium' | 'high';
+  location?: string;
+  user?: string;
+}
 
 export const SecurityMonitoring = () => {
-  const { auditLogs, loading, refreshAuditLogs } = useSecurityAudit();
-  const securityState = useSecurityMonitor();
-
-  const getThreatLevelColor = (level: string) => {
-    switch (level) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-green-100 text-green-800 border-green-200';
+  const securityEvents: SecurityEvent[] = [
+    {
+      id: '1',
+      timestamp: '2024-06-08T14:30:00Z',
+      type: 'login',
+      description: 'Successful login from new device',
+      severity: 'low',
+      location: 'New York, USA',
+      user: 'john.doe@example.com'
+    },
+    {
+      id: '2',
+      timestamp: '2024-06-08T15:45:00Z',
+      type: 'access',
+      description: 'User accessed sensitive data',
+      severity: 'medium',
+      user: 'jane.doe@example.com'
+    },
+    {
+      id: '3',
+      timestamp: '2024-06-08T16:20:00Z',
+      type: 'threat',
+      description: 'Potential SQL injection attempt',
+      severity: 'high'
+    },
+    {
+      id: '4',
+      timestamp: '2024-06-08T17:00:00Z',
+      type: 'data_change',
+      description: 'Admin settings modified',
+      severity: 'medium',
+      user: 'admin@example.com'
+    },
+    {
+      id: '5',
+      timestamp: '2024-06-08T18:10:00Z',
+      type: 'login',
+      description: 'Login failed due to invalid credentials',
+      severity: 'low',
+      location: 'Remote'
     }
-  };
+  ];
 
-  const getEventTypeIcon = (eventType: string) => {
-    switch (eventType) {
-      case 'login_attempt':
-        return <UserCheck className="h-4 w-4" />;
-      case 'security_threat_detected':
-        return <AlertTriangle className="h-4 w-4" />;
-      case 'impersonation_started':
-        return <Eye className="h-4 w-4" />;
+  const severityCounts = securityEvents.reduce(
+    (acc, event) => {
+      acc[event.severity] += 1;
+      return acc;
+    },
+    { low: 0, medium: 0, high: 0 }
+  );
+
+  const totalEvents = securityEvents.length;
+
+  const getSeverityColor = (severity: SecurityEvent['severity']) => {
+    switch (severity) {
+      case 'low':
+        return 'text-green-500';
+      case 'medium':
+        return 'text-orange-500';
+      case 'high':
+        return 'text-red-500';
       default:
-        return <Shield className="h-4 w-4" />;
+        return 'text-gray-500';
     }
   };
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-64 bg-gray-200 rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            <LocalizedText text="Security Monitoring" />
-          </h2>
-          <p className="text-gray-600">
-            <LocalizedText text="Monitor security events and threats" />
-          </p>
-        </div>
-        <Button onClick={refreshAuditLogs} variant="outline">
-          <Activity className="h-4 w-4 mr-2" />
-          <LocalizedText text="Refresh" />
-        </Button>
-      </div>
-
-      {/* Security Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Threat Level" />
-            </CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2">
-              <Badge className={getThreatLevelColor(securityState.threatLevel)}>
-                {securityState.threatLevel.toUpperCase()}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              <LocalizedText text="Current security status" />
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Active Threats" />
-            </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{securityState.activeThreats.length}</div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Detected threats" />
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Security Events" />
-            </CardTitle>
-            <Eye className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{auditLogs.length}</div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Recent events" />
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Last Check" />
-            </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm font-bold">
-              {securityState.lastSecurityCheck.toLocaleTimeString()}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Security scan time" />
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Active Threats */}
-      {securityState.activeThreats.length > 0 && (
-        <Card className="border-red-200 bg-red-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-800">
-              <AlertTriangle className="h-5 w-5" />
-              <LocalizedText text="Active Security Threats" />
-            </CardTitle>
-            <CardDescription className="text-red-600">
-              <LocalizedText text="Immediate attention required" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {securityState.activeThreats.map((threat, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200">
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
-                    <span className="font-medium text-red-800">{threat}</span>
-                  </div>
-                  <Badge variant="destructive">Active</Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Security Audit Log */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            <LocalizedText text="Security Audit Log" />
+            <UnifiedLocalizedText text="Security Monitoring" />
           </CardTitle>
           <CardDescription>
-            <LocalizedText text="Recent security events and activities" />
+            <UnifiedLocalizedText text="Real-time monitoring of security events and system health" />
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          {auditLogs.length === 0 ? (
-            <div className="text-center py-8">
-              <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">
-                <LocalizedText text="No security events recorded" />
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {auditLogs.slice(0, 10).map((event) => (
-                <div
-                  key={event.id}
-                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
-                >
-                  <div className="flex items-center gap-3">
-                    {getEventTypeIcon(event.event_type)}
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {event.event_type.replace('_', ' ').toUpperCase()}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {event.ip_address && `IP: ${event.ip_address}`}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-600">
-                      {new Date(event.created_at).toLocaleDateString()}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(event.created_at).toLocaleTimeString()}
-                    </p>
-                  </div>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-green-50 border-green-200">
+              <CardContent className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="font-medium">
+                    <UnifiedLocalizedText text="Low Risk Events" />
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <span className="text-2xl font-bold text-green-800">{severityCounts.low}</span>
+                <span className="text-sm text-green-700">
+                  <UnifiedLocalizedText text="Recent low-risk activity" />
+                </span>
+              </CardContent>
+            </Card>
 
-      {/* Security Recommendations */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5" />
-            <LocalizedText text="Security Recommendations" />
-          </CardTitle>
-          <CardDescription>
-            <LocalizedText text="Suggested actions to improve security" />
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <Lock className="h-4 w-4 text-blue-500" />
-              <div>
-                <p className="font-medium text-blue-800">
-                  <LocalizedText text="Enable Two-Factor Authentication" />
-                </p>
-                <p className="text-sm text-blue-600">
-                  <LocalizedText text="Strengthen account security for all admin users" />
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              <div>
-                <p className="font-medium text-green-800">
-                  <LocalizedText text="Regular Security Audits" />
-                </p>
-                <p className="text-sm text-green-600">
-                  <LocalizedText text="Schedule automated security scans weekly" />
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-              <AlertTriangle className="h-4 w-4 text-yellow-500" />
-              <div>
-                <p className="font-medium text-yellow-800">
-                  <LocalizedText text="Monitor Failed Login Attempts" />
-                </p>
-                <p className="text-sm text-yellow-600">
-                  <LocalizedText text="Set up alerts for suspicious login patterns" />
-                </p>
-              </div>
-            </div>
+            <Card className="bg-orange-50 border-orange-200">
+              <CardContent className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-orange-600" />
+                  <span className="font-medium">
+                    <UnifiedLocalizedText text="Medium Risk Events" />
+                  </span>
+                </div>
+                <span className="text-2xl font-bold text-orange-800">{severityCounts.medium}</span>
+                <span className="text-sm text-orange-700">
+                  <UnifiedLocalizedText text="Potential security concerns" />
+                </span>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-red-50 border-red-200">
+              <CardContent className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <span className="font-medium">
+                    <UnifiedLocalizedText text="High Risk Events" />
+                  </span>
+                </div>
+                <span className="text-2xl font-bold text-red-800">{severityCounts.high}</span>
+                <span className="text-sm text-red-700">
+                  <UnifiedLocalizedText text="Immediate action required" />
+                </span>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <UnifiedLocalizedText text="Recent Security Events" />
+              </CardTitle>
+              <CardDescription>
+                <UnifiedLocalizedText text="Detailed log of recent security-related activity" />
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {securityEvents.length === 0 ? (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <UnifiedLocalizedText text="No security events to display." />
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="space-y-2">
+                  {securityEvents.map((event) => (
+                    <div
+                      key={event.id}
+                      className="flex items-center justify-between p-3 border rounded-md"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
+                            {event.timestamp}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Zap className={`h-4 w-4 ${getSeverityColor(event.severity)}`} />
+                          <span className="text-sm">
+                            <UnifiedLocalizedText text={event.description} />
+                          </span>
+                        </div>
+                        {event.user && (
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">
+                              {event.user}
+                            </span>
+                          </div>
+                        )}
+                        {event.location && (
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">
+                              {event.location}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <Badge variant="outline">
+                        <UnifiedLocalizedText text={event.type} />
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-between">
+            <Button variant="outline">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              <UnifiedLocalizedText text="Refresh Events" />
+            </Button>
+            <Button>
+              <Settings className="h-4 w-4 mr-2" />
+              <UnifiedLocalizedText text="Security Settings" />
+            </Button>
           </div>
         </CardContent>
       </Card>

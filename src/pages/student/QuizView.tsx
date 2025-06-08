@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
 import { PlatformCard } from '@/components/platform/PlatformCard';
@@ -7,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Clock, CheckCircle } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { CheckCircle, Clock, AlertCircle, ChevronRight } from 'lucide-react';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const QuizView = () => {
   const { id, quizId } = useParams();
@@ -33,7 +32,7 @@ export const QuizView = () => {
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">
-            <LocalizedText text="React Components Quiz" />
+            <UnifiedLocalizedText text="React Components Quiz" />
           </h1>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
@@ -85,7 +84,7 @@ export const QuizView = () => {
                     disabled={currentQuestion === 1}
                     onClick={() => setCurrentQuestion(prev => Math.max(1, prev - 1))}
                   >
-                    <LocalizedText text="Previous" />
+                    <UnifiedLocalizedText text="Previous" />
                   </Button>
                   <Button 
                     disabled={!selectedAnswer}
@@ -96,7 +95,7 @@ export const QuizView = () => {
                       }
                     }}
                   >
-                    <LocalizedText text={currentQuestion === totalQuestions ? "Submit Quiz" : "Next Question"} />
+                    <UnifiedLocalizedText text={currentQuestion === totalQuestions ? "Submit Quiz" : "Next Question"} />
                   </Button>
                 </div>
               </div>
@@ -106,7 +105,7 @@ export const QuizView = () => {
           <div className="space-y-6">
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Quiz Progress" />
+                <UnifiedLocalizedText text="Quiz Progress" />
               </h3>
               <div className="grid grid-cols-5 gap-2">
                 {[...Array(totalQuestions)].map((_, index) => (
@@ -128,7 +127,7 @@ export const QuizView = () => {
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Quiz Details" />
+                <UnifiedLocalizedText text="Quiz Details" />
               </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">

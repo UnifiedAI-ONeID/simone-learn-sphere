@@ -1,29 +1,32 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { 
-  BookOpen, 
   Users, 
+  BookOpen, 
   TrendingUp, 
-  Plus,
-  BarChart3,
-  Star,
+  AlertTriangle,
+  GraduationCap,
+  Clock,
   DollarSign,
-  MessageCircle,
-  Bot,
-  Lightbulb,
-  Sparkles,
-  Rocket,
-  Heart,
-  Edit,
+  Star,
+  Play,
+  PlusCircle,
   Eye,
-  Calendar
+  Edit,
+  BarChart3,
+  Award,
+  MessageSquare,
+  Calendar,
+  FileText,
+  Activity,
+  Zap,
+  Brain
 } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const EducatorDashboardContent = () => {
   const navigate = useNavigate();
@@ -44,23 +47,23 @@ export const EducatorDashboardContent = () => {
               <Rocket className="h-16 w-16 text-primary" />
             </div>
             <CardTitle className="text-2xl text-foreground">
-              <LocalizedText text="Welcome, Educator!" />
+              <UnifiedLocalizedText text="Welcome, Educator!" />
             </CardTitle>
             <CardDescription className="text-lg text-muted-foreground">
-              <LocalizedText text="Ready to inspire and educate the next generation of learners?" />
+              <UnifiedLocalizedText text="Ready to inspire and educate the next generation of learners?" />
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              <LocalizedText text="Share your knowledge and passion with students worldwide" />
+              <UnifiedLocalizedText text="Share your knowledge and passion with students worldwide" />
             </p>
             <Button 
               size="lg" 
               className="bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={() => navigate('/educator/course/create')}
             >
-              <Plus className="h-5 w-5 mr-2" />
-              <LocalizedText text="Create Your First Course" />
+              <PlusCircle className="h-5 w-5 mr-2" />
+              <UnifiedLocalizedText text="Create Your First Course" />
             </Button>
           </CardContent>
         </Card>
@@ -70,10 +73,10 @@ export const EducatorDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Lightbulb className="h-5 w-5 text-yellow-500" />
-              <LocalizedText text="Getting Started as an Educator" />
+              <UnifiedLocalizedText text="Getting Started as an Educator" />
             </CardTitle>
             <CardDescription>
-              <LocalizedText text="Follow these simple steps to launch your teaching journey" />
+              <UnifiedLocalizedText text="Follow these simple steps to launch your teaching journey" />
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -84,10 +87,10 @@ export const EducatorDashboardContent = () => {
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-foreground">
-                    <LocalizedText text="Plan Your Course" />
+                    <UnifiedLocalizedText text="Plan Your Course" />
                   </h4>
                   <p className="text-sm text-muted-foreground mt-1">
-                    <LocalizedText text="Use our AI Course Planner to structure your curriculum and learning objectives" />
+                    <UnifiedLocalizedText text="Use our AI Course Planner to structure your curriculum and learning objectives" />
                   </p>
                   <Button 
                     variant="outline" 
@@ -96,7 +99,7 @@ export const EducatorDashboardContent = () => {
                     onClick={() => navigate('/educator/ai-planner')}
                   >
                     <Bot className="h-4 w-4 mr-2" />
-                    <LocalizedText text="Try AI Planner" />
+                    <UnifiedLocalizedText text="Try AI Planner" />
                   </Button>
                 </div>
               </div>
@@ -107,10 +110,10 @@ export const EducatorDashboardContent = () => {
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-foreground">
-                    <LocalizedText text="Create Content" />
+                    <UnifiedLocalizedText text="Create Content" />
                   </h4>
                   <p className="text-sm text-muted-foreground mt-1">
-                    <LocalizedText text="Build engaging lessons with our AI Content Generator or create from scratch" />
+                    <UnifiedLocalizedText text="Build engaging lessons with our AI Content Generator or create from scratch" />
                   </p>
                   <Button 
                     variant="outline" 
@@ -119,7 +122,7 @@ export const EducatorDashboardContent = () => {
                     onClick={() => navigate('/educator/ai-content')}
                   >
                     <Sparkles className="h-4 w-4 mr-2" />
-                    <LocalizedText text="Generate Content" />
+                    <UnifiedLocalizedText text="Generate Content" />
                   </Button>
                 </div>
               </div>
@@ -130,10 +133,10 @@ export const EducatorDashboardContent = () => {
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-foreground">
-                    <LocalizedText text="Publish & Share" />
+                    <UnifiedLocalizedText text="Publish & Share" />
                   </h4>
                   <p className="text-sm text-muted-foreground mt-1">
-                    <LocalizedText text="Launch your course and start making an impact on students' lives" />
+                    <UnifiedLocalizedText text="Launch your course and start making an impact on students' lives" />
                   </p>
                   <Button 
                     variant="outline" 
@@ -142,7 +145,7 @@ export const EducatorDashboardContent = () => {
                     onClick={() => navigate('/educator/course/create')}
                   >
                     <BookOpen className="h-4 w-4 mr-2" />
-                    <LocalizedText text="Course Builder" />
+                    <UnifiedLocalizedText text="Course Builder" />
                   </Button>
                 </div>
               </div>
@@ -160,17 +163,17 @@ export const EducatorDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <LocalizedText text="Earn Revenue" />
+                    <UnifiedLocalizedText text="Earn Revenue" />
                   </CardTitle>
                   <CardDescription>
-                    <LocalizedText text="Monetize your expertise" />
+                    <UnifiedLocalizedText text="Monetize your expertise" />
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <LocalizedText text="Set your own pricing and earn money from course enrollments while helping others learn" />
+                <UnifiedLocalizedText text="Set your own pricing and earn money from course enrollments while helping others learn" />
               </p>
             </CardContent>
           </Card>
@@ -183,17 +186,17 @@ export const EducatorDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <LocalizedText text="Global Reach" />
+                    <UnifiedLocalizedText text="Global Reach" />
                   </CardTitle>
                   <CardDescription>
-                    <LocalizedText text="Teach students worldwide" />
+                    <UnifiedLocalizedText text="Teach students worldwide" />
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <LocalizedText text="Connect with learners from around the globe and build an international community" />
+                <UnifiedLocalizedText text="Connect with learners from around the globe and build an international community" />
               </p>
             </CardContent>
           </Card>
@@ -206,17 +209,17 @@ export const EducatorDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <LocalizedText text="AI-Powered Tools" />
+                    <UnifiedLocalizedText text="AI-Powered Tools" />
                   </CardTitle>
                   <CardDescription>
-                    <LocalizedText text="Smart content creation" />
+                    <UnifiedLocalizedText text="Smart content creation" />
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <LocalizedText text="Leverage AI to create course outlines, generate content, and enhance your teaching" />
+                <UnifiedLocalizedText text="Leverage AI to create course outlines, generate content, and enhance your teaching" />
               </p>
             </CardContent>
           </Card>
@@ -227,31 +230,31 @@ export const EducatorDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Heart className="h-5 w-5 text-red-500" />
-              <LocalizedText text="Make a Difference" />
+              <UnifiedLocalizedText text="Make a Difference" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-center space-y-4">
               <p className="text-lg text-muted-foreground">
-                <LocalizedText text="Every course you create has the potential to change someone's life" />
+                <UnifiedLocalizedText text="Every course you create has the potential to change someone's life" />
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">∞</div>
                   <p className="text-sm text-muted-foreground">
-                    <LocalizedText text="Impact Lives" />
+                    <UnifiedLocalizedText text="Impact Lives" />
                   </p>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">🌍</div>
                   <p className="text-sm text-muted-foreground">
-                    <LocalizedText text="Global Classroom" />
+                    <UnifiedLocalizedText text="Global Classroom" />
                   </p>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">🚀</div>
                   <p className="text-sm text-muted-foreground">
-                    <LocalizedText text="Limitless Growth" />
+                    <UnifiedLocalizedText text="Limitless Growth" />
                   </p>
                 </div>
               </div>
@@ -297,14 +300,14 @@ export const EducatorDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Total Students" />
+              <UnifiedLocalizedText text="Total Students" />
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">323</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="+12 this week" />
+              <UnifiedLocalizedText text="+12 this week" />
             </p>
           </CardContent>
         </Card>
@@ -313,14 +316,14 @@ export const EducatorDashboardContent = () => {
               onClick={() => navigate('/educator/revenue')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Total Revenue" />
+              <UnifiedLocalizedText text="Total Revenue" />
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">$3,230</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="+$420 this month" />
+              <UnifiedLocalizedText text="+$420 this month" />
             </p>
           </CardContent>
         </Card>
@@ -328,14 +331,14 @@ export const EducatorDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Active Courses" />
+              <UnifiedLocalizedText text="Active Courses" />
             </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">5</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="2 published" />
+              <UnifiedLocalizedText text="2 published" />
             </p>
           </CardContent>
         </Card>
@@ -343,14 +346,14 @@ export const EducatorDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Avg Rating" />
+              <UnifiedLocalizedText text="Avg Rating" />
             </CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">4.7</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Based on 89 reviews" />
+              <UnifiedLocalizedText text="Based on 89 reviews" />
             </p>
           </CardContent>
         </Card>
@@ -363,10 +366,10 @@ export const EducatorDashboardContent = () => {
             <div className="flex justify-between items-center">
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <BookOpen className="h-5 w-5" />
-                <LocalizedText text="My Courses" />
+                <UnifiedLocalizedText text="My Courses" />
               </CardTitle>
               <Button size="sm" onClick={() => navigate('/educator/course/create')}>
-                <Plus className="h-4 w-4 mr-2" />
+                <PlusCircle className="h-4 w-4 mr-2" />
                 Create New
               </Button>
             </div>
@@ -422,10 +425,10 @@ export const EducatorDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <TrendingUp className="h-5 w-5" />
-              <LocalizedText text="Recent Activity" />
+              <UnifiedLocalizedText text="Recent Activity" />
             </CardTitle>
             <CardDescription>
-              <LocalizedText text="Latest updates from your courses" />
+              <UnifiedLocalizedText text="Latest updates from your courses" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -453,12 +456,12 @@ export const EducatorDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Bot className="h-5 w-5" />
-              <LocalizedText text="AI Assistant" />
+              <UnifiedLocalizedText text="AI Assistant" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              <LocalizedText text="Generate quizzes, lesson plans, and content" />
+              <UnifiedLocalizedText text="Generate quizzes, lesson plans, and content" />
             </p>
             <Button className="w-full">
               <Sparkles className="h-4 w-4 mr-2" />
@@ -471,13 +474,13 @@ export const EducatorDashboardContent = () => {
               onClick={() => navigate('/educator/announcements')}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
-              <MessageCircle className="h-5 w-5" />
-              <LocalizedText text="Announcements" />
+              <MessageSquare className="h-5 w-5" />
+              <UnifiedLocalizedText text="Announcements" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              <LocalizedText text="Communicate with your students" />
+              <UnifiedLocalizedText text="Communicate with your students" />
             </p>
             <Button variant="outline" className="w-full">
               <Calendar className="h-4 w-4 mr-2" />
@@ -491,12 +494,12 @@ export const EducatorDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Users className="h-5 w-5" />
-              <LocalizedText text="Student Insights" />
+              <UnifiedLocalizedText text="Student Insights" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              <LocalizedText text="Track engagement and progress" />
+              <UnifiedLocalizedText text="Track engagement and progress" />
             </p>
             <Button variant="outline" className="w-full">
               <BarChart3 className="h-4 w-4 mr-2" />

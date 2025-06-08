@@ -1,32 +1,36 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   BookOpen, 
-  Users, 
+  Clock, 
+  Trophy, 
   TrendingUp, 
-  Plus,
-  Target,
-  Trophy,
-  Clock,
-  Star,
-  CheckCircle,
-  MessageCircle,
+  Play,
   Calendar,
-  Zap,
-  Brain,
+  Star,
   Award,
-  Timer,
-  BookMarked,
+  Users,
+  MessageSquare,
+  Brain,
+  Zap,
+  Target,
+  CheckCircle,
+  AlertCircle,
+  GraduationCap,
   Activity,
+  BarChart3,
+  Bookmark,
+  Download,
+  Share,
   Heart,
-  Sparkles
+  Coffee
 } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const StudentDashboardContent = () => {
   const navigate = useNavigate();
@@ -50,15 +54,15 @@ export const StudentDashboardContent = () => {
               <Sparkles className="h-16 w-16 text-primary" />
             </div>
             <CardTitle className="text-2xl text-foreground">
-              <LocalizedText text="Welcome to Your Learning Journey!" />
+              <UnifiedLocalizedText text="Welcome to Your Learning Journey!" />
             </CardTitle>
             <CardDescription className="text-lg text-muted-foreground">
-              <LocalizedText text="You're about to embark on an amazing adventure of knowledge and growth" />
+              <UnifiedLocalizedText text="You're about to embark on an amazing adventure of knowledge and growth" />
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              <LocalizedText text="Start by exploring our course catalog and enrolling in your first course" />
+              <UnifiedLocalizedText text="Start by exploring our course catalog and enrolling in your first course" />
             </p>
             <Button 
               size="lg" 
@@ -66,7 +70,7 @@ export const StudentDashboardContent = () => {
               onClick={() => navigate('/student/courses')}
             >
               <BookOpen className="h-5 w-5 mr-2" />
-              <LocalizedText text="Browse Courses" />
+              <UnifiedLocalizedText text="Browse Courses" />
             </Button>
           </CardContent>
         </Card>
@@ -82,17 +86,17 @@ export const StudentDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <LocalizedText text="Browse Courses" />
+                    <UnifiedLocalizedText text="Browse Courses" />
                   </CardTitle>
                   <CardDescription>
-                    <LocalizedText text="Find your perfect learning path" />
+                    <UnifiedLocalizedText text="Find your perfect learning path" />
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <LocalizedText text="Explore hundreds of courses across different subjects and skill levels" />
+                <UnifiedLocalizedText text="Explore hundreds of courses across different subjects and skill levels" />
               </p>
             </CardContent>
           </Card>
@@ -106,17 +110,17 @@ export const StudentDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <LocalizedText text="AI Study Assistant" />
+                    <UnifiedLocalizedText text="AI Study Assistant" />
                   </CardTitle>
                   <CardDescription>
-                    <LocalizedText text="Get personalized help anytime" />
+                    <UnifiedLocalizedText text="Get personalized help anytime" />
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <LocalizedText text="Ask questions and get instant, personalized learning support" />
+                <UnifiedLocalizedText text="Ask questions and get instant, personalized learning support" />
               </p>
             </CardContent>
           </Card>
@@ -130,17 +134,17 @@ export const StudentDashboardContent = () => {
                 </div>
                 <div>
                   <CardTitle className="text-lg text-foreground">
-                    <LocalizedText text="Study Groups" />
+                    <UnifiedLocalizedText text="Study Groups" />
                   </CardTitle>
                   <CardDescription>
-                    <LocalizedText text="Learn with peers" />
+                    <UnifiedLocalizedText text="Learn with peers" />
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                <LocalizedText text="Join study groups and collaborate with fellow learners" />
+                <UnifiedLocalizedText text="Join study groups and collaborate with fellow learners" />
               </p>
             </CardContent>
           </Card>
@@ -151,7 +155,7 @@ export const StudentDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Heart className="h-5 w-5 text-red-500" />
-              <LocalizedText text="Why Learning Matters" />
+              <UnifiedLocalizedText text="Why Learning Matters" />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -161,10 +165,10 @@ export const StudentDashboardContent = () => {
                   <Trophy className="h-5 w-5 text-yellow-500 mt-1" />
                   <div>
                     <h4 className="font-medium text-foreground">
-                      <LocalizedText text="Build Confidence" />
+                      <UnifiedLocalizedText text="Build Confidence" />
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      <LocalizedText text="Every lesson completed is a step towards mastering new skills" />
+                      <UnifiedLocalizedText text="Every lesson completed is a step towards mastering new skills" />
                     </p>
                   </div>
                 </div>
@@ -172,10 +176,10 @@ export const StudentDashboardContent = () => {
                   <TrendingUp className="h-5 w-5 text-green-500 mt-1" />
                   <div>
                     <h4 className="font-medium text-foreground">
-                      <LocalizedText text="Advance Your Career" />
+                      <UnifiedLocalizedText text="Advance Your Career" />
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      <LocalizedText text="Gain valuable skills that employers are looking for" />
+                      <UnifiedLocalizedText text="Gain valuable skills that employers are looking for" />
                     </p>
                   </div>
                 </div>
@@ -185,10 +189,10 @@ export const StudentDashboardContent = () => {
                   <Zap className="h-5 w-5 text-blue-500 mt-1" />
                   <div>
                     <h4 className="font-medium text-foreground">
-                      <LocalizedText text="Learn at Your Pace" />
+                      <UnifiedLocalizedText text="Learn at Your Pace" />
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      <LocalizedText text="Flexible learning that fits your schedule and lifestyle" />
+                      <UnifiedLocalizedText text="Flexible learning that fits your schedule and lifestyle" />
                     </p>
                   </div>
                 </div>
@@ -196,10 +200,10 @@ export const StudentDashboardContent = () => {
                   <Star className="h-5 w-5 text-purple-500 mt-1" />
                   <div>
                     <h4 className="font-medium text-foreground">
-                      <LocalizedText text="Achieve Your Goals" />
+                      <UnifiedLocalizedText text="Achieve Your Goals" />
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      <LocalizedText text="Transform your aspirations into reality with structured learning" />
+                      <UnifiedLocalizedText text="Transform your aspirations into reality with structured learning" />
                     </p>
                   </div>
                 </div>
@@ -231,14 +235,14 @@ export const StudentDashboardContent = () => {
               onClick={() => navigate('/student/streak')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Daily Streak" />
+              <UnifiedLocalizedText text="Daily Streak" />
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">7 days</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Keep it going!" />
+              <UnifiedLocalizedText text="Keep it going!" />
             </p>
           </CardContent>
         </Card>
@@ -246,14 +250,14 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Total XP" />
+              <UnifiedLocalizedText text="Total XP" />
             </CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">1,250</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Level 5" />
+              <UnifiedLocalizedText text="Level 5" />
             </p>
           </CardContent>
         </Card>
@@ -261,14 +265,14 @@ export const StudentDashboardContent = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Courses Active" />
+              <UnifiedLocalizedText text="Courses Active" />
             </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">3</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="2 in progress" />
+              <UnifiedLocalizedText text="2 in progress" />
             </p>
           </CardContent>
         </Card>
@@ -277,14 +281,14 @@ export const StudentDashboardContent = () => {
               onClick={() => navigate('/student/badges')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Badges Earned" />
+              <UnifiedLocalizedText text="Badges Earned" />
             </CardTitle>
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">12</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="3 this week" />
+              <UnifiedLocalizedText text="3 this week" />
             </p>
           </CardContent>
         </Card>
@@ -297,7 +301,7 @@ export const StudentDashboardContent = () => {
             <div className="flex justify-between items-center">
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <BookOpen className="h-5 w-5" />
-                <LocalizedText text="My Courses" />
+                <UnifiedLocalizedText text="My Courses" />
               </CardTitle>
               <Button size="sm" onClick={() => navigate('/student/courses')}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -340,10 +344,10 @@ export const StudentDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Calendar className="h-5 w-5" />
-              <LocalizedText text="Upcoming Deadlines" />
+              <UnifiedLocalizedText text="Upcoming Deadlines" />
             </CardTitle>
             <CardDescription>
-              <LocalizedText text="Stay on track with your assignments" />
+              <UnifiedLocalizedText text="Stay on track with your assignments" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -380,12 +384,12 @@ export const StudentDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Brain className="h-5 w-5" />
-              <LocalizedText text="Ask AI Tutor" />
+              <UnifiedLocalizedText text="Ask AI Tutor" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              <LocalizedText text="Get instant help with your studies" />
+              <UnifiedLocalizedText text="Get instant help with your studies" />
             </p>
             <Button className="w-full">
               <Zap className="h-4 w-4 mr-2" />
@@ -399,12 +403,12 @@ export const StudentDashboardContent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Trophy className="h-5 w-5" />
-              <LocalizedText text="Leaderboard" />
+              <UnifiedLocalizedText text="Leaderboard" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              <LocalizedText text="See how you rank among peers" />
+              <UnifiedLocalizedText text="See how you rank among peers" />
             </p>
             <Button variant="outline" className="w-full">
               View Rankings
@@ -416,13 +420,13 @@ export const StudentDashboardContent = () => {
               onClick={() => navigate('/student/forums')}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
-              <MessageCircle className="h-5 w-5" />
-              <LocalizedText text="Forums" />
+              <MessageSquare className="h-5 w-5" />
+              <UnifiedLocalizedText text="Forums" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              <LocalizedText text="Join discussions with classmates" />
+              <UnifiedLocalizedText text="Join discussions with classmates" />
             </p>
             <Button variant="outline" className="w-full">
               Browse Forums

@@ -2,88 +2,54 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Shield, User, GraduationCap, Settings } from 'lucide-react';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { LocalizedText } from '@/components/LocalizedText';
-import { User, GraduationCap, Settings, Shield } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const UserRoleManager = () => {
   const { user } = useAuth();
-  const { role: currentRole, hasRole } = useUserRole();
+  const { role, setRole } = useUserRole();
+  const [selectedRole, setSelectedRole] = useState(role || 'student');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const availableRoles = [
-    {
-      id: 'student',
-      title: 'Student',
-      description: 'Learn with personalized AI-powered experiences',
-      icon: GraduationCap,
-      color: 'bg-blue-100 text-blue-800'
-    },
-    {
-      id: 'educator',
-      title: 'Educator', 
-      description: 'Create and monetize educational content',
-      icon: User,
-      color: 'bg-purple-100 text-purple-800'
-    }
-    // Note: Admin role is intentionally excluded from self-assignment
-  ];
-
-  const handleAddRole = async (newRole: string) => {
-    if (!user || !currentRole) return;
-
-    // Prevent admin self-assignment
-    if (newRole === 'admin') {
-      toast({
-        title: "Permission denied",
-        description: "Admin roles can only be assigned by existing administrators.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleRoleChange = async () => {
+    if (!user || selectedRole === role) return;
 
     setIsLoading(true);
     try {
-      // Check if user already has this role
-      if (currentRole.includes(newRole)) {
-        toast({
-          title: "Role already assigned",
-          description: `You already have the ${newRole} role.`,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Combine current role with new role
-      const combinedRole = currentRole === 'admin' ? 'admin' : `${currentRole}+${newRole}`;
-      
+      // Update role in profiles table
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          role: combinedRole,
-          updated_at: new Date().toISOString()
-        })
+        .update({ role: selectedRole })
         .eq('id', user.id);
 
       if (error) throw error;
 
-      toast({
-        title: "Role added successfully",
-        description: `You now have ${newRole} access in addition to your existing roles.`,
+      // Update user metadata
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: { role: selectedRole }
       });
 
-      // Refresh the page to update role context
-      window.location.reload();
+      if (metadataError) throw metadataError;
 
-    } catch (error: any) {
-      console.error('Error adding role:', error);
+      // Update local role state
+      setRole(selectedRole);
+
       toast({
-        title: "Failed to add role",
-        description: error.message || "An error occurred while adding the role.",
+        title: "Role updated",
+        description: `Your role has been updated to ${selectedRole}.`,
+      });
+    } catch (error: any) {
+      console.error('Error updating role:', error);
+      toast({
+        title: "Error updating role",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -91,116 +57,104 @@ export const UserRoleManager = () => {
     }
   };
 
-  const getCurrentRoles = () => {
-    if (!currentRole) return [];
-    if (currentRole === 'admin') return ['admin'];
-    return currentRole.split('+');
+  const getRoleBadgeColor = (roleType: string) => {
+    switch (roleType) {
+      case 'student':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'educator':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+      case 'admin':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+    }
   };
 
-  const currentRoles = getCurrentRoles();
+  const getRoleIcon = (roleType: string) => {
+    switch (roleType) {
+      case 'student':
+        return <User className="h-4 w-4" />;
+      case 'educator':
+        return <GraduationCap className="h-4 w-4" />;
+      case 'admin':
+        return <Shield className="h-4 w-4" />;
+      default:
+        return <Settings className="h-4 w-4" />;
+    }
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Settings className="h-5 w-5" />
-          <LocalizedText text="Manage Your Roles" />
+        <CardTitle>
+          <UnifiedLocalizedText text="Role Management" />
         </CardTitle>
         <CardDescription>
-          <LocalizedText text="Add additional roles to expand your platform capabilities" />
+          <UnifiedLocalizedText text="Change your role to access different features" />
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <h4 className="text-sm font-medium mb-2">
-            <LocalizedText text="Current Roles:" />
-          </h4>
-          <div className="flex flex-wrap gap-2">
-            {currentRoles.map((role) => (
-              <Badge key={role} variant="secondary" className="capitalize">
-                {role === 'admin' && <Shield className="h-3 w-3 mr-1" />}
-                {role}
-              </Badge>
-            ))}
-          </div>
+        <div className="flex items-center space-x-2">
+          <UnifiedLocalizedText text="Current Role:" />
+          <Badge className={getRoleBadgeColor(role || 'student')}>
+            {getRoleIcon(role || 'student')}
+            <span className="ml-1 capitalize">{role || 'student'}</span>
+          </Badge>
         </div>
 
-        {hasRole('admin') && (
-          <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
-                <Shield className="h-4 w-4" />
-                <div>
-                  <p className="text-sm font-medium">Administrator Access</p>
-                  <p className="text-xs">You have full system privileges. Admin roles cannot be self-assigned or removed.</p>
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            <UnifiedLocalizedText text="Select New Role" />
+          </label>
+          <Select
+            value={selectedRole}
+            onValueChange={setSelectedRole}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="student">
+                <div className="flex items-center">
+                  <User className="h-4 w-4 mr-2" />
+                  <UnifiedLocalizedText text="Student" />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </SelectItem>
+              <SelectItem value="educator">
+                <div className="flex items-center">
+                  <GraduationCap className="h-4 w-4 mr-2" />
+                  <UnifiedLocalizedText text="Educator" />
+                </div>
+              </SelectItem>
+              <SelectItem value="admin">
+                <div className="flex items-center">
+                  <Shield className="h-4 w-4 mr-2" />
+                  <UnifiedLocalizedText text="Admin" />
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {selectedRole !== role && (
+          <Alert>
+            <AlertDescription>
+              <UnifiedLocalizedText text="Changing your role will affect the features and content you can access." />
+            </AlertDescription>
+          </Alert>
         )}
 
-        <div>
-          <h4 className="text-sm font-medium mb-2">
-            <LocalizedText text="Available Roles to Add:" />
-          </h4>
-          <div className="space-y-2">
-            {availableRoles.map((role) => {
-              const hasRole = currentRoles.includes(role.id);
-              const isAdmin = currentRoles.includes('admin');
-              
-              return (
-                <div
-                  key={role.id}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    hasRole 
-                      ? 'border-gray-200 bg-gray-50 opacity-50' 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <role.icon className="h-5 w-5" />
-                      <div>
-                        <div className="font-medium">{role.title}</div>
-                        <div className="text-sm text-gray-600">{role.description}</div>
-                      </div>
-                    </div>
-                    {!hasRole && !isAdmin && (
-                      <Button
-                        onClick={() => handleAddRole(role.id)}
-                        disabled={isLoading}
-                        size="sm"
-                        variant="outline"
-                      >
-                        <LocalizedText text="Add Role" />
-                      </Button>
-                    )}
-                    {hasRole && (
-                      <Badge variant="secondary">
-                        <LocalizedText text="Current" />
-                      </Badge>
-                    )}
-                    {isAdmin && (
-                      <Badge variant="secondary">
-                        <LocalizedText text="Admin has all access" />
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="text-xs text-gray-500 mt-4 space-y-1">
-          <p><LocalizedText text="Note: Adding roles will combine your access levels. You can access features from all your assigned roles." /></p>
-          {!hasRole('admin') && (
-            <p className="text-amber-600 dark:text-amber-400">
-              <Shield className="h-3 w-3 inline mr-1" />
-              <LocalizedText text="Admin roles can only be assigned by existing administrators for security." />
-            </p>
+        <Button
+          onClick={handleRoleChange}
+          disabled={isLoading || selectedRole === role}
+          className="w-full"
+        >
+          {isLoading ? (
+            <UnifiedLocalizedText text="Updating..." />
+          ) : (
+            <UnifiedLocalizedText text="Update Role" />
           )}
-        </div>
+        </Button>
       </CardContent>
     </Card>
   );

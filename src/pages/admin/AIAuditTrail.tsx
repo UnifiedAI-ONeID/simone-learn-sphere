@@ -1,198 +1,127 @@
-
 import React from 'react';
-import { PlatformLayout } from '@/components/platform/PlatformLayout';
-import { PlatformCard } from '@/components/platform/PlatformCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Search, Filter, AlertTriangle, Info, CheckCircle } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { Brain, Clock, User, Activity, Search, Filter } from 'lucide-react';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const AIAuditTrail = () => {
-  const auditLogs = [
-    {
-      id: 1,
-      user: "john.doe@example.com",
-      action: "AI_TUTOR_QUERY",
-      details: "Asked question about React hooks",
-      timestamp: "2024-06-08 14:30:25",
-      severity: "normal",
-      flagged: false
-    },
-    {
-      id: 2,
-      user: "suspicious.user@example.com",
-      action: "BULK_AI_REQUESTS",
-      details: "Made 50+ requests in 1 minute",
-      timestamp: "2024-06-08 14:25:10",
-      severity: "high",
-      flagged: true
-    },
-    {
-      id: 3,
-      user: "student123@example.com",
-      action: "AI_CONTENT_GENERATION",
-      details: "Generated quiz answers",
-      timestamp: "2024-06-08 14:20:15",
-      severity: "medium",
-      flagged: true
-    }
-  ];
-
-  const getSeverityIcon = (severity: string) => {
-    switch (severity) {
-      case 'high': return <AlertTriangle className="h-4 w-4 text-red-500" />;
-      case 'medium': return <Info className="h-4 w-4 text-yellow-500" />;
-      default: return <CheckCircle className="h-4 w-4 text-green-500" />;
-    }
-  };
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-green-100 text-green-800';
-    }
-  };
-
   return (
-    <PlatformLayout>
-      <div className="container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">
-            <LocalizedText text="AI Audit Trail" />
-          </h1>
-          <p className="text-muted-foreground">
-            <LocalizedText text="Monitor AI usage patterns and detect potential abuse" />
-          </p>
-        </div>
-
-        <PlatformCard className="mb-6">
-          <div className="flex gap-4 items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search logs..." className="pl-10" />
-            </div>
-            <Select>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Severity" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Levels</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="normal">Normal</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Action" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Actions</SelectItem>
-                <SelectItem value="AI_TUTOR_QUERY">Tutor Queries</SelectItem>
-                <SelectItem value="AI_CONTENT_GENERATION">Content Gen</SelectItem>
-                <SelectItem value="BULK_AI_REQUESTS">Bulk Requests</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
-              <LocalizedText text="Filter" />
-            </Button>
-          </div>
-        </PlatformCard>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-          <PlatformCard>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-red-600">23</p>
-              <p className="text-sm text-muted-foreground">High Severity</p>
-            </div>
-          </PlatformCard>
-          <PlatformCard>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-yellow-600">156</p>
-              <p className="text-sm text-muted-foreground">Medium Severity</p>
-            </div>
-          </PlatformCard>
-          <PlatformCard>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-green-600">2,847</p>
-              <p className="text-sm text-muted-foreground">Normal Activity</p>
-            </div>
-          </PlatformCard>
-          <PlatformCard>
-            <div className="text-center">
-              <p className="text-2xl font-bold">12</p>
-              <p className="text-sm text-muted-foreground">Users Flagged</p>
-            </div>
-          </PlatformCard>
-        </div>
-
-        <PlatformCard>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-4">Timestamp</th>
-                  <th className="text-left p-4">User</th>
-                  <th className="text-left p-4">Action</th>
-                  <th className="text-left p-4">Details</th>
-                  <th className="text-left p-4">Severity</th>
-                  <th className="text-left p-4">Status</th>
-                  <th className="text-left p-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {auditLogs.map((log) => (
-                  <tr key={log.id} className="border-b hover:bg-muted/50">
-                    <td className="p-4 text-sm text-muted-foreground">
-                      {log.timestamp}
-                    </td>
-                    <td className="p-4">
-                      <span className="text-sm">{log.user}</span>
-                    </td>
-                    <td className="p-4">
-                      <Badge variant="outline" className="text-xs">
-                        {log.action.replace(/_/g, ' ')}
-                      </Badge>
-                    </td>
-                    <td className="p-4 text-sm">
-                      {log.details}
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        {getSeverityIcon(log.severity)}
-                        <Badge className={getSeverityColor(log.severity)}>
-                          {log.severity}
-                        </Badge>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <Badge variant={log.flagged ? 'destructive' : 'secondary'}>
-                        {log.flagged ? 'Flagged' : 'Normal'}
-                      </Badge>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <LocalizedText text="View" />
-                        </Button>
-                        {log.flagged && (
-                          <Button size="sm" variant="destructive">
-                            <LocalizedText text="Take Action" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </PlatformCard>
+    <div className="container mx-auto py-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">
+          <UnifiedLocalizedText text="AI Audit Trail" />
+        </h1>
+        <p className="text-muted-foreground">
+          <UnifiedLocalizedText text="Monitor AI usage and track generated content" />
+        </p>
       </div>
-    </PlatformLayout>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3 space-y-6">
+          <Card>
+            <div className="flex gap-4 items-center mb-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search logs..." className="pl-10" />
+              </div>
+              <Select>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="content_generation">Content Generation</SelectItem>
+                  <SelectItem value="course_planning">Course Planning</SelectItem>
+                  <SelectItem value="quiz_generation">Quiz Generation</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button>
+                <Filter className="h-4 w-4 mr-2" />
+                <UnifiedLocalizedText text="Filters" />
+              </Button>
+            </div>
+          </Card>
+
+          <div className="space-y-4">
+            {[1, 2, 3].map((log) => (
+              <Card key={log}>
+                <div className="flex gap-4">
+                  <div className="rounded-full bg-blue-100 p-3">
+                    <Brain className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="font-semibold">
+                          AI Generated Content
+                        </h3>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span><User className="h-4 w-4 mr-1" />Admin User</span>
+                          <span>•</span>
+                          <span><Clock className="h-4 w-4 mr-1" />2 hours ago</span>
+                        </div>
+                      </div>
+                      <Badge variant="secondary">Content Generation</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Generated a lesson plan for React Hooks.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <Card>
+            <h3 className="font-semibold mb-3">
+              <UnifiedLocalizedText text="Log Filters" />
+            </h3>
+            <div className="space-y-2">
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All Users" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin User</SelectItem>
+                  <SelectItem value="educator">Educator</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All Actions" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="content_generation">Content Generation</SelectItem>
+                  <SelectItem value="course_planning">Course Planning</SelectItem>
+                  <SelectItem value="quiz_generation">Quiz Generation</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </Card>
+
+          <Card>
+            <h3 className="font-semibold mb-3">
+              <UnifiedLocalizedText text="Recent Activity" />
+            </h3>
+            <div className="space-y-3">
+              {[1, 2, 3].map((activity) => (
+                <div key={activity} className="flex items-center gap-2">
+                  <div className="rounded-full bg-green-100 p-1">
+                    <Activity className="h-4 w-4 text-green-600" />
+                  </div>
+                  <span className="text-sm">
+                    Admin User generated a quiz.
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 };

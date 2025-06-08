@@ -1,14 +1,14 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Save, Eye, Settings } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const CourseEditor = () => {
   const { id } = useParams();
@@ -20,20 +20,20 @@ export const CourseEditor = () => {
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold mb-2">
-                <LocalizedText text="Course Editor" />
+                <UnifiedLocalizedText text="Course Editor" />
               </h1>
               <p className="text-muted-foreground">
-                <LocalizedText text="Edit and manage your course content" />
+                <UnifiedLocalizedText text="Edit and manage your course content" />
               </p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline">
                 <Eye className="h-4 w-4 mr-2" />
-                <LocalizedText text="Preview" />
+                <UnifiedLocalizedText text="Preview" />
               </Button>
               <Button>
                 <Save className="h-4 w-4 mr-2" />
-                <LocalizedText text="Save Changes" />
+                <UnifiedLocalizedText text="Save Changes" />
               </Button>
             </div>
           </div>

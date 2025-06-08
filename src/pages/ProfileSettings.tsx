@@ -7,10 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { LocalizedText } from '@/components/LocalizedText';
-import { UserRoleManager } from '@/components/UserRoleManager';
-import { ProfilePictureUpload } from '@/components/ProfilePictureUpload';
-import { TwoFactorSetup } from '@/components/TwoFactorSetup';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 const ProfileSettings = () => {
   const { user, signOut } = useAuth();
@@ -67,10 +64,10 @@ const ProfileSettings = () => {
     <div className="container mx-auto py-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
-          <LocalizedText text="Profile Settings" />
+          <UnifiedLocalizedText text="Profile Settings" />
         </h1>
         <p className="text-gray-600">
-          <LocalizedText text="Manage your account settings and preferences." />
+          <UnifiedLocalizedText text="Manage your account settings and preferences." />
         </p>
       </div>
 
@@ -82,10 +79,10 @@ const ProfileSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <LocalizedText text="Basic Information" />
+              <UnifiedLocalizedText text="Basic Information" />
             </CardTitle>
             <CardDescription>
-              <LocalizedText text="Update your personal details." />
+              <UnifiedLocalizedText text="Update your personal details." />
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -93,7 +90,7 @@ const ProfileSettings = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">
-                    <LocalizedText text="First Name" />
+                    <UnifiedLocalizedText text="First Name" />
                   </Label>
                   <Input
                     id="firstName"
@@ -104,7 +101,7 @@ const ProfileSettings = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">
-                    <LocalizedText text="Last Name" />
+                    <UnifiedLocalizedText text="Last Name" />
                   </Label>
                   <Input
                     id="lastName"
@@ -116,7 +113,7 @@ const ProfileSettings = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  <LocalizedText text="Email" />
+                  <UnifiedLocalizedText text="Email" />
                 </Label>
                 <Input
                   id="email"
@@ -126,11 +123,11 @@ const ProfileSettings = () => {
                   className="bg-gray-50"
                 />
                 <p className="text-sm text-gray-500">
-                  <LocalizedText text="Email cannot be changed" />
+                  <UnifiedLocalizedText text="Email cannot be changed" />
                 </p>
               </div>
               <Button type="submit" disabled={isLoading}>
-                <LocalizedText text={isLoading ? 'Updating...' : 'Update Profile'} />
+                <UnifiedLocalizedText text={isLoading ? 'Updating...' : 'Update Profile'} />
               </Button>
             </form>
           </CardContent>
@@ -149,10 +146,10 @@ const ProfileSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <LocalizedText text="Account Actions" />
+              <UnifiedLocalizedText text="Account Actions" />
             </CardTitle>
             <CardDescription>
-              <LocalizedText text="Manage your account." />
+              <UnifiedLocalizedText text="Manage your account." />
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -161,7 +158,7 @@ const ProfileSettings = () => {
               variant="outline"
               className="w-full"
             >
-              <LocalizedText text="Sign Out" />
+              <UnifiedLocalizedText text="Sign Out" />
             </Button>
           </CardContent>
         </Card>

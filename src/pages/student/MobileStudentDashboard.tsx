@@ -1,343 +1,145 @@
-
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Brain, Trophy, MessageSquare, Zap, Plus, Target, Calendar } from 'lucide-react';
-import { useEngagementTracking } from '@/hooks/useEngagementTracking';
-import { useSessionTracking } from '@/hooks/useSessionTracking';
-import { useStudentDashboardData } from '@/hooks/useDashboardData';
-import { LocalizedText } from '@/components/LocalizedText';
-import { MobileAIChat } from '@/components/mobile/MobileAIChat';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { Progress } from '@/components/ui/progress';
+import { BookOpen, Clock, Trophy, TrendingUp, Play, Calendar } from 'lucide-react';
+import { useStudentAnalytics } from '@/hooks/useStudentAnalytics';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const MobileStudentDashboard = () => {
-  const navigate = useNavigate();
-  const { trackPageView } = useEngagementTracking();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [showAIChat, setShowAIChat] = useState(false);
-  const { data, loading, error } = useStudentDashboardData();
-  useSessionTracking();
+  const { totalCourses, coursesInProgress, completedCourses, timeSpentLearning } = useStudentAnalytics();
 
   useEffect(() => {
-    trackPageView('mobile_student_dashboard');
-  }, [trackPageView]);
+    // Simulate fetching analytics data
+  }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+  return (
+    <div className="container mx-auto p-4 space-y-4">
+      {/* Dashboard Header */}
+      <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-100">
+        <CardContent className="p-6">
+          <h2 className="text-xl font-semibold text-gray-900">
+            <UnifiedLocalizedText text="Welcome to Your Dashboard!" />
+          </h2>
+          <p className="text-gray-600">
+            <UnifiedLocalizedText text="Track your progress and stay motivated." />
+          </p>
+        </CardContent>
+      </Card>
 
-  if (error) {
-    return (
-      <div className="p-4">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-destructive">Error loading dashboard: {error}</p>
-            <Button onClick={() => window.location.reload()} className="mt-2">
-              Retry
-            </Button>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="bg-white/70 backdrop-blur-sm border-purple-100">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">
+                  <UnifiedLocalizedText text="Total Courses" />
+                </h3>
+                <p className="text-sm text-gray-600">{totalCourses}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/70 backdrop-blur-sm border-blue-100">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Clock className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">
+                  <UnifiedLocalizedText text="Time Spent Learning" />
+                </h3>
+                <p className="text-sm text-gray-600">{timeSpentLearning} <UnifiedLocalizedText text="hours" /></p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
-    );
-  }
 
-  return (
-    <div className="p-4 space-y-4">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-4">
-          <TabsTrigger value="overview" className="text-xs">
-            <LocalizedText text="Overview" />
-          </TabsTrigger>
-          <TabsTrigger value="courses" className="text-xs">
-            <LocalizedText text="Courses" />
-          </TabsTrigger>
-          <TabsTrigger value="ai-tutor" className="text-xs">
-            <LocalizedText text="AI Tutor" />
-          </TabsTrigger>
-          <TabsTrigger value="progress" className="text-xs">
-            <LocalizedText text="Progress" />
-          </TabsTrigger>
-          <TabsTrigger value="badges" className="text-xs">
-            <LocalizedText text="Badges" />
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <Card>
-              <CardContent className="p-3">
-                <div className="flex items-center space-x-2">
-                  <BookOpen className="h-4 w-4 text-blue-500" />
-                  <div>
-                    <p className="text-xs text-gray-500">
-                      <LocalizedText text="Enrolled Courses" />
-                    </p>
-                    <p className="text-lg font-semibold">{data?.enrolledCourses || 0}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-3">
-                <div className="flex items-center space-x-2">
-                  <Zap className="h-4 w-4 text-yellow-500" />
-                  <div>
-                    <p className="text-xs text-gray-500">
-                      <LocalizedText text="Current Streak" />
-                    </p>
-                    <p className="text-lg font-semibold">{data?.currentStreak || 0} days</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Card>
-              <CardContent className="p-3">
-                <div className="flex items-center space-x-2">
-                  <Target className="h-4 w-4 text-green-500" />
-                  <div>
-                    <p className="text-xs text-gray-500">
-                      <LocalizedText text="Lessons Completed" />
-                    </p>
-                    <p className="text-lg font-semibold">{data?.completedLessons || 0}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-3">
-                <div className="flex items-center space-x-2">
-                  <Trophy className="h-4 w-4 text-purple-500" />
-                  <div>
-                    <p className="text-xs text-gray-500">
-                      <LocalizedText text="Total Points" />
-                    </p>
-                    <p className="text-lg font-semibold">{data?.totalPoints || 0}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center">
-                <Brain className="h-4 w-4 mr-2" />
-                <LocalizedText text="Quick Actions" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                className="w-full justify-start" 
-                onClick={() => navigate('/courses')}
-              >
-                <BookOpen className="h-4 w-4 mr-2" />
-                <LocalizedText text="Browse Courses" />
-              </Button>
-              <Button 
-                className="w-full justify-start" 
-                variant="secondary"
-                onClick={() => setShowAIChat(true)}
-              >
-                <Brain className="h-4 w-4 mr-2" />
-                <LocalizedText text="Ask AI Tutor" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          {data?.recentCourses && data.recentCourses.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">
-                  <LocalizedText text="Continue Learning" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {data.recentCourses.map((course) => (
-                  <div key={course.id} className="border rounded-lg p-3">
-                    <h4 className="font-medium text-sm">{course.title}</h4>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-muted-foreground">
-                        {course.progress}% complete
-                      </span>
-                      <Button size="sm" onClick={() => navigate(`/course/${course.id}`)}>
-                        Continue
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="courses" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">
-              <LocalizedText text="My Courses" />
-            </h2>
-            <Button 
-              size="sm" 
-              onClick={() => navigate('/courses')}
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              <LocalizedText text="Browse" />
-            </Button>
-          </div>
-
-          {data?.recentCourses && data.recentCourses.length > 0 ? (
-            <div className="space-y-3">
-              {data.recentCourses.map((course) => (
-                <Card key={course.id}>
-                  <CardContent className="p-4">
-                    <h3 className="font-medium mb-2">{course.title}</h3>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full" 
-                        style={{ width: `${course.progress}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between items-center text-sm text-muted-foreground">
-                      <span>{course.progress}% complete</span>
-                      <Button size="sm" onClick={() => navigate(`/course/${course.id}`)}>
-                        Continue
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+      {/* Progress Overview */}
+      <Card className="bg-white/70 backdrop-blur-sm border-green-100">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center space-x-2">
+            <TrendingUp className="h-5 w-5 text-green-600" />
+            <UnifiedLocalizedText text="Learning Progress" />
+          </CardTitle>
+          <CardDescription>
+            <UnifiedLocalizedText text="Track your course progress" />
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">
+                <UnifiedLocalizedText text="Courses In Progress" />
+              </span>
+              <span className="text-sm text-gray-600">{coursesInProgress}</span>
             </div>
-          ) : (
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-center text-muted-foreground">
-                  <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm mb-3">
-                    <LocalizedText text="No courses enrolled yet" />
-                  </p>
-                  <Button onClick={() => navigate('/courses')}>
-                    <LocalizedText text="Browse Courses" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+            <Progress value={(coursesInProgress / totalCourses) * 100} />
 
-        <TabsContent value="ai-tutor" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center">
-                <Brain className="h-4 w-4 mr-2" />
-                <LocalizedText text="AI Learning Assistant" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                className="w-full justify-start" 
-                onClick={() => setShowAIChat(true)}
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                <LocalizedText text="Ask a Question" />
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">
+                <UnifiedLocalizedText text="Completed Courses" />
+              </span>
+              <span className="text-sm text-gray-600">{completedCourses}</span>
+            </div>
+            <Progress value={(completedCourses / totalCourses) * 100} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Actionable Items */}
+      <div className="space-y-3">
+        <Card className="bg-white/70 backdrop-blur-sm border-yellow-100 active:scale-95 transition-transform">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <Trophy className="h-5 w-5 text-yellow-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-gray-900">
+                  <UnifiedLocalizedText text="Continue Learning" />
+                </h3>
+                <p className="text-sm text-gray-600">
+                  <UnifiedLocalizedText text="Pick up where you left off" />
+                </p>
+              </div>
+              <Button size="sm">
+                <Play className="h-4 w-4 mr-2" />
+                <UnifiedLocalizedText text="Resume" />
               </Button>
-              <Button 
-                className="w-full justify-start" 
-                variant="secondary"
-                onClick={() => setShowAIChat(true)}
-              >
-                <Target className="h-4 w-4 mr-2" />
-                <LocalizedText text="Get Study Tips" />
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="progress" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center">
-                <Target className="h-4 w-4 mr-2" />
-                <LocalizedText text="Learning Progress" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">{data?.completedLessons || 0}</div>
-                <p className="text-sm text-muted-foreground">
-                  <LocalizedText text="Lessons Completed" />
+        <Card className="bg-white/70 backdrop-blur-sm border-indigo-100 active:scale-95 transition-transform">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-gray-900">
+                  <UnifiedLocalizedText text="Upcoming Deadlines" />
+                </h3>
+                <p className="text-sm text-gray-600">
+                  <UnifiedLocalizedText text="Stay on track with your assignments" />
                 </p>
               </div>
-              
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-500">{data?.currentStreak || 0}</div>
-                <p className="text-sm text-muted-foreground">
-                  <LocalizedText text="Day Learning Streak" />
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-500">{data?.totalPoints || 0}</div>
-                <p className="text-sm text-muted-foreground">
-                  <LocalizedText text="Total Points Earned" />
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="badges" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center">
-                <Trophy className="h-4 w-4 mr-2" />
-                <LocalizedText text="Achievements" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {data?.badges && data.badges.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3">
-                  {data.badges.map((badge) => (
-                    <div key={badge.id} className="text-center p-3 border rounded-lg">
-                      <div className="text-2xl mb-2">{badge.icon}</div>
-                      <h4 className="font-medium text-sm">{badge.name}</h4>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(badge.earnedAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center text-muted-foreground py-6">
-                  <Trophy className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">
-                    <LocalizedText text="No badges earned yet" />
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    <LocalizedText text="Complete lessons to earn your first badge!" />
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      <MobileAIChat
-        isOpen={showAIChat}
-        onClose={() => setShowAIChat(false)}
-        context="You are an AI tutor helping students learn. Provide clear explanations, study tips, and answer questions about various subjects."
-        placeholder="Ask me anything about your studies..."
-      />
+              <Badge variant="outline">
+                <UnifiedLocalizedText text="View All" />
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

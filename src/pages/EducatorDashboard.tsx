@@ -10,7 +10,7 @@ import { useEngagementTracking } from '@/hooks/useEngagementTracking';
 import { useSessionTracking } from '@/hooks/useSessionTracking';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useEffect } from 'react';
 
 const EducatorDashboard = () => {

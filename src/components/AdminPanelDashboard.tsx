@@ -1,33 +1,34 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Users, 
-  DollarSign, 
+  BookOpen, 
   TrendingUp, 
-  AlertTriangle,
-  Shield,
-  Globe,
-  BarChart3,
-  UserCheck,
-  UserX,
-  Brain,
+  AlertTriangle, 
+  Shield, 
+  Activity, 
+  DollarSign,
   Settings,
-  Eye,
-  Download,
-  RefreshCw,
-  Activity,
-  Server,
-  Database,
+  UserCheck,
+  School,
+  GraduationCap,
+  Clock,
   Zap,
-  FileText,
-  MessageSquare,
-  Flag
+  BarChart3,
+  Database,
+  Globe,
+  Lock,
+  Bell,
+  CheckCircle,
+  XCircle,
+  Eye,
+  Filter
 } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const AdminPanelDashboard = () => {
   const platformStats = {
@@ -105,14 +106,14 @@ export const AdminPanelDashboard = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Total Users" />
+              <UnifiedLocalizedText text="Total Users" />
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">{platformStats.totalUsers.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text={`${platformStats.activeUsers.toLocaleString()} active`} />
+              <UnifiedLocalizedText text={`${platformStats.activeUsers.toLocaleString()} active`} />
             </p>
           </CardContent>
         </Card>
@@ -120,14 +121,14 @@ export const AdminPanelDashboard = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="New Signups" />
+              <UnifiedLocalizedText text="New Signups" />
             </CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">{platformStats.newSignups}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="This week" />
+              <UnifiedLocalizedText text="This week" />
             </p>
           </CardContent>
         </Card>
@@ -135,14 +136,14 @@ export const AdminPanelDashboard = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Platform Revenue" />
+              <UnifiedLocalizedText text="Platform Revenue" />
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">${platformStats.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text={`+${platformStats.monthlyGrowth}% this month`} />
+              <UnifiedLocalizedText text={`+${platformStats.monthlyGrowth}% this month`} />
             </p>
           </CardContent>
         </Card>
@@ -150,14 +151,14 @@ export const AdminPanelDashboard = () => {
         <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="System Uptime" />
+              <UnifiedLocalizedText text="System Uptime" />
             </CardTitle>
             <Server className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">{platformStats.systemUptime}%</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Last 30 days" />
+              <UnifiedLocalizedText text="Last 30 days" />
             </p>
           </CardContent>
         </Card>
@@ -169,10 +170,10 @@ export const AdminPanelDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <DollarSign className="h-5 w-5" />
-              <LocalizedText text="Revenue & Payouts" />
+              <UnifiedLocalizedText text="Revenue & Payouts" />
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              <LocalizedText text="Global financial overview" />
+              <UnifiedLocalizedText text="Global financial overview" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -215,10 +216,10 @@ export const AdminPanelDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Users className="h-5 w-5" />
-              <LocalizedText text="User Management" />
+              <UnifiedLocalizedText text="User Management" />
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              <LocalizedText text="Monitor and manage platform users" />
+              <UnifiedLocalizedText text="Monitor and manage platform users" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -272,10 +273,10 @@ export const AdminPanelDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Brain className="h-5 w-5" />
-              <LocalizedText text="AI Usage Monitor" />
+              <UnifiedLocalizedText text="AI Usage Monitor" />
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              <LocalizedText text="Track AI queries and detect patterns" />
+              <UnifiedLocalizedText text="Track AI queries and detect patterns" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -330,10 +331,10 @@ export const AdminPanelDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Server className="h-5 w-5" />
-              <LocalizedText text="System Logs" />
+              <UnifiedLocalizedText text="System Logs" />
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              <LocalizedText text="Monitor system health and events" />
+              <UnifiedLocalizedText text="Monitor system health and events" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -375,10 +376,10 @@ export const AdminPanelDashboard = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <MessageSquare className="h-5 w-5" />
-            <LocalizedText text="Recent Reports & Tickets" />
+            <UnifiedLocalizedText text="Recent Reports & Tickets" />
           </CardTitle>
           <CardDescription className="text-muted-foreground">
-            <LocalizedText text="Handle user reports and platform issues" />
+            <UnifiedLocalizedText text="Handle user reports and platform issues" />
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

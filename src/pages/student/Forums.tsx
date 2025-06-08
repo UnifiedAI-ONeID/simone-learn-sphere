@@ -1,14 +1,13 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { MessageCircle, ThumbsUp, Search, Plus, Pin } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const Forums = () => {
   const { courseId } = useParams();
@@ -51,10 +50,10 @@ export const Forums = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">
-            <LocalizedText text="Course Forum" />
+            <UnifiedLocalizedText text="Course Forum" />
           </h1>
           <p className="text-muted-foreground">
-            <LocalizedText text="Discuss topics, ask questions, and help your fellow students" />
+            <UnifiedLocalizedText text="Discuss topics, ask questions, and help your fellow students" />
           </p>
         </div>
 
@@ -68,7 +67,7 @@ export const Forums = () => {
                 </div>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  <LocalizedText text="New Post" />
+                  <UnifiedLocalizedText text="New Post" />
                 </Button>
               </div>
             </PlatformCard>
@@ -119,7 +118,7 @@ export const Forums = () => {
           <div className="space-y-6">
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Forum Guidelines" />
+                <UnifiedLocalizedText text="Forum Guidelines" />
               </h3>
               <div className="text-sm text-muted-foreground space-y-2">
                 <p>• Be respectful and constructive</p>
@@ -131,7 +130,7 @@ export const Forums = () => {
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Categories" />
+                <UnifiedLocalizedText text="Categories" />
               </h3>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
@@ -155,7 +154,7 @@ export const Forums = () => {
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Active Contributors" />
+                <UnifiedLocalizedText text="Active Contributors" />
               </h3>
               <div className="space-y-3">
                 {['Sarah Chen', 'Mike Johnson', 'Lisa Wang'].map((name, index) => (

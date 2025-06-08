@@ -1,178 +1,294 @@
-
-import React, { useState } from 'react';
-import { PlatformLayout } from '@/components/platform/PlatformLayout';
-import { PlatformCard } from '@/components/platform/PlatformCard';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Search, Filter, MoreHorizontal, UserPlus, Eye, Shield } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { Users, Search, Filter, Edit, Trash2, Shield } from 'lucide-react';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface UserProfile {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  role: string;
+  is_active: boolean;
+}
 
 export const UserManagement = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const users = [
-    { id: 1, name: "Alice Johnson", email: "alice@example.com", role: "student", status: "active", joined: "2024-01-15", courses: 3 },
-    { id: 2, name: "Bob Smith", email: "bob@example.com", role: "educator", status: "active", joined: "2024-02-20", courses: 8 },
-    { id: 3, name: "Carol Williams", email: "carol@example.com", role: "student", status: "inactive", joined: "2024-03-10", courses: 1 },
-    { id: 4, name: "David Brown", email: "david@example.com", role: "admin", status: "active", joined: "2024-01-05", courses: 0 },
-  ];
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterRole, setFilterRole] = useState('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'admin': return 'bg-red-100 text-red-800';
-      case 'educator': return 'bg-blue-100 text-blue-800';
-      case 'student': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, first_name, last_name, role, is_active')
+        .like('email', `%${searchQuery}%`)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setUsers(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Error fetching users",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <PlatformLayout>
-      <div className="container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">
-                <LocalizedText text="User Management" />
-              </h1>
-              <p className="text-muted-foreground">
-                <LocalizedText text="Manage platform users and their roles" />
-              </p>
-            </div>
-            <Button>
-              <UserPlus className="h-4 w-4 mr-2" />
-              <LocalizedText text="Add User" />
-            </Button>
-          </div>
-        </div>
+  const handleSearch = () => {
+    fetchUsers();
+  };
 
-        <PlatformCard className="mb-6">
-          <div className="flex gap-4 items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id === userId ? { ...user, role: newRole } : user
+        )
+      );
+
+      toast({
+        title: "Role updated",
+        description: "User role has been updated successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error updating role",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleStatusChange = async (userId: string, newStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: newStatus })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id === userId ? { ...user, is_active: newStatus } : user
+        )
+      );
+
+      toast({
+        title: "Status updated",
+        description: "User status has been updated successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error updating status",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('delete-user', {
+        body: { user_id: userId }
+      });
+
+      if (error) throw error;
+
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+
+      toast({
+        title: "User deleted",
+        description: "User has been deleted successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error deleting user",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const filteredUsers = React.useMemo(() => {
+    let filtered = [...users];
+
+    if (filterRole !== 'all') {
+      filtered = filtered.filter(user => user.role === filterRole);
+    }
+
+    return filtered;
+  }, [users, filterRole]);
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          <UnifiedLocalizedText text="User Management" />
+        </CardTitle>
+        <CardDescription>
+          <UnifiedLocalizedText text="Manage user accounts and roles" />
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="relative">
               <Input
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                type="text"
+                placeholder="Search by email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                onClick={handleSearch}
               />
             </div>
-            <Select>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="student">Students</SelectItem>
-                <SelectItem value="educator">Educators</SelectItem>
-                <SelectItem value="admin">Admins</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="suspended">Suspended</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
-              <LocalizedText text="Filter" />
+            <Button onClick={handleSearch}>
+              <UnifiedLocalizedText text="Search" />
             </Button>
           </div>
-        </PlatformCard>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-          <PlatformCard>
-            <div className="text-center">
-              <p className="text-2xl font-bold">12,486</p>
-              <p className="text-sm text-muted-foreground">Total Users</p>
-            </div>
-          </PlatformCard>
-          <PlatformCard>
-            <div className="text-center">
-              <p className="text-2xl font-bold">10,234</p>
-              <p className="text-sm text-muted-foreground">Students</p>
-            </div>
-          </PlatformCard>
-          <PlatformCard>
-            <div className="text-center">
-              <p className="text-2xl font-bold">2,156</p>
-              <p className="text-sm text-muted-foreground">Educators</p>
-            </div>
-          </PlatformCard>
-          <PlatformCard>
-            <div className="text-center">
-              <p className="text-2xl font-bold">96</p>
-              <p className="text-sm text-muted-foreground">Admins</p>
-            </div>
-          </PlatformCard>
+          <Select value={filterRole} onValueChange={setFilterRole}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                <UnifiedLocalizedText text="All Roles" />
+              </SelectItem>
+              <SelectItem value="student">
+                <UnifiedLocalizedText text="Student" />
+              </SelectItem>
+              <SelectItem value="educator">
+                <UnifiedLocalizedText text="Educator" />
+              </SelectItem>
+              <SelectItem value="admin">
+                <UnifiedLocalizedText text="Admin" />
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <PlatformCard>
+        {isLoading ? (
+          <p>
+            <UnifiedLocalizedText text="Loading users..." />
+          </p>
+        ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left p-4">User</th>
-                  <th className="text-left p-4">Role</th>
-                  <th className="text-left p-4">Status</th>
-                  <th className="text-left p-4">Joined</th>
-                  <th className="text-left p-4">Courses</th>
-                  <th className="text-left p-4">Actions</th>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <UnifiedLocalizedText text="Email" />
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <UnifiedLocalizedText text="Name" />
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <UnifiedLocalizedText text="Role" />
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <UnifiedLocalizedText text="Status" />
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <UnifiedLocalizedText text="Actions" />
+                  </th>
                 </tr>
               </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id} className="border-b hover:bg-muted/50">
-                    <td className="p-4">
-                      <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
-                      </div>
+              <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {user.email}
                     </td>
-                    <td className="p-4">
-                      <Badge className={getRoleBadgeColor(user.role)}>
-                        {user.role}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {user.first_name} {user.last_name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <Select
+                        value={user.role}
+                        onValueChange={(newRole) => handleRoleChange(user.id, newRole)}
+                      >
+                        <SelectTrigger className="w-[120px]">
+                          <span>{user.role}</span>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="student">
+                            <UnifiedLocalizedText text="Student" />
+                          </SelectItem>
+                          <SelectItem value="educator">
+                            <UnifiedLocalizedText text="Educator" />
+                          </SelectItem>
+                          <SelectItem value="admin">
+                            <UnifiedLocalizedText text="Admin" />
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <Badge variant={user.is_active ? "outline" : "destructive"}>
+                        {user.is_active ? (
+                          <UnifiedLocalizedText text="Active" />
+                        ) : (
+                          <UnifiedLocalizedText text="Inactive" />
+                        )}
                       </Badge>
                     </td>
-                    <td className="p-4">
-                      <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
-                        {user.status}
-                      </Badge>
-                    </td>
-                    <td className="p-4 text-sm text-muted-foreground">
-                      {user.joined}
-                    </td>
-                    <td className="p-4 text-sm">
-                      {user.courses}
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Shield className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleStatusChange(user.id, !user.is_active)}
+                      >
+                        <Shield className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </PlatformCard>
-      </div>
-    </PlatformLayout>
+        )}
+      </CardContent>
+    </Card>
   );
 };

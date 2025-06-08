@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertTriangle, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const MobileNotFound = () => {
   const navigate = useNavigate();
@@ -17,17 +16,17 @@ export const MobileNotFound = () => {
             <AlertTriangle className="h-8 w-8 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            <LocalizedText text="Page Not Found" />
+            <UnifiedLocalizedText text="Page Not Found" />
           </h1>
           <p className="text-gray-600 mb-6">
-            <LocalizedText text="The page you're looking for doesn't exist." />
+            <UnifiedLocalizedText text="The page you're looking for doesn't exist." />
           </p>
           <Button
             onClick={() => navigate('/')}
             className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
           >
             <Home className="h-4 w-4 mr-2" />
-            <LocalizedText text="Go Home" />
+            <UnifiedLocalizedText text="Go Home" />
           </Button>
         </CardContent>
       </Card>

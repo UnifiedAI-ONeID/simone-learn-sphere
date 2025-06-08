@@ -1,225 +1,141 @@
-
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { PlatformLayout } from '@/components/platform/PlatformLayout';
+import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Star, ArrowLeft, Target, Zap, BookOpen, Users } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { Button } from '@/components/ui/button';
+import { Trophy, Medal, Award, Star, Target, Calendar, Lock } from 'lucide-react';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const StudentBadges = () => {
-  const navigate = useNavigate();
-
   const earnedBadges = [
-    {
-      id: 1,
-      name: 'First Steps',
-      description: 'Complete your first lesson',
-      icon: '🎯',
-      earnedAt: '2 days ago',
-      rarity: 'Common'
-    },
-    {
-      id: 2,
-      name: 'Week Warrior',
-      description: 'Maintain a 7-day learning streak',
-      icon: '🔥',
-      earnedAt: 'Today',
-      rarity: 'Uncommon'
-    },
-    {
-      id: 3,
-      name: 'Quiz Master',
-      description: 'Score 90%+ on 5 quizzes',
-      icon: '🧠',
-      earnedAt: '1 week ago',
-      rarity: 'Rare'
-    }
+    { id: 1, name: "First Steps", description: "Completed first lesson", icon: Star, color: "bg-yellow-500", date: "2024-06-01" },
+    { id: 2, name: "Quiz Master", description: "Scored 100% on a quiz", icon: Trophy, color: "bg-blue-500", date: "2024-06-05" },
+    { id: 3, name: "Streak Keeper", description: "7-day learning streak", icon: Target, color: "bg-orange-500", date: "2024-06-10" },
   ];
 
   const availableBadges = [
-    {
-      id: 4,
-      name: 'Course Crusher',
-      description: 'Complete your first course',
-      icon: '🏆',
-      progress: 75,
-      requirement: 'Complete 1 course',
-      rarity: 'Uncommon'
-    },
-    {
-      id: 5,
-      name: 'Speed Learner',
-      description: 'Complete 3 lessons in one day',
-      icon: '⚡',
-      progress: 33,
-      requirement: 'Complete 3 lessons in 24 hours',
-      rarity: 'Rare'
-    },
-    {
-      id: 6,
-      name: 'Community Helper',
-      description: 'Help 10 fellow students',
-      icon: '🤝',
-      progress: 20,
-      requirement: 'Answer 10 forum questions',
-      rarity: 'Epic'
-    }
+    { id: 4, name: "Course Completer", description: "Complete your first course", icon: Award, progress: 65 },
+    { id: 5, name: "Social Butterfly", description: "Join 3 study groups", icon: Users, progress: 33 },
+    { id: 6, name: "Monthly Champion", description: "Top performer this month", icon: Calendar, progress: 80 },
+    { id: 7, name: "Security Star", description: "Enable 2FA", icon: Lock, progress: 0 },
   ];
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case 'Common': return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-      case 'Uncommon': return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200';
-      case 'Rare': return 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200';
-      case 'Epic': return 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-200';
-      case 'Legendary': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-    }
-  };
-
   return (
-    <div className="container mx-auto px-4 py-6 space-y-8">
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/student/dashboard')}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            <Trophy className="h-8 w-8 text-yellow-500" />
-            <LocalizedText text="Badges & Achievements" />
+    <PlatformLayout>
+      <div className="container mx-auto px-4 py-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">
+            <UnifiedLocalizedText text="Your Badges & Achievements" />
           </h1>
           <p className="text-muted-foreground">
-            <LocalizedText text="Track your learning milestones and unlock new achievements" />
+            <UnifiedLocalizedText text="Track your learning milestones and unlock new achievements" />
           </p>
         </div>
-      </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-foreground">12</div>
-            <p className="text-sm text-muted-foreground">Total Badges</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-foreground">3</div>
-            <p className="text-sm text-muted-foreground">This Week</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-foreground">1</div>
-            <p className="text-sm text-muted-foreground">Rare Badges</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-foreground">75%</div>
-            <p className="text-sm text-muted-foreground">Collection Rate</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Earned Badges */}
-      <section>
-        <h2 className="text-2xl font-semibold text-foreground mb-4">
-          <LocalizedText text="Earned Badges" />
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {earnedBadges.map((badge) => (
-            <Card key={badge.id} className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-              <CardHeader className="text-center">
-                <div className="text-6xl mb-2">{badge.icon}</div>
-                <CardTitle className="text-lg">{badge.name}</CardTitle>
-                <CardDescription>{badge.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center space-y-2">
-                <Badge className={getRarityColor(badge.rarity)}>
-                  {badge.rarity}
-                </Badge>
-                <p className="text-sm text-muted-foreground">
-                  Earned {badge.earnedAt}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Available Badges */}
-      <section>
-        <h2 className="text-2xl font-semibold text-foreground mb-4">
-          <LocalizedText text="Available Badges" />
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {availableBadges.map((badge) => (
-            <Card key={badge.id} className="bg-card text-card-foreground">
-              <CardHeader className="text-center">
-                <div className="text-6xl mb-2 opacity-50">{badge.icon}</div>
-                <CardTitle className="text-lg">{badge.name}</CardTitle>
-                <CardDescription>{badge.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Progress</span>
-                    <span>{badge.progress}%</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <PlatformCard>
+              <h2 className="text-xl font-semibold mb-4">
+                <UnifiedLocalizedText text="Earned Badges" />
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {earnedBadges.map((badge) => (
+                  <div key={badge.id} className="flex items-start gap-4 p-4 border rounded-lg bg-gradient-to-r from-accent/20 to-transparent">
+                    <div className={`w-12 h-12 rounded-full ${badge.color} flex items-center justify-center text-white`}>
+                      <badge.icon className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold">
+                        <UnifiedLocalizedText text={badge.name} />
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        <UnifiedLocalizedText text={badge.description} />
+                      </p>
+                      <Badge variant="secondary" className="text-xs">
+                        <UnifiedLocalizedText text="Earned" /> {badge.date}
+                      </Badge>
+                    </div>
                   </div>
-                  <Progress value={badge.progress} />
-                </div>
-                
-                <div className="text-center space-y-2">
-                  <Badge variant="outline" className={getRarityColor(badge.rarity)}>
-                    {badge.rarity}
-                  </Badge>
-                  <p className="text-xs text-muted-foreground">
-                    {badge.requirement}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+                ))}
+              </div>
+            </PlatformCard>
 
-      {/* Quick Actions */}
-      <section>
-        <h2 className="text-2xl font-semibold text-foreground mb-4">
-          <LocalizedText text="Quick Actions" />
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => navigate('/student/leaderboard')}>
-            <CardContent className="p-6 text-center">
-              <Star className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
-              <h3 className="font-semibold mb-1">View Leaderboard</h3>
-              <p className="text-sm text-muted-foreground">See how you rank</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => navigate('/student/courses')}>
-            <CardContent className="p-6 text-center">
-              <BookOpen className="h-8 w-8 mx-auto mb-2 text-blue-500" />
-              <h3 className="font-semibold mb-1">Continue Learning</h3>
-              <p className="text-sm text-muted-foreground">Earn more badges</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => navigate('/student/forums')}>
-            <CardContent className="p-6 text-center">
-              <Users className="h-8 w-8 mx-auto mb-2 text-green-500" />
-              <h3 className="font-semibold mb-1">Join Community</h3>
-              <p className="text-sm text-muted-foreground">Help others learn</p>
-            </CardContent>
-          </Card>
+            <PlatformCard>
+              <h2 className="text-xl font-semibold mb-4">
+                <UnifiedLocalizedText text="Available Badges" />
+              </h2>
+              <div className="space-y-4">
+                {availableBadges.map((badge) => (
+                  <div key={badge.id} className="flex items-start gap-4 p-4 border rounded-lg">
+                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                      <badge.icon className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold">
+                        <UnifiedLocalizedText text={badge.name} />
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        <UnifiedLocalizedText text={badge.description} />
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <UnifiedLocalizedText text="Progress" />
+                          <span>{badge.progress}%</span>
+                        </div>
+                        <Progress value={badge.progress} className="h-2" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </PlatformCard>
+          </div>
+
+          <div className="space-y-6">
+            <PlatformCard>
+              <h3 className="font-semibold mb-3">
+                <UnifiedLocalizedText text="Badge Stats" />
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <UnifiedLocalizedText text="Total Badges" />
+                  <span className="text-sm font-medium">3/7</span>
+                </div>
+                <div className="flex justify-between">
+                  <UnifiedLocalizedText text="Points Earned" />
+                  <span className="text-sm font-medium">150</span>
+                </div>
+                <div className="flex justify-between">
+                  <UnifiedLocalizedText text="Completion Rate" />
+                  <span className="text-sm font-medium">43%</span>
+                </div>
+              </div>
+            </PlatformCard>
+
+            <PlatformCard>
+              <h3 className="font-semibold mb-3">
+                <UnifiedLocalizedText text="Next Milestone" />
+              </h3>
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                  <Award className="h-8 w-8 text-primary" />
+                </div>
+                <h4 className="font-medium mb-2">
+                  <UnifiedLocalizedText text="Course Completer" />
+                </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  <UnifiedLocalizedText text="35% remaining" />
+                </p>
+                <Progress value={65} className="mb-2" />
+                <p className="text-xs text-muted-foreground">
+                  <UnifiedLocalizedText text="Complete 3 more lessons" />
+                </p>
+              </div>
+            </PlatformCard>
+          </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </PlatformLayout>
   );
 };

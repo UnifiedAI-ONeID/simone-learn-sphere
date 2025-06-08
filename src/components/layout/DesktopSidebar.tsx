@@ -4,6 +4,9 @@ import { Brain, Home, BookOpen, Users, BarChart3, Shield, Settings, Bot } from '
 import { useUserRole } from '@/hooks/useUserRole';
 import { LocalizedText } from '@/components/LocalizedText';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const DesktopSidebar = () => {
   const { role } = useUserRole();
@@ -58,7 +61,7 @@ export const DesktopSidebar = () => {
           <Brain className="h-6 w-6 text-white" />
         </div>
         <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          <LocalizedText text="SimoneLabs" />
+          <UnifiedLocalizedText text="SimoneLabs" />
         </h2>
       </div>
 

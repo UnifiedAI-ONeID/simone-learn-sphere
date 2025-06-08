@@ -1,9 +1,8 @@
-
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface Props {
   children: ReactNode;
@@ -95,20 +94,20 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 <AlertTriangle className="h-12 w-12 text-destructive" />
               </div>
               <CardTitle className="text-destructive">
-                <LocalizedText text="Something went wrong" />
+                <UnifiedLocalizedText text="Something went wrong" />
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center space-y-2">
                 <p className="text-sm text-muted-foreground">
                   {isAuthError && (
-                    <LocalizedText text="There was an authentication error. Please try signing in again." />
+                    <UnifiedLocalizedText text="There was an authentication error. Please try signing in again." />
                   )}
                   {isNetworkError && (
-                    <LocalizedText text="Network connection issue. Please check your internet connection." />
+                    <UnifiedLocalizedText text="Network connection issue. Please check your internet connection." />
                   )}
                   {!isAuthError && !isNetworkError && (
-                    <LocalizedText text="An unexpected error occurred. Please try again." />
+                    <UnifiedLocalizedText text="An unexpected error occurred. Please try again." />
                   )}
                 </p>
                 
@@ -125,28 +124,28 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               <div className="grid grid-cols-2 gap-2">
                 <Button onClick={this.handleRetry} variant="outline" size="sm">
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  <LocalizedText text="Try Again" />
+                  <UnifiedLocalizedText text="Try Again" />
                 </Button>
                 <Button onClick={this.handleReload} variant="outline" size="sm">
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  <LocalizedText text="Reload Page" />
+                  <UnifiedLocalizedText text="Reload Page" />
                 </Button>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <Button onClick={this.handleGoHome} variant="default" size="sm">
                   <Home className="h-4 w-4 mr-2" />
-                  <LocalizedText text="Go Home" />
+                  <UnifiedLocalizedText text="Go Home" />
                 </Button>
                 <Button onClick={this.handleReportError} variant="ghost" size="sm">
                   <Bug className="h-4 w-4 mr-2" />
-                  <LocalizedText text="Report" />
+                  <UnifiedLocalizedText text="Report" />
                 </Button>
               </div>
 
               {this.state.retryCount > 0 && (
                 <p className="text-xs text-muted-foreground text-center">
-                  <LocalizedText text={`Retry attempts: ${this.state.retryCount}`} />
+                  <UnifiedLocalizedText text={`Retry attempts: ${this.state.retryCount}`} />
                 </p>
               )}
             </CardContent>

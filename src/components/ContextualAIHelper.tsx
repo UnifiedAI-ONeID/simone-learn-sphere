@@ -1,24 +1,27 @@
-
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  Brain, 
+  Bot, 
+  Send, 
+  Lightbulb, 
   MessageCircle, 
-  X, 
-  HelpCircle, 
-  BookOpen, 
-  Users, 
-  Settings, 
-  Shield,
-  BarChart3,
-  Lightbulb
+  HelpCircle,
+  Sparkles,
+  Brain,
+  User,
+  Loader2,
+  RefreshCw,
+  Minimize2,
+  Maximize2
 } from 'lucide-react';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useLocation } from 'react-router-dom';
-import { LocalizedText } from '@/components/LocalizedText';
 
 interface AIHelpSuggestion {
   title: string;
@@ -151,7 +154,7 @@ export const ContextualAIHelper: React.FC = () => {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Brain className="w-5 h-5 text-purple-600" />
-                  <LocalizedText text="AI Assistant" />
+                  <UnifiedLocalizedText text="AI Assistant" />
                 </CardTitle>
                 <Button 
                   variant="ghost" 
@@ -164,10 +167,10 @@ export const ContextualAIHelper: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                 <Badge variant="outline" className="text-xs">
-                  <LocalizedText text={`${role} Dashboard`} />
+                  <UnifiedLocalizedText text={`${role} Dashboard`} />
                 </Badge>
                 <span className="text-xs">
-                  <LocalizedText text="Context-aware help" />
+                  <UnifiedLocalizedText text="Context-aware help" />
                 </span>
               </div>
             </CardHeader>
@@ -175,7 +178,7 @@ export const ContextualAIHelper: React.FC = () => {
             <CardContent className="space-y-4 max-h-96 overflow-y-auto">
               <div className="flex items-center gap-2 text-sm font-medium text-purple-700 dark:text-purple-300">
                 <Lightbulb className="w-4 h-4" />
-                <LocalizedText text="Suggested Actions" />
+                <UnifiedLocalizedText text="Suggested Actions" />
               </div>
               
               {contextualHelp.map((suggestion, index) => (
@@ -189,17 +192,17 @@ export const ContextualAIHelper: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-medium text-sm">
-                        <LocalizedText text={suggestion.title} />
+                        <UnifiedLocalizedText text={suggestion.title} />
                       </h4>
                       <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        <LocalizedText text={suggestion.description} />
+                        <UnifiedLocalizedText text={suggestion.description} />
                       </p>
                       <Button
                         variant="outline"
                         size="sm"
                         className="mt-2 text-xs h-7"
                       >
-                        <LocalizedText text={suggestion.action} />
+                        <UnifiedLocalizedText text={suggestion.action} />
                       </Button>
                     </div>
                   </div>
@@ -211,7 +214,7 @@ export const ContextualAIHelper: React.FC = () => {
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
-                  <LocalizedText text="Chat with AI" />
+                  <UnifiedLocalizedText text="Chat with AI" />
                 </Button>
               </div>
             </CardContent>

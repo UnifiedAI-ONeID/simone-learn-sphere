@@ -1,13 +1,12 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, Video, MessageSquare, Calendar, Clock } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const StudyGroups = () => {
   const { groupId } = useParams();
@@ -23,9 +22,11 @@ export const StudyGroups = () => {
     <PlatformLayout>
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">React Study Group</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            <UnifiedLocalizedText text="React Study Group" />
+          </h1>
           <p className="text-muted-foreground">
-            <LocalizedText text="Collaborative learning session in progress" />
+            <UnifiedLocalizedText text="Collaborative learning session in progress" />
           </p>
         </div>
 
@@ -35,49 +36,65 @@ export const StudyGroups = () => {
               <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center mb-4">
                 <div className="text-center text-white">
                   <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg">Live Study Session</p>
-                  <p className="text-sm opacity-75">Video conferencing area</p>
+                  <p className="text-lg">
+                    <UnifiedLocalizedText text="Live Study Session" />
+                  </p>
+                  <p className="text-sm opacity-75">
+                    <UnifiedLocalizedText text="Video conferencing area" />
+                  </p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <Button>
                   <Video className="h-4 w-4 mr-2" />
-                  <LocalizedText text="Join Video" />
+                  <UnifiedLocalizedText text="Join Video" />
                 </Button>
                 <Button variant="outline">
                   <MessageSquare className="h-4 w-4 mr-2" />
-                  <LocalizedText text="Chat" />
+                  <UnifiedLocalizedText text="Chat" />
                 </Button>
                 <Button variant="outline">
-                  <LocalizedText text="Share Screen" />
+                  <UnifiedLocalizedText text="Share Screen" />
                 </Button>
               </div>
             </PlatformCard>
 
             <PlatformCard className="mt-6">
               <h2 className="text-xl font-semibold mb-4">
-                <LocalizedText text="Study Plan" />
+                <UnifiedLocalizedText text="Study Plan" />
               </h2>
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 border rounded">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">React Hooks Review (30 min)</p>
-                    <p className="text-sm text-muted-foreground">useState, useEffect, custom hooks</p>
+                    <p className="font-medium">
+                      <UnifiedLocalizedText text="React Hooks Review (30 min)" />
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      <UnifiedLocalizedText text="useState, useEffect, custom hooks" />
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 border rounded">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">Practice Exercise (45 min)</p>
-                    <p className="text-sm text-muted-foreground">Build a counter component together</p>
+                    <p className="font-medium">
+                      <UnifiedLocalizedText text="Practice Exercise (45 min)" />
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      <UnifiedLocalizedText text="Build a counter component together" />
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 border rounded">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">Q&A Session (15 min)</p>
-                    <p className="text-sm text-muted-foreground">Address any questions or doubts</p>
+                    <p className="font-medium">
+                      <UnifiedLocalizedText text="Q&A Session (15 min)" />
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      <UnifiedLocalizedText text="Address any questions or doubts" />
+                    </p>
                   </div>
                 </div>
               </div>
@@ -87,7 +104,7 @@ export const StudyGroups = () => {
           <div className="space-y-6">
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Group Members" />
+                <UnifiedLocalizedText text="Group Members" />
               </h3>
               <div className="space-y-3">
                 {groupMembers.map((member, index) => (
@@ -120,37 +137,43 @@ export const StudyGroups = () => {
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Session Info" />
+                <UnifiedLocalizedText text="Session Info" />
               </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>Started 30 minutes ago</span>
+                  <span>
+                    <UnifiedLocalizedText text="Started 30 minutes ago" />
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>1 hour remaining</span>
+                  <span>
+                    <UnifiedLocalizedText text="1 hour remaining" />
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
-                  <span>4/6 members present</span>
+                  <span>
+                    <UnifiedLocalizedText text="4/6 members present" />
+                  </span>
                 </div>
               </div>
             </PlatformCard>
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Shared Resources" />
+                <UnifiedLocalizedText text="Shared Resources" />
               </h3>
               <div className="space-y-2">
                 <Button variant="outline" size="sm" className="w-full justify-start">
-                  <LocalizedText text="React Documentation" />
+                  <UnifiedLocalizedText text="React Documentation" />
                 </Button>
                 <Button variant="outline" size="sm" className="w-full justify-start">
-                  <LocalizedText text="Practice Exercises" />
+                  <UnifiedLocalizedText text="Practice Exercises" />
                 </Button>
                 <Button variant="outline" size="sm" className="w-full justify-start">
-                  <LocalizedText text="Code Sandbox" />
+                  <UnifiedLocalizedText text="Code Sandbox" />
                 </Button>
               </div>
             </PlatformCard>

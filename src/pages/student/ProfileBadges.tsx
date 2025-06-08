@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Star, Target, Zap, Award, Calendar } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { Trophy, Medal, Award, Star, Target, Calendar } from 'lucide-react';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const ProfileBadges = () => {
   const earnedBadges = [
@@ -25,10 +24,10 @@ export const ProfileBadges = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">
-            <LocalizedText text="Your Badges & Achievements" />
+            <UnifiedLocalizedText text="Your Badges & Achievements" />
           </h1>
           <p className="text-muted-foreground">
-            <LocalizedText text="Track your learning milestones and unlock new achievements" />
+            <UnifiedLocalizedText text="Track your learning milestones and unlock new achievements" />
           </p>
         </div>
 
@@ -36,7 +35,7 @@ export const ProfileBadges = () => {
           <div className="lg:col-span-2 space-y-6">
             <PlatformCard>
               <h2 className="text-xl font-semibold mb-4">
-                <LocalizedText text="Earned Badges" />
+                <UnifiedLocalizedText text="Earned Badges" />
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {earnedBadges.map((badge) => (
@@ -45,10 +44,10 @@ export const ProfileBadges = () => {
                       <badge.icon className="h-6 w-6" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold">{badge.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">{badge.description}</p>
+                      <h3 className="font-semibold"><UnifiedLocalizedText text={badge.name} /></h3>
+                      <p className="text-sm text-muted-foreground mb-2"><UnifiedLocalizedText text={badge.description} /></p>
                       <Badge variant="secondary" className="text-xs">
-                        Earned {badge.date}
+                        <UnifiedLocalizedText text={`Earned ${badge.date}`} />
                       </Badge>
                     </div>
                   </div>
@@ -58,7 +57,7 @@ export const ProfileBadges = () => {
 
             <PlatformCard>
               <h2 className="text-xl font-semibold mb-4">
-                <LocalizedText text="Available Badges" />
+                <UnifiedLocalizedText text="Available Badges" />
               </h2>
               <div className="space-y-4">
                 {availableBadges.map((badge) => (
@@ -67,11 +66,11 @@ export const ProfileBadges = () => {
                       <badge.icon className="h-6 w-6 text-muted-foreground" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold">{badge.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-3">{badge.description}</p>
+                      <h3 className="font-semibold"><UnifiedLocalizedText text={badge.name} /></h3>
+                      <p className="text-sm text-muted-foreground mb-3"><UnifiedLocalizedText text={badge.description} /></p>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span>Progress</span>
+                          <span><UnifiedLocalizedText text="Progress" /></span>
                           <span>{badge.progress}%</span>
                         </div>
                         <Progress value={badge.progress} className="h-2" />
@@ -86,36 +85,36 @@ export const ProfileBadges = () => {
           <div className="space-y-6">
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Badge Stats" />
+                <UnifiedLocalizedText text="Badge Stats" />
               </h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm">Total Badges</span>
-                  <span className="text-sm font-medium">3/6</span>
+                  <span><UnifiedLocalizedText text="Total Badges" /></span>
+                  <span className="font-medium">3/6</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm">Points Earned</span>
-                  <span className="text-sm font-medium">150</span>
+                  <span><UnifiedLocalizedText text="Points Earned" /></span>
+                  <span className="font-medium">150</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm">Completion Rate</span>
-                  <span className="text-sm font-medium">50%</span>
+                  <span><UnifiedLocalizedText text="Completion Rate" /></span>
+                  <span className="font-medium">50%</span>
                 </div>
               </div>
             </PlatformCard>
 
             <PlatformCard>
               <h3 className="font-semibold mb-3">
-                <LocalizedText text="Next Milestone" />
+                <UnifiedLocalizedText text="Next Milestone" />
               </h3>
               <div className="text-center">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
                   <Award className="h-8 w-8 text-primary" />
                 </div>
-                <h4 className="font-medium mb-2">Course Completer</h4>
-                <p className="text-sm text-muted-foreground mb-3">35% remaining</p>
+                <h4 className="font-medium mb-2"><UnifiedLocalizedText text="Course Completer" /></h4>
+                <p className="text-sm text-muted-foreground mb-3"><UnifiedLocalizedText text="35% remaining" /></p>
                 <Progress value={65} className="mb-2" />
-                <p className="text-xs text-muted-foreground">Complete 3 more lessons</p>
+                <p className="text-xs text-muted-foreground"><UnifiedLocalizedText text="Complete 3 more lessons" /></p>
               </div>
             </PlatformCard>
           </div>

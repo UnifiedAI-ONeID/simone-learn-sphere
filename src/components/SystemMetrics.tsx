@@ -1,20 +1,28 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Server, 
-  Database, 
+  Activity, 
   Cpu, 
-  HardDrive, 
-  Wifi, 
-  Activity,
+  Database, 
+  HardDrive,
+  Memory,
+  Globe,
+  Users,
   TrendingUp,
-  Clock
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Zap,
+  BarChart3,
+  Monitor,
+  Wifi,
+  RefreshCw
 } from 'lucide-react';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useMetricsDashboard } from '@/hooks/useMetricsDashboard';
-import { LocalizedText } from '@/components/LocalizedText';
 
 export const SystemMetrics = () => {
   const { metrics, loading } = useMetricsDashboard();
@@ -60,15 +68,15 @@ export const SystemMetrics = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
-            <LocalizedText text="System Metrics" />
+            <UnifiedLocalizedText text="System Metrics" />
           </h2>
           <p className="text-gray-600">
-            <LocalizedText text="Monitor platform performance and health" />
+            <UnifiedLocalizedText text="Monitor platform performance and health" />
           </p>
         </div>
         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
           <Activity className="h-3 w-3 mr-1" />
-          <LocalizedText text="Live" />
+          <UnifiedLocalizedText text="Live" />
         </Badge>
       </div>
 
@@ -77,14 +85,14 @@ export const SystemMetrics = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Avg Response Time" />
+              <UnifiedLocalizedText text="Avg Response Time" />
             </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.averageResponseTime}ms</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Last 24 hours" />
+              <UnifiedLocalizedText text="Last 24 hours" />
             </p>
           </CardContent>
         </Card>
@@ -92,14 +100,14 @@ export const SystemMetrics = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Concurrent Users" />
+              <UnifiedLocalizedText text="Concurrent Users" />
             </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.concurrentUsers}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Currently active" />
+              <UnifiedLocalizedText text="Currently active" />
             </p>
           </CardContent>
         </Card>
@@ -107,14 +115,14 @@ export const SystemMetrics = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Completion Rate" />
+              <UnifiedLocalizedText text="Completion Rate" />
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.weeklyCompletionRate}%</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="This week" />
+              <UnifiedLocalizedText text="This week" />
             </p>
           </CardContent>
         </Card>
@@ -122,14 +130,14 @@ export const SystemMetrics = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Total Users" />
+              <UnifiedLocalizedText text="Total Users" />
             </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.totalUsers.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Platform users" />
+              <UnifiedLocalizedText text="Platform users" />
             </p>
           </CardContent>
         </Card>
@@ -141,7 +149,7 @@ export const SystemMetrics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Cpu className="h-5 w-5" />
-              <LocalizedText text="CPU Usage" />
+              <UnifiedLocalizedText text="CPU Usage" />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -162,7 +170,7 @@ export const SystemMetrics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <HardDrive className="h-5 w-5" />
-              <LocalizedText text="Memory Usage" />
+              <UnifiedLocalizedText text="Memory Usage" />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -183,7 +191,7 @@ export const SystemMetrics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Database className="h-5 w-5" />
-              <LocalizedText text="Database Performance" />
+              <UnifiedLocalizedText text="Database Performance" />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -204,7 +212,7 @@ export const SystemMetrics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <HardDrive className="h-5 w-5" />
-              <LocalizedText text="Storage Usage" />
+              <UnifiedLocalizedText text="Storage Usage" />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -225,7 +233,7 @@ export const SystemMetrics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wifi className="h-5 w-5" />
-              <LocalizedText text="Network Status" />
+              <UnifiedLocalizedText text="Network Status" />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -246,7 +254,7 @@ export const SystemMetrics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Server className="h-5 w-5" />
-              <LocalizedText text="API Health" />
+              <UnifiedLocalizedText text="API Health" />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">

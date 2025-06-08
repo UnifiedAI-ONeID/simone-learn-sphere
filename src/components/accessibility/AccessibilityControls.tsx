@@ -1,291 +1,218 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  Accessibility, 
-  Type, 
-  Contrast, 
-  Volume, 
+  Accessibility,
+  Type,
+  Contrast,
+  Volume2,
+  Mouse,
   Eye,
-  Minus,
-  Plus,
-  Settings
+  Keyboard,
+  Monitor,
+  Palette,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Play,
+  Pause,
+  Settings,
+  Info,
+  CheckCircle,
+  AlertTriangle
 } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useToast } from '@/hooks/use-toast';
 
-export const AccessibilityControls: React.FC = () => {
-  const [fontSize, setFontSize] = useState('medium');
-  const [highContrast, setHighContrast] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [announcements, setAnnouncements] = useState(true);
+interface AccessibilityControlsProps {
+  onSettingsChange: (settings: any) => void;
+  initialSettings: any;
+}
+
+export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({ onSettingsChange, initialSettings }) => {
+  const [fontSize, setFontSize] = useState(initialSettings?.fontSize || 16);
+  const [highContrast, setHighContrast] = useState(initialSettings?.highContrast || false);
+  const [darkMode, setDarkMode] = useState(initialSettings?.darkMode || false);
+  const [cursorSize, setCursorSize] = useState(initialSettings?.cursorSize || 1);
+  const [keyboardNavigation, setKeyboardNavigation] = useState(initialSettings?.keyboardNavigation || false);
+  const [textToSpeech, setTextToSpeech] = useState(initialSettings?.textToSpeech || false);
+  const [language, setLanguage] = useState(initialSettings?.language || 'en');
+  const [isResetting, setIsResetting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load saved preferences
-    const savedFontSize = localStorage.getItem('accessibility-font-size');
-    const savedHighContrast = localStorage.getItem('accessibility-high-contrast') === 'true';
-    const savedReducedMotion = localStorage.getItem('accessibility-reduced-motion') === 'true';
-    const savedAnnouncements = localStorage.getItem('accessibility-announcements') !== 'false';
+    setFontSize(initialSettings?.fontSize || 16);
+    setHighContrast(initialSettings?.highContrast || false);
+    setDarkMode(initialSettings?.darkMode || false);
+    setCursorSize(initialSettings?.cursorSize || 1);
+    setKeyboardNavigation(initialSettings?.keyboardNavigation || false);
+    setTextToSpeech(initialSettings?.textToSpeech || false);
+    setLanguage(initialSettings?.language || 'en');
+  }, [initialSettings]);
 
-    if (savedFontSize) setFontSize(savedFontSize);
-    setHighContrast(savedHighContrast);
-    setReducedMotion(savedReducedMotion);
-    setAnnouncements(savedAnnouncements);
+  useEffect(() => {
+    const settings = {
+      fontSize,
+      highContrast,
+      darkMode,
+      cursorSize,
+      keyboardNavigation,
+      textToSpeech,
+      language
+    };
+    onSettingsChange(settings);
+  }, [fontSize, highContrast, darkMode, cursorSize, keyboardNavigation, textToSpeech, language, onSettingsChange]);
 
-    // Apply settings
-    applyFontSize(savedFontSize || 'medium');
-    applyHighContrast(savedHighContrast);
-    applyReducedMotion(savedReducedMotion);
-  }, []);
+  const handleResetSettings = () => {
+    setIsResetting(true);
+    setFontSize(16);
+    setHighContrast(false);
+    setDarkMode(false);
+    setCursorSize(1);
+    setKeyboardNavigation(false);
+    setTextToSpeech(false);
+    setLanguage('en');
+    setIsResetting(false);
 
-  const applyFontSize = (size: string) => {
-    const root = document.documentElement;
-    root.classList.remove('text-sm', 'text-base', 'text-lg');
-    
-    switch (size) {
-      case 'small':
-        root.classList.add('text-sm');
-        break;
-      case 'large':
-        root.classList.add('text-lg');
-        break;
-      default:
-        root.classList.add('text-base');
-    }
-  };
-
-  const applyHighContrast = (enabled: boolean) => {
-    if (enabled) {
-      document.documentElement.classList.add('high-contrast');
-    } else {
-      document.documentElement.classList.remove('high-contrast');
-    }
-  };
-
-  const applyReducedMotion = (enabled: boolean) => {
-    if (enabled) {
-      document.documentElement.classList.add('reduce-motion');
-    } else {
-      document.documentElement.classList.remove('reduce-motion');
-    }
-  };
-
-  const handleFontSizeChange = (size: string) => {
-    setFontSize(size);
-    localStorage.setItem('accessibility-font-size', size);
-    applyFontSize(size);
-    
     toast({
-      title: "Font size updated",
-      description: `Text size changed to ${size}`,
+      title: "Accessibility settings reset",
+      description: "All accessibility settings have been reset to their defaults.",
     });
-
-    // Announce to screen readers
-    if (announcements) {
-      announceToScreenReader(`Font size changed to ${size}`);
-    }
-  };
-
-  const handleHighContrastToggle = () => {
-    const newValue = !highContrast;
-    setHighContrast(newValue);
-    localStorage.setItem('accessibility-high-contrast', newValue.toString());
-    applyHighContrast(newValue);
-    
-    toast({
-      title: newValue ? "High contrast enabled" : "High contrast disabled",
-      description: newValue ? "Improved visibility activated" : "Normal contrast restored",
-    });
-
-    if (announcements) {
-      announceToScreenReader(newValue ? "High contrast mode enabled" : "High contrast mode disabled");
-    }
-  };
-
-  const handleReducedMotionToggle = () => {
-    const newValue = !reducedMotion;
-    setReducedMotion(newValue);
-    localStorage.setItem('accessibility-reduced-motion', newValue.toString());
-    applyReducedMotion(newValue);
-    
-    toast({
-      title: newValue ? "Reduced motion enabled" : "Reduced motion disabled",
-      description: newValue ? "Animations minimized" : "Full animations restored",
-    });
-
-    if (announcements) {
-      announceToScreenReader(newValue ? "Reduced motion enabled" : "Reduced motion disabled");
-    }
-  };
-
-  const handleAnnouncementsToggle = () => {
-    const newValue = !announcements;
-    setAnnouncements(newValue);
-    localStorage.setItem('accessibility-announcements', newValue.toString());
-    
-    toast({
-      title: newValue ? "Screen reader announcements enabled" : "Screen reader announcements disabled",
-      description: newValue ? "You will hear updates" : "Updates will be silent",
-    });
-  };
-
-  const announceToScreenReader = (message: string) => {
-    const announcement = document.createElement('div');
-    announcement.setAttribute('aria-live', 'polite');
-    announcement.setAttribute('aria-atomic', 'true');
-    announcement.className = 'sr-only';
-    announcement.textContent = message;
-    
-    document.body.appendChild(announcement);
-    
-    setTimeout(() => {
-      document.body.removeChild(announcement);
-    }, 1000);
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-gray-600 hover:text-purple-600 dark:text-gray-300 dark:hover:text-purple-400"
-          aria-label="Accessibility settings"
-        >
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
           <Accessibility className="h-5 w-5" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
-        <div className="p-2">
-          <div className="flex items-center space-x-2 mb-4">
-            <Accessibility className="h-4 w-4" />
-            <span className="font-semibold">
-              <LocalizedText text="Accessibility Settings" />
-            </span>
+          <UnifiedLocalizedText text="Accessibility Settings" />
+        </CardTitle>
+        <CardDescription>
+          <UnifiedLocalizedText text="Customize your experience" />
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Font Size */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="font-size" className="flex items-center gap-2">
+              <Type className="h-4 w-4" />
+              <UnifiedLocalizedText text="Font Size" />
+            </Label>
+            <Badge variant="secondary">{fontSize}px</Badge>
           </div>
-          
-          <div className="space-y-4">
-            {/* Font Size Controls */}
-            <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <Type className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                  <LocalizedText text="Text Size" />
-                </span>
-              </div>
-              <div className="flex space-x-1">
-                <Button
-                  variant={fontSize === 'small' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleFontSizeChange('small')}
-                  className="flex-1"
-                >
-                  <Minus className="h-3 w-3 mr-1" />
-                  <LocalizedText text="Small" />
-                </Button>
-                <Button
-                  variant={fontSize === 'medium' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleFontSizeChange('medium')}
-                  className="flex-1"
-                >
-                  <LocalizedText text="Medium" />
-                </Button>
-                <Button
-                  variant={fontSize === 'large' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleFontSizeChange('large')}
-                  className="flex-1"
-                >
-                  <Plus className="h-3 w-3 mr-1" />
-                  <LocalizedText text="Large" />
-                </Button>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* High Contrast Toggle */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Contrast className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                  <LocalizedText text="High Contrast" />
-                </span>
-              </div>
-              <Button
-                variant={highContrast ? 'default' : 'outline'}
-                size="sm"
-                onClick={handleHighContrastToggle}
-              >
-                {highContrast ? (
-                  <LocalizedText text="Enabled" />
-                ) : (
-                  <LocalizedText text="Disabled" />
-                )}
-              </Button>
-            </div>
-
-            {/* Reduced Motion Toggle */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Eye className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                  <LocalizedText text="Reduce Motion" />
-                </span>
-              </div>
-              <Button
-                variant={reducedMotion ? 'default' : 'outline'}
-                size="sm"
-                onClick={handleReducedMotionToggle}
-              >
-                {reducedMotion ? (
-                  <LocalizedText text="Enabled" />
-                ) : (
-                  <LocalizedText text="Disabled" />
-                )}
-              </Button>
-            </div>
-
-            {/* Screen Reader Announcements */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Volume className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                  <LocalizedText text="Announcements" />
-                </span>
-              </div>
-              <Button
-                variant={announcements ? 'default' : 'outline'}
-                size="sm"
-                onClick={handleAnnouncementsToggle}
-              >
-                {announcements ? (
-                  <LocalizedText text="On" />
-                ) : (
-                  <LocalizedText text="Off" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          <Separator className="my-4" />
-
-          <div className="text-xs text-gray-500">
-            <LocalizedText text="Settings are saved automatically and persist between sessions." />
-          </div>
+          <Slider
+            id="font-size"
+            defaultValue={[fontSize]}
+            max={30}
+            min={12}
+            step={1}
+            onValueChange={(value) => setFontSize(value[0])}
+          />
         </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+
+        {/* High Contrast */}
+        <div className="flex items-center justify-between">
+          <Label htmlFor="high-contrast" className="flex items-center gap-2">
+            <Contrast className="h-4 w-4" />
+            <UnifiedLocalizedText text="High Contrast" />
+          </Label>
+          <Switch
+            id="high-contrast"
+            checked={highContrast}
+            onCheckedChange={setHighContrast}
+          />
+        </div>
+
+        {/* Dark Mode */}
+        <div className="flex items-center justify-between">
+          <Label htmlFor="dark-mode" className="flex items-center gap-2">
+            <Palette className="h-4 w-4" />
+            <UnifiedLocalizedText text="Dark Mode" />
+          </Label>
+          <Switch
+            id="dark-mode"
+            checked={darkMode}
+            onCheckedChange={setDarkMode}
+          />
+        </div>
+
+        {/* Cursor Size */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="cursor-size" className="flex items-center gap-2">
+              <Mouse className="h-4 w-4" />
+              <UnifiedLocalizedText text="Cursor Size" />
+            </Label>
+            <Badge variant="secondary">{cursorSize}x</Badge>
+          </div>
+          <Slider
+            id="cursor-size"
+            defaultValue={[cursorSize]}
+            max={3}
+            min={1}
+            step={0.1}
+            onValueChange={(value) => setCursorSize(value[0])}
+          />
+        </div>
+
+        {/* Keyboard Navigation */}
+        <div className="flex items-center justify-between">
+          <Label htmlFor="keyboard-navigation" className="flex items-center gap-2">
+            <Keyboard className="h-4 w-4" />
+            <UnifiedLocalizedText text="Keyboard Navigation" />
+          </Label>
+          <Switch
+            id="keyboard-navigation"
+            checked={keyboardNavigation}
+            onCheckedChange={setKeyboardNavigation}
+          />
+        </div>
+
+        {/* Text-to-Speech */}
+        <div className="flex items-center justify-between">
+          <Label htmlFor="text-to-speech" className="flex items-center gap-2">
+            <Volume2 className="h-4 w-4" />
+            <UnifiedLocalizedText text="Text-to-Speech" />
+          </Label>
+          <Switch
+            id="text-to-speech"
+            checked={textToSpeech}
+            onCheckedChange={setTextToSpeech}
+          />
+        </div>
+
+        {/* Language Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="language" className="flex items-center gap-2">
+            <Type className="h-4 w-4" />
+            <UnifiedLocalizedText text="Language" />
+          </Label>
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="es">Español</SelectItem>
+              <SelectItem value="fr">Français</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Separator />
+
+        {/* Reset Settings */}
+        <Button variant="outline" className="w-full" onClick={handleResetSettings} disabled={isResetting}>
+          <RotateCcw className="h-4 w-4 mr-2" />
+          <UnifiedLocalizedText text={isResetting ? "Resetting..." : "Reset to Defaults"} />
+        </Button>
+      </CardContent>
+    </Card>
   );
 };

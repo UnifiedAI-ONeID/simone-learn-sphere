@@ -1,8 +1,7 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Brain } from 'lucide-react';
-import { LocalizedText } from '@/components/LocalizedText';
+import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { supabase } from '@/integrations/supabase/client';
 import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import { ensureProfileExists } from '@/utils/authUtils';
@@ -101,10 +100,10 @@ export const MobileAuthCallback = () => {
           <Brain className="w-8 h-8 text-primary-foreground" />
         </div>
         <h2 className="text-xl font-semibold text-foreground">
-          <LocalizedText text="Completing Sign In..." />
+          <UnifiedLocalizedText text="Completing Sign In..." />
         </h2>
         <p className="text-muted-foreground">
-          <LocalizedText text="Setting up your account with the selected role" />
+          <UnifiedLocalizedText text="Setting up your account with the selected role" />
         </p>
       </div>
     </div>
