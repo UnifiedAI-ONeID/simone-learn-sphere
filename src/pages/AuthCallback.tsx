@@ -2,8 +2,8 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
-import { ensureProfileExists } from '@/utils/authUtils';
+import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
+import { ensureProfileExists } from '@/utils/consolidatedAuthUtils';
 import { useToast } from '@/hooks/use-toast';
 
 const AuthCallback = () => {
@@ -14,6 +14,22 @@ const AuthCallback = () => {
     const handleAuthCallback = async () => {
       try {
         console.log('AuthCallback: Processing OAuth callback');
+        
+        // Validate OAuth state for CSRF protection
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnedState = urlParams.get('state');
+        const storedState = localStorage.getItem('oauth_state');
+        
+        if (returnedState && storedState && returnedState !== storedState) {
+          console.error('OAuth state mismatch - possible CSRF attack');
+          toast({
+            title: "Security Error",
+            description: "Possible security issue detected. Please try signing in again.",
+            variant: "destructive",
+          });
+          navigate('/auth?error=csrf_detected');
+          return;
+        }
         
         const { data, error } = await supabase.auth.getSession();
         
@@ -35,6 +51,10 @@ const AuthCallback = () => {
           const pendingUserRole = localStorage.getItem('pendingUserRole');
           console.log('AuthCallback: Found pending role:', pendingUserRole);
           
+          // Clean up OAuth state
+          localStorage.removeItem('oauth_state');
+          localStorage.removeItem('oauth_provider');
+          
           if (pendingUserRole) {
             localStorage.removeItem('pendingUserRole');
           }
@@ -45,28 +65,38 @@ const AuthCallback = () => {
           
           // Ensure profile exists with the correct role
           try {
-            await ensureProfileExists(data.session.user.id, data.session.user, userRole);
-            console.log('AuthCallback: Profile ensured with role:', userRole);
+            const profile = await ensureProfileExists(data.session.user.id, data.session.user, userRole);
+            if (profile && profile.role) {
+              userRole = profile.role;
+              console.log('AuthCallback: Role confirmed from profile:', userRole);
+            }
           } catch (profileError) {
             console.error('AuthCallback: Profile creation failed:', profileError);
             // Continue with authentication even if profile creation fails
           }
           
-          // Wait a moment for profile operations to complete
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Verify role in database
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', data.session.user.id)
-            .single();
-          
-          if (profileData && !profileError) {
-            userRole = profileData.role;
-            console.log('AuthCallback: Role verified from database:', userRole);
-          } else {
-            console.error('AuthCallback: Profile verification failed:', profileError);
+          // Verify role in database with retry
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', data.session.user.id)
+                .single();
+              
+              if (profileData && !profileError) {
+                userRole = profileData.role;
+                console.log('AuthCallback: Role verified from database:', userRole);
+                break;
+              } else if (attempt === 3) {
+                console.error('AuthCallback: Profile verification failed after 3 attempts:', profileError);
+              }
+            } catch (retryError) {
+              console.warn(`Profile verification attempt ${attempt} failed:`, retryError);
+              if (attempt < 3) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+              }
+            }
           }
           
           // Show success message with role
@@ -77,8 +107,8 @@ const AuthCallback = () => {
             description: `Successfully signed in as ${roleDisplayName}.`,
           });
           
-          // Redirect to appropriate dashboard using isLoginContext=true for proper prioritization
-          const redirectRoute = getRoleBasedRoute(userRole, true);
+          // Redirect to appropriate dashboard using unified routing
+          const redirectRoute = getUnifiedRoleRoute(userRole, true, false);
           console.log('AuthCallback: Redirecting to:', redirectRoute);
           
           navigate(redirectRoute, { replace: true });

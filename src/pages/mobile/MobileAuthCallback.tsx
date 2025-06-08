@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Brain } from 'lucide-react';
 import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { supabase } from '@/integrations/supabase/client';
-import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
-import { ensureProfileExists } from '@/utils/authUtils';
+import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
+import { ensureProfileExists } from '@/utils/consolidatedAuthUtils';
 import toast from 'react-hot-toast';
 
 // Define UserRole type locally since it's not exported from supabase types
@@ -19,12 +19,24 @@ export const MobileAuthCallback = () => {
       try {
         console.log('MobileAuthCallback: Processing OAuth callback');
         
+        // Validate OAuth state for CSRF protection
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnedState = urlParams.get('state');
+        const storedState = localStorage.getItem('oauth_state');
+        
+        if (returnedState && storedState && returnedState !== storedState) {
+          console.error('OAuth state mismatch - possible CSRF attack');
+          toast.error('Security error. Please try signing in again.');
+          navigate('/mobile/auth?error=csrf_detected');
+          return;
+        }
+        
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('MobileAuthCallback: Error getting session:', error);
           toast.error('Authentication failed. Please try again.');
-          navigate('/auth?error=callback_failed');
+          navigate('/mobile/auth?error=callback_failed');
           return;
         }
 
@@ -34,6 +46,10 @@ export const MobileAuthCallback = () => {
           // Get pending role and clean up
           const pendingUserRole = localStorage.getItem('pendingUserRole');
           console.log('MobileAuthCallback: Found pending role:', pendingUserRole);
+          
+          // Clean up OAuth state
+          localStorage.removeItem('oauth_state');
+          localStorage.removeItem('oauth_provider');
           
           if (pendingUserRole) {
             localStorage.removeItem('pendingUserRole');
@@ -45,28 +61,38 @@ export const MobileAuthCallback = () => {
           
           // Ensure profile exists with the correct role
           try {
-            await ensureProfileExists(data.session.user.id, data.session.user, userRole);
-            console.log('MobileAuthCallback: Profile ensured with role:', userRole);
+            const profile = await ensureProfileExists(data.session.user.id, data.session.user, userRole);
+            if (profile && profile.role) {
+              userRole = profile.role;
+              console.log('MobileAuthCallback: Role confirmed from profile:', userRole);
+            }
           } catch (profileError) {
             console.error('MobileAuthCallback: Profile creation failed:', profileError);
             // Continue with authentication even if profile creation fails
           }
           
-          // Wait a moment for profile operations to complete
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Verify role in database
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', data.session.user.id)
-            .single();
-          
-          if (profileData && !profileError) {
-            userRole = profileData.role;
-            console.log('MobileAuthCallback: Role verified from database:', userRole);
-          } else {
-            console.error('MobileAuthCallback: Profile verification failed:', profileError);
+          // Verify role in database with retry
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', data.session.user.id)
+                .single();
+              
+              if (profileData && !profileError) {
+                userRole = profileData.role;
+                console.log('MobileAuthCallback: Role verified from database:', userRole);
+                break;
+              } else if (attempt === 3) {
+                console.error('MobileAuthCallback: Profile verification failed after 3 attempts:', profileError);
+              }
+            } catch (retryError) {
+              console.warn(`Profile verification attempt ${attempt} failed:`, retryError);
+              if (attempt < 3) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+              }
+            }
           }
           
           // Show success message with role
@@ -74,20 +100,20 @@ export const MobileAuthCallback = () => {
                                  userRole === 'admin' ? 'Admin' : 'Student';
           toast.success(`Welcome! Successfully signed in as ${roleDisplayName}.`);
           
-          // Use mobile-specific routing
-          const redirectRoute = getMobileRoleBasedRoute(userRole as UserRole, true);
+          // Use unified mobile routing
+          const redirectRoute = getUnifiedRoleRoute(userRole as UserRole, true, true);
           console.log('MobileAuthCallback: Redirecting to:', redirectRoute);
           
           navigate(redirectRoute, { replace: true });
         } else {
           console.log('MobileAuthCallback: No session found, redirecting to auth');
           toast.error('Authentication incomplete. Please try signing in again.');
-          navigate('/auth', { replace: true });
+          navigate('/mobile/auth', { replace: true });
         }
       } catch (error) {
         console.error('MobileAuthCallback: Unexpected error:', error);
         toast.error('An unexpected error occurred. Please try again.');
-        navigate('/auth?error=callback_failed');
+        navigate('/mobile/auth?error=callback_failed');
       }
     };
 

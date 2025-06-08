@@ -3,18 +3,19 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
 import {
-  getEnhancedAuthErrorMessage,
+  getConsolidatedAuthErrorMessage,
   logAuthEvent,
   withAuthRetry,
   validatePasswordStrength,
   cleanupAuthState,
   shouldSuggestOAuth,
   getOAuthRedirectUrl,
+  generateOAuthState,
+  ensureProfileExists,
   AuthResult
-} from '@/utils/enhancedAuthUtils';
+} from '@/utils/consolidatedAuthUtils';
 import toast from 'react-hot-toast';
 
 export const useEnhancedAuthentication = () => {
@@ -36,10 +37,7 @@ export const useEnhancedAuthentication = () => {
   }, [isMobile]);
 
   const navigateBasedOnRole = useCallback((role: string) => {
-    const redirectRoute = isMobile 
-      ? getMobileRoleBasedRoute(role as any, true)
-      : getRoleBasedRoute(role, true);
-    
+    const redirectRoute = getUnifiedRoleRoute(role, true, isMobile);
     console.log('Navigating to:', redirectRoute);
     navigate(redirectRoute, { replace: true });
   }, [isMobile, navigate]);
@@ -50,7 +48,7 @@ export const useEnhancedAuthentication = () => {
   }, []);
 
   const handleAuthError = useCallback((error: any, operation: string) => {
-    const errorMessage = getEnhancedAuthErrorMessage(error);
+    const errorMessage = getConsolidatedAuthErrorMessage(error);
     setError(errorMessage);
     
     // Log authentication failure
@@ -133,6 +131,10 @@ export const useEnhancedAuthentication = () => {
         return { success: true, requiresEmailVerification: true };
       } else if (data.session) {
         console.log('Immediate signup success');
+        
+        // Ensure profile exists with proper error handling
+        await ensureProfileExists(data.user.id, data.user, selectedRole);
+        
         toast.success(`Account created successfully! Welcome, ${selectedRole}!`);
         navigateBasedOnRole(selectedRole);
         return { success: true };
@@ -204,6 +206,11 @@ export const useEnhancedAuthentication = () => {
         console.log('Starting OAuth with role:', selectedRole);
       }
 
+      // Generate and store OAuth state for CSRF protection
+      const oauthState = generateOAuthState();
+      localStorage.setItem('oauth_state', oauthState);
+      localStorage.setItem('oauth_provider', provider);
+
       const redirectUrl = getRedirectUrl();
       console.log('Starting OAuth with redirect:', redirectUrl);
 
@@ -215,6 +222,7 @@ export const useEnhancedAuthentication = () => {
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
+            state: oauthState
           }
         }
       });
@@ -228,7 +236,7 @@ export const useEnhancedAuthentication = () => {
       return { success: true };
     } catch (error: any) {
       console.error('OAuth error:', error);
-      const errorMessage = getEnhancedAuthErrorMessage(error);
+      const errorMessage = getConsolidatedAuthErrorMessage(error);
       setError(errorMessage);
       
       await logAuthEvent('oauth_failed', provider, false, error.code, error.message);
