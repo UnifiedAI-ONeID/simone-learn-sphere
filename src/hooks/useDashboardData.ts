@@ -175,24 +175,55 @@ export const useEducatorDashboardData = () => {
         // Fetch educator's courses
         const { data: courses, error: coursesError } = await supabase
           .from('courses')
-          .select(`
-            *,
-            course_enrollments (
-              id,
-              user_id,
-              enrolled_at,
-              profiles (
-                first_name,
-                last_name
-              )
-            )
-          `)
+          .select('*')
           .eq('educator_id', user.id);
 
         if (coursesError) throw coursesError;
 
-        const totalStudents = courses?.reduce((sum, course) => 
-          sum + (course.course_enrollments?.length || 0), 0) || 0;
+        // Fetch enrollments for educator's courses
+        const courseIds = courses?.map(course => course.id) || [];
+        let enrollments: any[] = [];
+        let enrollmentProfiles: any[] = [];
+
+        if (courseIds.length > 0) {
+          const { data: enrollmentData, error: enrollmentError } = await supabase
+            .from('course_enrollments')
+            .select('*')
+            .in('course_id', courseIds);
+
+          if (enrollmentError) throw enrollmentError;
+          enrollments = enrollmentData || [];
+
+          // Fetch profiles for enrolled users
+          const userIds = enrollments.map(enrollment => enrollment.user_id);
+          if (userIds.length > 0) {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('id, first_name, last_name')
+              .in('id', userIds);
+
+            if (profileError) throw profileError;
+            enrollmentProfiles = profileData || [];
+          }
+        }
+
+        const totalStudents = enrollments.length;
+
+        // Create recent enrollments with proper student names
+        const recentEnrollments = enrollments
+          .slice(0, 10)
+          .map(enrollment => {
+            const profile = enrollmentProfiles.find(p => p.id === enrollment.user_id);
+            const course = courses?.find(c => c.id === enrollment.course_id);
+            
+            return {
+              studentName: profile 
+                ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Anonymous'
+                : 'Anonymous',
+              courseName: course?.title || 'Unknown Course',
+              enrolledAt: enrollment.enrolled_at
+            };
+          });
 
         const dashboardData: EducatorDashboardData = {
           totalCourses: courses?.length || 0,
@@ -202,18 +233,12 @@ export const useEducatorDashboardData = () => {
           courses: courses?.map(course => ({
             id: course.id,
             title: course.title,
-            students: course.course_enrollments?.length || 0,
+            students: enrollments.filter(e => e.course_id === course.id).length,
             revenue: 0, // Would calculate from pricing
             rating: 4.5, // Would fetch from ratings
             published: course.is_published
           })) || [],
-          recentEnrollments: courses?.flatMap(course => 
-            course.course_enrollments?.slice(0, 5).map(enrollment => ({
-              studentName: `${enrollment.profiles?.first_name || ''} ${enrollment.profiles?.last_name || ''}`.trim() || 'Anonymous',
-              courseName: course.title,
-              enrolledAt: enrollment.enrolled_at
-            })) || []
-          ).slice(0, 10) || []
+          recentEnrollments
         };
 
         setData(dashboardData);
