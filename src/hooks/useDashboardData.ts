@@ -82,7 +82,7 @@ export const useStudentDashboardData = () => {
         setLoading(true);
         setError(null);
         
-        const fetchStudentData = async () => {
+        const fetchStudentData = async (): Promise<StudentDashboardData> => {
           // Fetch enrolled courses
           const { data: enrollments, error: enrollmentsError } = await supabase
             .from('course_enrollments')
@@ -131,35 +131,27 @@ export const useStudentDashboardData = () => {
           if (badgesError) throw badgesError;
 
           return {
-            enrollments: enrollments || [],
-            completions: completions || [],
-            streak: streak || null,
-            userBadges: userBadges || []
+            enrolledCourses: enrollments?.length || 0,
+            completedLessons: completions?.length || 0,
+            currentStreak: streak?.current_streak || 0,
+            totalPoints: (completions?.length || 0) * 10,
+            recentCourses: (enrollments || []).slice(0, 3).map(enrollment => ({
+              id: enrollment.courses?.id || '',
+              title: enrollment.courses?.title || '',
+              progress: enrollment.progress_percentage || 0,
+              lastAccessed: enrollment.last_accessed_at || enrollment.enrolled_at
+            })),
+            badges: (userBadges || []).map(ub => ({
+              id: ub.badges?.id || '',
+              name: ub.badges?.name || '',
+              icon: ub.badges?.icon || '',
+              earnedAt: ub.earned_at
+            }))
           };
         };
 
         const result = await withRetry(fetchStudentData, 3, 1000);
-
-        const dashboardData: StudentDashboardData = {
-          enrolledCourses: result.enrollments.length,
-          completedLessons: result.completions.length,
-          currentStreak: result.streak?.current_streak || 0,
-          totalPoints: result.completions.length * 10,
-          recentCourses: result.enrollments.slice(0, 3).map(enrollment => ({
-            id: enrollment.courses?.id || '',
-            title: enrollment.courses?.title || '',
-            progress: enrollment.progress_percentage || 0,
-            lastAccessed: enrollment.last_accessed_at || enrollment.enrolled_at
-          })),
-          badges: result.userBadges.map(ub => ({
-            id: ub.badges?.id || '',
-            name: ub.badges?.name || '',
-            icon: ub.badges?.icon || '',
-            earnedAt: ub.earned_at
-          }))
-        };
-
-        setData(dashboardData);
+        setData(result);
       } catch (err) {
         const errorInfo = getAppErrorMessage(err, 'dashboard');
         logError(err, 'student_dashboard', { userId: user.id });
@@ -192,7 +184,7 @@ export const useEducatorDashboardData = () => {
         setLoading(true);
         setError(null);
 
-        const fetchEducatorData = async () => {
+        const fetchEducatorData = async (): Promise<EducatorDashboardData> => {
           // Fetch educator's courses
           const { data: courses, error: coursesError } = await supabase
             .from('courses')
@@ -246,7 +238,7 @@ export const useEducatorDashboardData = () => {
               };
             });
 
-          const dashboardData: EducatorDashboardData = {
+          return {
             totalCourses: courses?.length || 0,
             totalStudents,
             totalRevenue: 0, // Would calculate from pricing and enrollments
@@ -261,8 +253,6 @@ export const useEducatorDashboardData = () => {
             })) || [],
             recentEnrollments
           };
-
-          setData(dashboardData);
         };
 
         const result = await withRetry(fetchEducatorData, 3, 1000);
@@ -293,7 +283,7 @@ export const useAdminDashboardData = () => {
         setLoading(true);
         setError(null);
 
-        const fetchAdminData = async () => {
+        const fetchAdminData = async (): Promise<AdminDashboardData> => {
           // Fetch user counts by role
           const { data: profiles, error: profilesError } = await supabase
             .from('profiles')
@@ -323,7 +313,7 @@ export const useAdminDashboardData = () => {
             return acc;
           }, { students: 0, educators: 0, admins: 0 }) || { students: 0, educators: 0, admins: 0 };
 
-          const dashboardData: AdminDashboardData = {
+          return {
             totalUsers: profiles?.length || 0,
             activeUsers: Math.floor((profiles?.length || 0) * 0.7), // Estimate 70% active
             totalRevenue: 0, // Would calculate from all transactions
@@ -336,13 +326,11 @@ export const useAdminDashboardData = () => {
               time: event.created_at
             })) || [],
             systemMetrics: [
-              { name: 'API Uptime', value: 99.9, status: 'healthy' },
-              { name: 'Database Performance', value: 95, status: 'healthy' },
-              { name: 'CDN Response Time', value: 85, status: 'warning' }
+              { name: 'API Uptime', value: 99.9, status: 'healthy' as const },
+              { name: 'Database Performance', value: 95, status: 'healthy' as const },
+              { name: 'CDN Response Time', value: 85, status: 'warning' as const }
             ]
           };
-
-          setData(dashboardData);
         };
 
         const result = await withRetry(fetchAdminData, 3, 1000);
