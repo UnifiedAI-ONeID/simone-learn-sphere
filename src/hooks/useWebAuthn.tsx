@@ -71,6 +71,18 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
       if (credential && credential.response) {
         const response = credential.response as AuthenticatorAttestationResponse;
         
+        // Get the public key using the correct method
+        const publicKeyBuffer = response.getPublicKey();
+        if (!publicKeyBuffer) {
+          setError('Failed to get public key from credential');
+          return false;
+        }
+
+        // Convert ArrayBuffer to hex string for storage
+        const publicKeyHex = Array.from(new Uint8Array(publicKeyBuffer))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+        
         // Store credential info in Supabase
         const { error } = await supabase
           .from('user_passkeys')
@@ -78,7 +90,7 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
             user_id: user.id,
             user_email: email,
             credential_id: credential.id,
-            public_key: Array.from(new Uint8Array(response.publicKey || new ArrayBuffer(0))),
+            public_key: publicKeyHex,
           });
 
         if (error) {
