@@ -125,31 +125,33 @@ export const OptimizedLocalizedText: React.FC<OptimizedLocalizedTextProps> = ({
     }
   }, [lazy, visibilityRef]);
 
+  // Helper function to create the element with proper typing
+  const createElement = (children: React.ReactNode, additionalProps: any = {}) => {
+    const props = {
+      className,
+      ref: lazy ? setElementRef : undefined,
+      ...additionalProps
+    };
+    return React.createElement(Component as any, props, children);
+  };
+
   // Render loading state
   if (isLoading && showLoadingSpinner) {
-    return (
-      <Component 
-        className={cn(className, "inline-flex items-center space-x-1")}
-        ref={lazy ? setElementRef : undefined}
-      >
-        {fallback || (
-          <>
-            <Loader2 className="h-3 w-3 animate-spin" />
-            <span>{text}</span>
-          </>
-        )}
-      </Component>
+    const loadingContent = fallback || (
+      <>
+        <Loader2 className="h-3 w-3 animate-spin" />
+        <span>{text}</span>
+      </>
     );
+    return createElement(loadingContent, {
+      className: cn(className, "inline-flex items-center space-x-1")
+    });
   }
 
   // Render error state
   if (hasError || translationError) {
-    return (
-      <Component 
-        className={cn(className, "inline-flex items-center space-x-1")}
-        title={hasError ? 'Translation failed, showing original text' : translationError || undefined}
-        ref={lazy ? setElementRef : undefined}
-      >
+    const errorContent = (
+      <>
         <span className={hasError ? "text-orange-600" : undefined}>
           {localizedText}
         </span>
@@ -167,19 +169,17 @@ export const OptimizedLocalizedText: React.FC<OptimizedLocalizedTextProps> = ({
         {hasError && (
           <AlertTriangle className="h-3 w-3 text-orange-500" />
         )}
-      </Component>
+      </>
     );
+    
+    return createElement(errorContent, {
+      className: cn(className, "inline-flex items-center space-x-1"),
+      title: hasError ? 'Translation failed, showing original text' : translationError || undefined
+    });
   }
 
   // Render normal state
-  return (
-    <Component 
-      className={className}
-      ref={lazy ? setElementRef : undefined}
-    >
-      {localizedText}
-    </Component>
-  );
+  return createElement(localizedText);
 };
 
 // Export with legacy names for compatibility
