@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Fingerprint, AlertCircle } from 'lucide-react';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
 import { LocalizedText } from '@/components/LocalizedText';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PasskeyAuthProps {
   email: string;
@@ -22,14 +23,39 @@ export const PasskeyAuth: React.FC<PasskeyAuthProps> = ({
   const handlePasskeyAction = async () => {
     setShowError(false);
     
-    const success = isSignUp 
-      ? await register(email)
-      : await authenticate(email);
-
-    if (success) {
-      onSuccess();
+    if (isSignUp) {
+      // For signup, user must be authenticated first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowError(true);
+        return;
+      }
+      
+      const success = await register(email);
+      if (success) {
+        onSuccess();
+      } else {
+        setShowError(true);
+      }
     } else {
-      setShowError(true);
+      // For signin, check if passkeys exist and authenticate
+      const success = await authenticate(email);
+      if (success) {
+        // Try to sign in the user
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('email', email)
+          .single();
+
+        if (profile) {
+          onSuccess();
+        } else {
+          setShowError(true);
+        }
+      } else {
+        setShowError(true);
+      }
     }
   };
 
@@ -56,7 +82,7 @@ export const PasskeyAuth: React.FC<PasskeyAuthProps> = ({
         <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-md">
           <AlertCircle className="h-4 w-4 text-red-500" />
           <p className="text-sm text-red-700">
-            {error || 'Passkey authentication failed'}
+            {error || (isSignUp ? 'Failed to set up passkey' : 'Passkey authentication failed')}
           </p>
         </div>
       )}

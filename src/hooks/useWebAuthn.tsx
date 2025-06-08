@@ -2,12 +2,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface WebAuthnCredential {
-  id: string;
-  rawId: ArrayBuffer;
-  type: 'public-key';
-}
-
 interface UseWebAuthnReturn {
   isSupported: boolean;
   isLoading: boolean;
@@ -35,16 +29,27 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
     setError(null);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setError('User must be logged in to register a passkey');
+        return false;
+      }
+
+      // Generate challenge
+      const challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+
       // Create credential options
       const credentialCreationOptions: CredentialCreationOptions = {
         publicKey: {
-          challenge: new Uint8Array(32).map(() => Math.random() * 256),
+          challenge,
           rp: {
             name: 'SimoneLabs',
             id: window.location.hostname,
           },
           user: {
-            id: new TextEncoder().encode(email),
+            id: new TextEncoder().encode(user.id),
             name: email,
             displayName: email,
           },
@@ -63,17 +68,21 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
 
       const credential = await navigator.credentials.create(credentialCreationOptions) as PublicKeyCredential;
       
-      if (credential) {
+      if (credential && credential.response) {
+        const response = credential.response as AuthenticatorAttestationResponse;
+        
         // Store credential info in Supabase
         const { error } = await supabase
           .from('user_passkeys')
           .insert({
+            user_id: user.id,
             user_email: email,
             credential_id: credential.id,
-            public_key: Array.from(new Uint8Array(credential.response.publicKey || new ArrayBuffer(0))),
+            public_key: Array.from(new Uint8Array(response.publicKey || new ArrayBuffer(0))),
           });
 
         if (error) {
+          console.error('Failed to save passkey:', error);
           setError('Failed to save passkey');
           return false;
         }
@@ -83,6 +92,7 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
       
       return false;
     } catch (err: any) {
+      console.error('Passkey registration error:', err);
       setError(err.message || 'Failed to register passkey');
       return false;
     } finally {
@@ -100,20 +110,31 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
     setError(null);
 
     try {
-      // Get user's credentials
-      const { data: userPasskeys } = await supabase
+      // Get user's credentials from database
+      const { data: userPasskeys, error: fetchError } = await supabase
         .from('user_passkeys')
         .select('credential_id')
-        .eq('user_email', email);
+        .eq('user_email', email)
+        .eq('is_active', true);
+
+      if (fetchError) {
+        console.error('Error fetching passkeys:', fetchError);
+        setError('Failed to fetch passkeys');
+        return false;
+      }
 
       if (!userPasskeys || userPasskeys.length === 0) {
         setError('No passkeys found for this email');
         return false;
       }
 
+      // Generate challenge
+      const challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+
       const credentialRequestOptions: CredentialRequestOptions = {
         publicKey: {
-          challenge: new Uint8Array(32).map(() => Math.random() * 256),
+          challenge,
           allowCredentials: userPasskeys.map(pk => ({
             id: new TextEncoder().encode(pk.credential_id),
             type: 'public-key' as const,
@@ -126,23 +147,33 @@ export const useWebAuthn = (): UseWebAuthnReturn => {
       const assertion = await navigator.credentials.get(credentialRequestOptions);
       
       if (assertion) {
-        // In a real app, you'd verify the assertion server-side
-        // For now, we'll just sign in the user
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password: 'passkey-auth', // This would be handled differently in production
-        });
+        // In a real implementation, you'd verify the assertion server-side
+        // For now, we'll attempt to sign in the user with email
+        
+        // Try to get user by email from profiles
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .single();
 
-        if (error) {
-          setError('Authentication failed');
-          return false;
+        if (profile) {
+          // Update last used timestamp
+          await supabase
+            .from('user_passkeys')
+            .update({ last_used_at: new Date().toISOString() })
+            .eq('user_email', email);
+
+          // Note: In a production app, you'd need to implement proper
+          // server-side verification and session creation
+          // For now, we'll return success and let the parent handle auth
+          return true;
         }
-
-        return true;
       }
       
       return false;
     } catch (err: any) {
+      console.error('Passkey authentication error:', err);
       setError(err.message || 'Authentication failed');
       return false;
     } finally {
