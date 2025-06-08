@@ -1,134 +1,108 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Users, 
-  Shield, 
-  Activity, 
-  AlertTriangle, 
+  DollarSign, 
   TrendingUp, 
-  Database, 
-  Server, 
-  Clock,
-  DollarSign,
-  Eye,
-  Bot,
+  AlertTriangle,
+  Shield,
   Globe,
+  BarChart3,
   UserCheck,
+  UserX,
+  Brain,
+  Settings,
+  Eye,
+  Download,
+  RefreshCw,
+  Activity,
+  Server,
+  Database,
+  Zap,
   FileText,
-  Settings
+  MessageSquare,
+  Flag
 } from 'lucide-react';
-import { useMetricsDashboard } from '@/hooks/useMetricsDashboard';
-import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
 import { LocalizedText } from '@/components/LocalizedText';
 
 export const AdminPanelDashboard = () => {
-  const { metrics, loading } = useMetricsDashboard();
-  const securityState = useSecurityMonitor();
-
-  // Mock additional admin data
-  const revenueData = {
-    totalRevenue: 45780,
-    monthlyRevenue: 8950,
-    pendingPayouts: 12300,
-    affiliateEarnings: 2150
+  const platformStats = {
+    totalUsers: 12450,
+    activeUsers: 8920,
+    newSignups: 340,
+    globalEngagement: 78,
+    totalRevenue: 45600,
+    monthlyGrowth: 15.8,
+    systemUptime: 99.9
   };
+
+  const revenueData = {
+    totalRevenue: 45600,
+    affiliateStats: 8900,
+    pendingPayouts: 12300,
+    regions: [
+      { name: 'North America', revenue: 18240, percentage: 40 },
+      { name: 'Europe', revenue: 13680, percentage: 30 },
+      { name: 'Asia Pacific', revenue: 9120, percentage: 20 },
+      { name: 'Others', revenue: 4560, percentage: 10 }
+    ]
+  };
+
+  const userManagement = [
+    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'educator', status: 'active', lastSeen: '2 hours ago' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'student', status: 'suspended', lastSeen: '1 day ago' },
+    { id: 3, name: 'Bob Wilson', email: 'bob@example.com', role: 'educator', status: 'active', lastSeen: '30 min ago' },
+    { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'admin', status: 'active', lastSeen: 'Online' }
+  ];
+
+  const aiUsageData = {
+    totalQueries: 15420,
+    monthlyQueries: 3240,
+    averageResponseTime: 1.2,
+    suspiciousPatterns: 3,
+    flaggedContent: 12
+  };
+
+  const systemLogs = [
+    { timestamp: '10:30 AM', event: 'User login spike detected', severity: 'info', details: '+25% above normal' },
+    { timestamp: '10:15 AM', event: 'Payment processing error', severity: 'warning', details: 'Stripe API timeout' },
+    { timestamp: '10:00 AM', event: 'Course published', severity: 'info', details: 'React Advanced by John Doe' },
+    { timestamp: '09:45 AM', event: 'Suspicious activity detected', severity: 'critical', details: 'Multiple failed login attempts' }
+  ];
 
   const recentReports = [
-    { id: 1, type: 'Content', description: 'Inappropriate content in React course', status: 'pending', time: '2 hours ago' },
-    { id: 2, type: 'User', description: 'Spam behavior reported', status: 'reviewed', time: '1 day ago' },
-    { id: 3, type: 'Technical', description: 'API timeout issues', status: 'resolved', time: '2 days ago' }
+    { id: 1, type: 'content', description: 'Inappropriate course content reported', status: 'pending', reporter: 'Student' },
+    { id: 2, type: 'user', description: 'Spam behavior in forums', status: 'resolved', reporter: 'Educator' },
+    { id: 3, type: 'technical', description: 'Video playback issues', status: 'investigating', reporter: 'Student' }
   ];
 
-  const aiUsageStats = {
-    totalQueries: 15420,
-    suspiciousPatterns: 3,
-    blockedQueries: 12,
-    avgResponseTime: 1.2
-  };
-
-  const regionalBreakdown = [
-    { region: 'North America', users: 8450, revenue: 22400 },
-    { region: 'Europe', users: 6200, revenue: 15300 },
-    { region: 'Asia Pacific', users: 4800, revenue: 8080 }
-  ];
-
-  const getSecurityBadgeColor = (level: string) => {
-    switch (level) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-green-100 text-green-800 border-green-200';
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'text-red-600 dark:text-red-400';
+      case 'warning': return 'text-yellow-600 dark:text-yellow-400';
+      case 'info': return 'text-blue-600 dark:text-blue-400';
+      default: return 'text-muted-foreground';
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'resolved': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'reviewed': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const getSeverityBg = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800';
+      case 'warning': return 'bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800';
+      case 'info': return 'bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800';
+      default: return 'bg-background border-border';
     }
   };
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
-      {/* Critical Security Alerts */}
-      {securityState.threatLevel !== 'low' && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
-              <div>
-                <p className="font-medium text-red-800">
-                  <LocalizedText text="Security Alert" />
-                </p>
-                <p className="text-sm text-red-600">
-                  <LocalizedText text={`${securityState.activeThreats.length} threat(s) detected - Immediate attention required`} />
-                </p>
-              </div>
-              <Badge className={getSecurityBadgeColor(securityState.threatLevel)}>
-                {securityState.threatLevel}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Platform Analytics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Active Users" />
-            </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{metrics.concurrentUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              <LocalizedText text="Currently online" />
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
+        <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               <LocalizedText text="Total Users" />
@@ -136,43 +110,54 @@ export const AdminPanelDashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.totalUsers.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-foreground">{platformStats.totalUsers.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="+12% this month" />
+              <LocalizedText text={`${platformStats.activeUsers.toLocaleString()} active`} />
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="Global Revenue" />
+              <LocalizedText text="New Signups" />
+            </CardTitle>
+            <UserCheck className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">{platformStats.newSignups}</div>
+            <p className="text-xs text-muted-foreground">
+              <LocalizedText text="This week" />
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card text-card-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <LocalizedText text="Platform Revenue" />
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${revenueData.totalRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-foreground">${platformStats.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="All time platform revenue" />
+              <LocalizedText text={`+${platformStats.monthlyGrowth}% this month`} />
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-card text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <LocalizedText text="System Health" />
+              <LocalizedText text="System Uptime" />
             </CardTitle>
             <Server className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              <Badge variant="secondary" className="bg-green-100 text-green-700">
-                <LocalizedText text="Optimal" />
-              </Badge>
-            </div>
+            <div className="text-2xl font-bold text-foreground">{platformStats.systemUptime}%</div>
             <p className="text-xs text-muted-foreground">
-              <LocalizedText text="99.9% uptime" />
+              <LocalizedText text="Last 30 days" />
             </p>
           </CardContent>
         </Card>
@@ -180,90 +165,101 @@ export const AdminPanelDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue & Payouts */}
-        <Card>
+        <Card className="bg-card text-card-foreground">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               <DollarSign className="h-5 w-5" />
               <LocalizedText text="Revenue & Payouts" />
             </CardTitle>
-            <CardDescription>
-              <LocalizedText text="Platform financial overview" />
+            <CardDescription className="text-muted-foreground">
+              <LocalizedText text="Global financial overview" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="text-sm text-gray-600">Monthly Revenue</p>
-                <p className="text-xl font-bold">${revenueData.monthlyRevenue.toLocaleString()}</p>
+              <div className="p-3 border border-border rounded-lg bg-background">
+                <div className="text-sm text-muted-foreground">Total Revenue</div>
+                <div className="text-2xl font-bold text-foreground">${revenueData.totalRevenue.toLocaleString()}</div>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="text-sm text-gray-600">Pending Payouts</p>
-                <p className="text-xl font-bold">${revenueData.pendingPayouts.toLocaleString()}</p>
+              <div className="p-3 border border-border rounded-lg bg-background">
+                <div className="text-sm text-muted-foreground">Pending Payouts</div>
+                <div className="text-2xl font-bold text-foreground">${revenueData.pendingPayouts.toLocaleString()}</div>
               </div>
             </div>
             
-            <div>
-              <h4 className="font-medium mb-2">Regional Breakdown</h4>
-              <div className="space-y-2">
-                {regionalBreakdown.map((region, index) => (
-                  <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                    <div>
-                      <p className="font-medium text-sm">{region.region}</p>
-                      <p className="text-xs text-gray-600">{region.users.toLocaleString()} users</p>
-                    </div>
-                    <p className="font-semibold">${region.revenue.toLocaleString()}</p>
+            <div className="space-y-3">
+              <h4 className="font-medium text-foreground">Regional Breakdown</h4>
+              {revenueData.regions.map((region, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-foreground">{region.name}</span>
                   </div>
-                ))}
-              </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="text-sm font-medium text-foreground">${region.revenue.toLocaleString()}</div>
+                    <Badge variant="outline" className="text-xs">{region.percentage}%</Badge>
+                  </div>
+                </div>
+              ))}
             </div>
+            
+            <Button variant="outline" className="w-full border-border text-foreground hover:bg-accent">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              View Financial Reports
+            </Button>
           </CardContent>
         </Card>
 
-        {/* User Management Overview */}
-        <Card>
+        {/* User Management Table */}
+        <Card className="bg-card text-card-foreground">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserCheck className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Users className="h-5 w-5" />
               <LocalizedText text="User Management" />
             </CardTitle>
-            <CardDescription>
-              <LocalizedText text="Platform user statistics and controls" />
+            <CardDescription className="text-muted-foreground">
+              <LocalizedText text="Monitor and manage platform users" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">
-                  {Math.round(metrics.totalUsers * 0.7)}
-                </p>
-                <p className="text-xs text-gray-600">Students</p>
-              </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="text-2xl font-bold text-green-600">
-                  {Math.round(metrics.totalUsers * 0.25)}
-                </p>
-                <p className="text-xs text-gray-600">Educators</p>
-              </div>
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">
-                  {Math.round(metrics.totalUsers * 0.05)}
-                </p>
-                <p className="text-xs text-gray-600">Admins</p>
-              </div>
+            <div className="space-y-2">
+              {userManagement.map((user, index) => (
+                <div key={index} className="p-3 border border-border rounded-lg bg-background">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-medium text-foreground">{user.name}</h4>
+                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'} className="text-xs">
+                          {user.role}
+                        </Badge>
+                        <Badge variant={user.status === 'active' ? 'default' : 'destructive'} className="text-xs">
+                          {user.status}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                      <p className="text-xs text-muted-foreground">Last seen: {user.lastSeen}</p>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline" className="border-border hover:bg-accent">
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                      <Button size="sm" variant="outline" className="border-border hover:bg-accent">
+                        <Settings className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
             
-            <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
-                <Users className="h-4 w-4 mr-2" />
-                Manage All Users
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1 border-border text-foreground hover:bg-accent">
+                <UserCheck className="h-4 w-4 mr-2" />
+                Bulk Actions
               </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Eye className="h-4 w-4 mr-2" />
-                Impersonate User
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Shield className="h-4 w-4 mr-2" />
-                Suspend/Reactivate
+              <Button variant="outline" className="flex-1 border-border text-foreground hover:bg-accent">
+                <Download className="h-4 w-4 mr-2" />
+                Export Users
               </Button>
             </div>
           </CardContent>
@@ -272,121 +268,150 @@ export const AdminPanelDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* AI Usage Monitor */}
-        <Card>
+        <Card className="bg-card text-card-foreground">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Brain className="h-5 w-5" />
               <LocalizedText text="AI Usage Monitor" />
             </CardTitle>
-            <CardDescription>
-              <LocalizedText text="Track AI queries and detect suspicious patterns" />
+            <CardDescription className="text-muted-foreground">
+              <LocalizedText text="Track AI queries and detect patterns" />
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="text-sm text-gray-600">Total Queries</p>
-                <p className="text-xl font-bold">{aiUsageStats.totalQueries.toLocaleString()}</p>
-              </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="text-sm text-gray-600">Avg Response</p>
-                <p className="text-xl font-bold">{aiUsageStats.avgResponseTime}s</p>
-              </div>
-            </div>
-            
-            {aiUsageStats.suspiciousPatterns > 0 && (
-              <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="p-3 border border-border rounded-lg bg-background">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-orange-800">Suspicious Patterns Detected</p>
-                    <p className="text-sm text-orange-600">{aiUsageStats.suspiciousPatterns} patterns flagged</p>
+                  <Zap className="h-8 w-8 text-primary" />
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-foreground">{aiUsageData.totalQueries.toLocaleString()}</div>
+                    <p className="text-xs text-muted-foreground">Total Queries</p>
                   </div>
-                  <Button size="sm" variant="outline">
-                    Review
-                  </Button>
                 </div>
               </div>
-            )}
-            
-            <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-              <span className="text-sm">Blocked Queries</span>
-              <Badge variant="secondary">{aiUsageStats.blockedQueries}</Badge>
+              <div className="p-3 border border-border rounded-lg bg-background">
+                <div className="flex items-center justify-between">
+                  <Activity className="h-8 w-8 text-primary" />
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-foreground">{aiUsageData.averageResponseTime}s</div>
+                    <p className="text-xs text-muted-foreground">Avg Response</p>
+                  </div>
+                </div>
+              </div>
             </div>
+            
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-3 border border-orange-200 rounded-lg bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
+                <div className="flex items-center space-x-2">
+                  <AlertTriangle className="h-5 w-5 text-orange-500" />
+                  <span className="text-sm font-medium text-orange-900 dark:text-orange-100">Suspicious Patterns</span>
+                </div>
+                <Badge variant="destructive" className="text-xs">{aiUsageData.suspiciousPatterns}</Badge>
+              </div>
+              
+              <div className="flex justify-between items-center p-3 border border-red-200 rounded-lg bg-red-50 dark:bg-red-950 dark:border-red-800">
+                <div className="flex items-center space-x-2">
+                  <Flag className="h-5 w-5 text-red-500" />
+                  <span className="text-sm font-medium text-red-900 dark:text-red-100">Flagged Content</span>
+                </div>
+                <Badge variant="destructive" className="text-xs">{aiUsageData.flaggedContent}</Badge>
+              </div>
+            </div>
+            
+            <Button variant="outline" className="w-full border-border text-foreground hover:bg-accent">
+              <Shield className="h-4 w-4 mr-2" />
+              View AI Audit Trail
+            </Button>
           </CardContent>
         </Card>
 
-        {/* Recent Reports & Tickets */}
-        <Card>
+        {/* System Logs & Uptime */}
+        <Card className="bg-card text-card-foreground">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              <LocalizedText text="Recent Reports" />
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Server className="h-5 w-5" />
+              <LocalizedText text="System Logs" />
             </CardTitle>
-            <CardDescription>
-              <LocalizedText text="Content moderation and user reports" />
+            <CardDescription className="text-muted-foreground">
+              <LocalizedText text="Monitor system health and events" />
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {recentReports.map((report) => (
-              <div key={report.id} className="p-3 border rounded-lg">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <Badge variant="outline" className="mb-1 text-xs">
-                      {report.type}
-                    </Badge>
-                    <p className="text-sm">{report.description}</p>
+          <CardContent className="space-y-4">
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {systemLogs.map((log, index) => (
+                <div key={index} className={`p-3 rounded-lg border ${getSeverityBg(log.severity)}`}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-muted-foreground">{log.timestamp}</span>
+                        <Badge variant="outline" className={`text-xs ${getSeverityColor(log.severity)}`}>
+                          {log.severity}
+                        </Badge>
+                      </div>
+                      <p className="text-sm font-medium text-foreground mt-1">{log.event}</p>
+                      <p className="text-xs text-muted-foreground">{log.details}</p>
+                    </div>
                   </div>
-                  <Badge className={getStatusColor(report.status)} variant="secondary">
-                    {report.status}
-                  </Badge>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">{report.time}</span>
-                  {report.status === 'pending' && (
-                    <Button size="sm" variant="outline">
-                      Review
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
             
-            <Button variant="outline" className="w-full">
-              <FileText className="h-4 w-4 mr-2" />
-              View All Reports
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1 border-border text-foreground hover:bg-accent">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+              <Button variant="outline" className="flex-1 border-border text-foreground hover:bg-accent">
+                <Download className="h-4 w-4 mr-2" />
+                Export Logs
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* System Configuration */}
-      <Card>
+      {/* Recent Reports / Tickets */}
+      <Card className="bg-card text-card-foreground">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            <LocalizedText text="Platform Configuration" />
+          <CardTitle className="flex items-center gap-2 text-foreground">
+            <MessageSquare className="h-5 w-5" />
+            <LocalizedText text="Recent Reports & Tickets" />
           </CardTitle>
-          <CardDescription>
-            <LocalizedText text="Configure platform-wide settings and export data" />
+          <CardDescription className="text-muted-foreground">
+            <LocalizedText text="Handle user reports and platform issues" />
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Button variant="outline" className="w-full">
-              <Globe className="h-4 w-4 mr-2" />
-              <LocalizedText text="Theme Settings" />
-            </Button>
-            <Button variant="outline" className="w-full">
-              <Shield className="h-4 w-4 mr-2" />
-              <LocalizedText text="Security Limits" />
-            </Button>
-            <Button variant="outline" className="w-full">
-              <Database className="h-4 w-4 mr-2" />
-              <LocalizedText text="Export Analytics" />
-            </Button>
-            <Button variant="outline" className="w-full">
+        <CardContent className="space-y-4">
+          <div className="grid gap-4">
+            {recentReports.map((report, index) => (
+              <div key={index} className="p-4 border border-border rounded-lg bg-background">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Badge variant="outline" className="text-xs">{report.type}</Badge>
+                      <Badge variant={report.status === 'resolved' ? 'default' : report.status === 'pending' ? 'secondary' : 'destructive'} className="text-xs">
+                        {report.status}
+                      </Badge>
+                    </div>
+                    <h4 className="font-medium text-foreground">{report.description}</h4>
+                    <p className="text-sm text-muted-foreground">Reported by: {report.reporter}</p>
+                  </div>
+                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    {report.status === 'pending' ? 'Review' : 'View'}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1 border-border text-foreground hover:bg-accent">
               <FileText className="h-4 w-4 mr-2" />
-              <LocalizedText text="Audit Logs" />
+              View All Reports
+            </Button>
+            <Button variant="outline" className="flex-1 border-border text-foreground hover:bg-accent">
+              <Settings className="h-4 w-4 mr-2" />
+              Moderation Settings
             </Button>
           </div>
         </CardContent>
