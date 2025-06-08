@@ -1,16 +1,16 @@
-
 import { isMobile, isTablet } from 'react-device-detect';
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun, Brain } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
+import { OptimizedLocalizedText } from '@/components/OptimizedLocalizedText';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getUnifiedRoleRoute } from '@/utils/unifiedRoleRouting';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
+import { useContentReadyState } from '@/hooks/useContentReadyState';
 
 // Lazy load heavy components
 const AccessibilityControls = lazy(() => import('@/components/accessibility/AccessibilityControls').then(m => ({ default: m.AccessibilityControls })));
@@ -26,8 +26,9 @@ const Index = () => {
   const { role, loading: roleLoading } = useUserRole();
   const { isDarkMode, toggleDarkMode } = usePlatformTheme();
   const [componentsLoaded, setComponentsLoaded] = useState(false);
+  const { isContentReady } = useContentReadyState({ delay: 300, waitForImages: true });
 
-  console.log('Index: Rendering with user:', !!user, 'role:', role, 'authLoading:', authLoading, 'roleLoading:', roleLoading);
+  console.log('Index: Rendering with user:', !!user, 'role:', role, 'authLoading:', authLoading, 'roleLoading:', roleLoading, 'contentReady:', isContentReady);
 
   // Redirect authenticated users to their dashboard
   useEffect(() => {
@@ -57,7 +58,7 @@ const Index = () => {
             <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
           <p className="landing-subtitle">
-            <UnifiedLocalizedText text="Loading..." />
+            <OptimizedLocalizedText text="Loading..." waitForContent={false} />
           </p>
         </div>
       </div>
@@ -73,7 +74,7 @@ const Index = () => {
             <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
           <p className="landing-subtitle">
-            <UnifiedLocalizedText text="Redirecting to your dashboard..." />
+            <OptimizedLocalizedText text="Redirecting to your dashboard..." waitForContent={false} />
           </p>
         </div>
       </div>
@@ -82,7 +83,7 @@ const Index = () => {
 
   const handleGetStarted = () => {
     console.log('Index: Get started clicked, navigating to auth');
-    toast.success(<UnifiedLocalizedText text="Welcome to SimoneLabs!" />);
+    toast.success(<OptimizedLocalizedText text="Welcome to SimoneLabs!" waitForContent={false} />);
     navigate('/auth');
   };
 
@@ -102,7 +103,7 @@ const Index = () => {
               <Brain className="h-7 w-7 text-primary-foreground" aria-hidden="true" />
             </div>
             <h1 className="text-3xl font-bold landing-gradient-text">
-              <UnifiedLocalizedText text="SimoneLabs" />
+              <OptimizedLocalizedText text="SimoneLabs" priority={3} />
             </h1>
           </div>
           
@@ -128,7 +129,7 @@ const Index = () => {
               variant="outline"
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-semibold"
             >
-              <UnifiedLocalizedText text="Sign In" />
+              <OptimizedLocalizedText text="Sign In" priority={3} />
             </Button>
           </div>
         </nav>
@@ -142,7 +143,9 @@ const Index = () => {
               <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center animate-pulse">
                 <Brain className="w-8 h-8 text-primary-foreground" />
               </div>
-              <p className="text-muted-foreground">Loading content...</p>
+              <p className="text-muted-foreground">
+                <OptimizedLocalizedText text="Loading content..." waitForContent={false} />
+              </p>
             </div>
           }>
             <PlatformOverview 
@@ -162,14 +165,14 @@ const Index = () => {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center text-muted-foreground">
             <p className="text-lg font-medium">
-              <UnifiedLocalizedText text="© 2024 SimoneLabs. Democratizing education worldwide." />
+              <OptimizedLocalizedText text="© 2024 SimoneLabs. Democratizing education worldwide." priority={1} />
             </p>
           </div>
         </div>
       </footer>
 
       {/* Landing Page Assistant - Load last */}
-      {componentsLoaded && (
+      {componentsLoaded && isContentReady && (
         <Suspense fallback={null}>
           <LandingPageAssistant />
         </Suspense>

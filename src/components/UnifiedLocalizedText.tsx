@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocalization } from '@/contexts/UnifiedLocalizationContext';
+import { useContentReadyState } from '@/hooks/useContentReadyState';
 import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -27,6 +28,7 @@ export const UnifiedLocalizedText: React.FC<UnifiedLocalizedTextProps> = ({
   maxRetries = 3,
 }) => {
   const { currentLanguage, translationKey, getTranslation, isTranslating, translationError } = useLocalization();
+  const { isContentReady } = useContentReadyState({ delay: 300 });
   const [localizedText, setLocalizedText] = useState(text);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -43,12 +45,18 @@ export const UnifiedLocalizedText: React.FC<UnifiedLocalizedTextProps> = ({
       return;
     }
 
+    // Wait for content to be ready before translating
+    if (!isContentReady) {
+      setLocalizedText(textToTranslate);
+      return;
+    }
+
     setLocalizedText(textToTranslate);
     setHasError(false);
     setIsLoading(true);
     
     try {
-      console.log('UnifiedLocalizedText: Translating:', textToTranslate.substring(0, 30), 'to', target);
+      console.log('UnifiedLocalizedText: Translating after content ready:', textToTranslate.substring(0, 30), 'to', target);
       const result = await getTranslation(textToTranslate.trim(), target);
       setLocalizedText(result);
       setRetryCount(0);
@@ -60,7 +68,7 @@ export const UnifiedLocalizedText: React.FC<UnifiedLocalizedTextProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [getTranslation]);
+  }, [getTranslation, isContentReady]);
 
   const handleRetry = useCallback(() => {
     if (retryCount < maxRetries) {
@@ -72,8 +80,15 @@ export const UnifiedLocalizedText: React.FC<UnifiedLocalizedTextProps> = ({
 
   useEffect(() => {
     const target = targetLanguage || currentLanguage.code;
-    translateText(text, target);
-  }, [text, targetLanguage, currentLanguage.code, translationKey, translateText]);
+    
+    // Only translate when content is ready
+    if (isContentReady) {
+      translateText(text, target);
+    } else {
+      // Show original text immediately
+      setLocalizedText(text);
+    }
+  }, [text, targetLanguage, currentLanguage.code, translationKey, translateText, isContentReady]);
 
   if (isLoading && showLoadingSpinner) {
     return (
