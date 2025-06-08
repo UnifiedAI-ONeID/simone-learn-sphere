@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -5,17 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Brain, Clock, User, Activity, Search, Filter } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const AIAuditTrail = () => {
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">
-          <UnifiedLocalizedText text="AI Audit Trail" />
+          AI Audit Trail
         </h1>
         <p className="text-muted-foreground">
-          <UnifiedLocalizedText text="Monitor AI usage and track generated content" />
+          Monitor AI usage and track generated content
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export const AIAuditTrail = () => {
               </Select>
               <Button>
                 <Filter className="h-4 w-4 mr-2" />
-                <UnifiedLocalizedText text="Filters" />
+                Filters
               </Button>
             </div>
           </Card>
@@ -78,7 +78,7 @@ export const AIAuditTrail = () => {
         <div className="space-y-6">
           <Card>
             <h3 className="font-semibold mb-3">
-              <UnifiedLocalizedText text="Log Filters" />
+              Log Filters
             </h3>
             <div className="space-y-2">
               <Select>
@@ -105,7 +105,7 @@ export const AIAuditTrail = () => {
 
           <Card>
             <h3 className="font-semibold mb-3">
-              <UnifiedLocalizedText text="Recent Activity" />
+              Recent Activity
             </h3>
             <div className="space-y-3">
               {[1, 2, 3].map((activity) => (

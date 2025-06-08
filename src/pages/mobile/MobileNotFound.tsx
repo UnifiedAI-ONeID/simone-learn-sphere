@@ -3,7 +3,6 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Home, ArrowLeft } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const MobileNotFound = () => {
   const navigate = useNavigate();
@@ -14,10 +13,10 @@ export const MobileNotFound = () => {
         <div className="space-y-2">
           <h1 className="text-6xl font-bold text-muted-foreground">404</h1>
           <h2 className="text-xl font-semibold">
-            <UnifiedLocalizedText text="Page Not Found" />
+            Page Not Found
           </h2>
           <p className="text-muted-foreground">
-            <UnifiedLocalizedText text="The page you're looking for doesn't exist or has been moved." />
+            The page you're looking for doesn't exist or has been moved.
           </p>
         </div>
 
@@ -27,7 +26,7 @@ export const MobileNotFound = () => {
             className="w-full"
           >
             <Home className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Go Home" />
+            Go Home
           </Button>
           
           <Button 
@@ -36,7 +35,7 @@ export const MobileNotFound = () => {
             className="w-full"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Go Back" />
+            Go Back
           </Button>
         </div>
       </div>

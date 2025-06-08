@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Shield } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface TwoFactorSetupProps {
   userEmail: string;
@@ -19,22 +18,22 @@ export const TwoFactorSetup: React.FC<TwoFactorSetupProps> = ({ userEmail, isEna
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shield className="h-5 w-5" />
-          <UnifiedLocalizedText text="Two-Factor Authentication" />
+          Two-Factor Authentication
         </CardTitle>
         <CardDescription>
-          <UnifiedLocalizedText text="Add an extra layer of security to your account" />
+          Add an extra layer of security to your account
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <span>
-            <UnifiedLocalizedText text="Enable 2FA" />
+            Enable 2FA
           </span>
           <Switch checked={enabled} onCheckedChange={setEnabled} />
         </div>
         {enabled && (
           <Button>
-            <UnifiedLocalizedText text="Configure 2FA" />
+            Configure 2FA
           </Button>
         )}
       </CardContent>

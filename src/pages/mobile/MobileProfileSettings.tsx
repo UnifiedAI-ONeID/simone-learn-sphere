@@ -1,11 +1,10 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Settings, User, Bell, Shield, LogOut, Globe } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
-import { LanguageSelector } from '@/components/LanguageSelector';
 
 export const MobileProfileSettings = () => {
   const { user, signOut } = useAuth();
@@ -43,14 +42,16 @@ export const MobileProfileSettings = () => {
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center space-x-2">
             <Globe className="h-5 w-5 text-purple-600" />
-            <UnifiedLocalizedText text="Language & Region" />
+            Language & Region
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Choose your preferred language for the interface" />
+            Choose your preferred language for the interface
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
-          <LanguageSelector />
+          <div className="text-sm text-muted-foreground">
+            English (Default)
+          </div>
         </CardContent>
       </Card>
 
@@ -65,10 +66,10 @@ export const MobileProfileSettings = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900">
-                    <UnifiedLocalizedText text={option.label} />
+                    {option.label}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    <UnifiedLocalizedText text={option.description} />
+                    {option.description}
                   </p>
                 </div>
               </div>
@@ -86,7 +87,7 @@ export const MobileProfileSettings = () => {
             className="w-full justify-start text-red-600 hover:bg-red-100"
           >
             <LogOut className="h-5 w-5 mr-3" />
-            <UnifiedLocalizedText text="Sign Out" />
+            Sign Out
           </Button>
         </CardContent>
       </Card>

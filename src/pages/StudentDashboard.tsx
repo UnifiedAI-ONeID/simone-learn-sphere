@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
@@ -8,7 +9,6 @@ import { useEngagementTracking } from '@/hooks/useEngagementTracking';
 import { useSessionTracking } from '@/hooks/useSessionTracking';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 const StudentDashboard = () => {
   const { trackPageView } = useEngagementTracking();
@@ -56,10 +56,10 @@ const StudentDashboard = () => {
               platform === 'android' ? 'text-xl font-medium' : 
               'text-3xl font-bold'
             }`}>
-              <UnifiedLocalizedText text="Student Dashboard" />
+              Student Dashboard
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              <UnifiedLocalizedText text="Track your progress and accelerate your learning with AI" />
+              Track your progress and accelerate your learning with AI
             </p>
           </div>
           <ThemeToggle />
@@ -70,16 +70,16 @@ const StudentDashboard = () => {
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className={`grid w-full grid-cols-4 max-w-2xl mx-auto ${getTabsStyles()}`}>
             <TabsTrigger value="dashboard" className={getTabTriggerStyles()}>
-              <UnifiedLocalizedText text="Dashboard" />
+              Dashboard
             </TabsTrigger>
             <TabsTrigger value="courses" className={getTabTriggerStyles()}>
-              <UnifiedLocalizedText text="Browse Courses" />
+              Browse Courses
             </TabsTrigger>
             <TabsTrigger value="ai-tutor" className={getTabTriggerStyles()}>
-              <UnifiedLocalizedText text="AI Tutor" />
+              AI Tutor
             </TabsTrigger>
             <TabsTrigger value="progress" className={getTabTriggerStyles()}>
-              <UnifiedLocalizedText text="My Progress" />
+              My Progress
             </TabsTrigger>
           </TabsList>
           
@@ -106,10 +106,10 @@ const StudentDashboard = () => {
                 platform === 'android' ? 'text-lg font-medium' :
                 'text-2xl font-bold'
               }`}>
-                <UnifiedLocalizedText text="Learning Progress" />
+                Learning Progress
               </h2>
               <p className="text-muted-foreground">
-                <UnifiedLocalizedText text="Detailed progress tracking coming soon..." />
+                Detailed progress tracking coming soon...
               </p>
             </div>
           </TabsContent>

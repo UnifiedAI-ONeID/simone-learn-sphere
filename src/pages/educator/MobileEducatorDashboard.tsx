@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Users, DollarSign, TrendingUp, Plus, BarChart3 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const MobileEducatorDashboard = () => {
   return (
@@ -13,10 +12,10 @@ export const MobileEducatorDashboard = () => {
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-bold">
-          <UnifiedLocalizedText text="Educator Dashboard" />
+          Educator Dashboard
         </h1>
         <p className="text-muted-foreground">
-          <UnifiedLocalizedText text="Manage your courses and track student progress" />
+          Manage your courses and track student progress
         </p>
       </div>
 
@@ -25,13 +24,13 @@ export const MobileEducatorDashboard = () => {
         <Button className="h-20 flex flex-col items-center justify-center space-y-2">
           <Plus className="h-6 w-6" />
           <span className="text-sm">
-            <UnifiedLocalizedText text="New Course" />
+            New Course
           </span>
         </Button>
         <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
           <BarChart3 className="h-6 w-6" />
           <span className="text-sm">
-            <UnifiedLocalizedText text="Analytics" />
+            Analytics
           </span>
         </Button>
       </div>
@@ -46,7 +45,7 @@ export const MobileEducatorDashboard = () => {
               </div>
               <div>
                 <h3 className="font-medium">
-                  <UnifiedLocalizedText text="Active Courses" />
+                  Active Courses
                 </h3>
                 <p className="text-2xl font-bold text-blue-600">0</p>
               </div>
@@ -62,7 +61,7 @@ export const MobileEducatorDashboard = () => {
               </div>
               <div>
                 <h3 className="font-medium">
-                  <UnifiedLocalizedText text="Total Students" />
+                  Total Students
                 </h3>
                 <p className="text-2xl font-bold text-green-600">0</p>
               </div>
@@ -78,7 +77,7 @@ export const MobileEducatorDashboard = () => {
               </div>
               <div>
                 <h3 className="font-medium">
-                  <UnifiedLocalizedText text="Revenue" />
+                  Revenue
                 </h3>
                 <p className="text-2xl font-bold text-purple-600">$0</p>
               </div>
@@ -92,10 +91,10 @@ export const MobileEducatorDashboard = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <TrendingUp className="h-5 w-5" />
-            <UnifiedLocalizedText text="Get Started" />
+            Get Started
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Create your first course to start teaching" />
+            Create your first course to start teaching
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -103,28 +102,28 @@ export const MobileEducatorDashboard = () => {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium">
-                  <UnifiedLocalizedText text="Create Your First Course" />
+                  Create Your First Course
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  <UnifiedLocalizedText text="Use our AI-powered course builder" />
+                  Use our AI-powered course builder
                 </p>
               </div>
               <Button size="sm">
-                <UnifiedLocalizedText text="Start" />
+                Start
               </Button>
             </div>
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium">
-                  <UnifiedLocalizedText text="Set Up Your Profile" />
+                  Set Up Your Profile
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  <UnifiedLocalizedText text="Add bio and teaching experience" />
+                  Add bio and teaching experience
                 </p>
               </div>
               <Button variant="outline" size="sm">
-                <UnifiedLocalizedText text="Setup" />
+                Setup
               </Button>
             </div>
           </div>

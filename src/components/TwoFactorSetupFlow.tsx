@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, CheckCircle, AlertCircle } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface TwoFactorSetupFlowProps {
   email: string;
@@ -53,18 +53,18 @@ export const TwoFactorSetupFlow: React.FC<TwoFactorSetupFlowProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-center">
             <CheckCircle className="h-5 w-5 text-green-500" />
-            <UnifiedLocalizedText text="Two-Factor Authentication Enabled" />
+            Two-Factor Authentication Enabled
           </CardTitle>
           <CardDescription className="text-center">
-            <UnifiedLocalizedText text="Your account is now protected with two-factor authentication." />
+            Your account is now protected with two-factor authentication.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-center text-sm text-muted-foreground">
-            <UnifiedLocalizedText text="You will need to enter a verification code from your email when you sign in." />
+            You will need to enter a verification code from your email when you sign in.
           </p>
           <Button onClick={onBack} className="w-full">
-            <UnifiedLocalizedText text="Back to Profile" />
+            Back to Profile
           </Button>
         </CardContent>
       </Card>
@@ -76,10 +76,10 @@ export const TwoFactorSetupFlow: React.FC<TwoFactorSetupFlowProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-center">
           <Shield className="h-5 w-5" />
-          <UnifiedLocalizedText text="Set Up Two-Factor Authentication" />
+          Set Up Two-Factor Authentication
         </CardTitle>
         <CardDescription className="text-center">
-          <UnifiedLocalizedText text="Enter the verification code sent to your email" />
+          Enter the verification code sent to your email
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -96,7 +96,7 @@ export const TwoFactorSetupFlow: React.FC<TwoFactorSetupFlowProps> = ({
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              <UnifiedLocalizedText text={error} />
+              {error}
             </AlertDescription>
           </Alert>
         )}
@@ -107,7 +107,7 @@ export const TwoFactorSetupFlow: React.FC<TwoFactorSetupFlowProps> = ({
             disabled={isLoading || verificationCode.length !== 6}
             className="w-full"
           >
-            <UnifiedLocalizedText text={isLoading ? 'Verifying...' : 'Verify Code'} />
+            {isLoading ? 'Verifying...' : 'Verify Code'}
           </Button>
 
           <Button
@@ -116,12 +116,12 @@ export const TwoFactorSetupFlow: React.FC<TwoFactorSetupFlowProps> = ({
             disabled={isLoading}
             className="w-full"
           >
-            <UnifiedLocalizedText text={isLoading ? 'Sending...' : 'Resend Code'} />
+            {isLoading ? 'Sending...' : 'Resend Code'}
           </Button>
         </div>
 
         <div className="text-center text-sm text-muted-foreground">
-          <UnifiedLocalizedText text="Didn't receive the email? Check your spam folder." />
+          Didn't receive the email? Check your spam folder.
         </div>
       </CardContent>
     </Card>

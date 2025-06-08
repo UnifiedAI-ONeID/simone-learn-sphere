@@ -1,9 +1,9 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -52,19 +52,19 @@ export const PasswordResetRequest: React.FC<PasswordResetRequestProps> = ({ onBa
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-center">
             <CheckCircle className="h-5 w-5 text-green-500" />
-            <UnifiedLocalizedText text="Reset Link Sent" />
+            Reset Link Sent
           </CardTitle>
           <CardDescription className="text-center">
-            <UnifiedLocalizedText text="Check your email for password reset instructions" />
+            Check your email for password reset instructions
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-center text-sm text-muted-foreground">
-            <UnifiedLocalizedText text="If you don't see the email, check your spam folder." />
+            If you don't see the email, check your spam folder.
           </div>
           <Button onClick={onBack} variant="outline" className="w-full">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Back to Sign In" />
+            Back to Sign In
           </Button>
         </CardContent>
       </Card>
@@ -76,10 +76,10 @@ export const PasswordResetRequest: React.FC<PasswordResetRequestProps> = ({ onBa
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-center">
           <Mail className="h-5 w-5" />
-          <UnifiedLocalizedText text="Reset Password" />
+          Reset Password
         </CardTitle>
         <CardDescription className="text-center">
-          <UnifiedLocalizedText text="Enter your email to receive a password reset link" />
+          Enter your email to receive a password reset link
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -101,7 +101,7 @@ export const PasswordResetRequest: React.FC<PasswordResetRequestProps> = ({ onBa
               className="w-full"
             >
               <Mail className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text={isLoading ? "Sending..." : "Send Reset Link"} />
+              {isLoading ? "Sending..." : "Send Reset Link"}
             </Button>
             
             <Button
@@ -111,7 +111,7 @@ export const PasswordResetRequest: React.FC<PasswordResetRequestProps> = ({ onBa
               className="w-full"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text="Back to Sign In" />
+              Back to Sign In
             </Button>
           </div>
         </form>

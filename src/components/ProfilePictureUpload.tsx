@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Upload } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const ProfilePictureUpload = () => {
   const [avatar, setAvatar] = useState<string>('');
@@ -13,10 +12,10 @@ export const ProfilePictureUpload = () => {
     <Card>
       <CardHeader>
         <CardTitle>
-          <UnifiedLocalizedText text="Profile Picture" />
+          Profile Picture
         </CardTitle>
         <CardDescription>
-          <UnifiedLocalizedText text="Upload your profile picture" />
+          Upload your profile picture
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center space-y-4">
@@ -28,7 +27,7 @@ export const ProfilePictureUpload = () => {
         </Avatar>
         <Button>
           <Upload className="h-4 w-4 mr-2" />
-          <UnifiedLocalizedText text="Upload Picture" />
+          Upload Picture
         </Button>
       </CardContent>
     </Card>
