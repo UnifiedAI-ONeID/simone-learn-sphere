@@ -16,12 +16,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children
 }) => {
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <DashboardHeader 
         title={title}
         subtitle={subtitle || ''}
       />
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 z-50">
         <ThemeToggle />
       </div>
       <main className="container mx-auto px-4 py-6">

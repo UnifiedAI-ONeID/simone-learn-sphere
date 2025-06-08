@@ -12,6 +12,7 @@ import { getRoleBasedRoute } from '@/utils/roleRouting';
 import { handleAuthError, cleanupAuthState, validatePasswordStrength } from '@/utils/authUtils';
 import { Brain, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { PasskeyAuth } from '@/components/PasskeyAuth';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import toast from 'react-hot-toast';
 import { LocalizedText } from '@/components/LocalizedText';
 
@@ -206,10 +207,10 @@ const Auth = () => {
   // Show loading state while checking auth
   if (authLoading || roleLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center bg-background transition-colors duration-300">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-gray-600">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">
             <LocalizedText text="Loading..." />
           </p>
         </div>
@@ -218,35 +219,40 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 transition-colors duration-300">
+      {/* Theme Toggle - Positioned absolutely */}
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
+
+      <Card className="w-full max-w-md bg-card border-border shadow-lg">
         <CardHeader className="text-center">
-          <div className="flex h-12 w-12 items-center justify-center mx-auto mb-4 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600">
-            <Brain className="h-6 w-6 text-white" />
+          <div className="flex h-12 w-12 items-center justify-center mx-auto mb-4 rounded-lg bg-gradient-to-r from-primary to-primary/80">
+            <Brain className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <CardTitle className="text-2xl bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
             <LocalizedText text="Welcome to SimoneLabs" />
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-muted-foreground">
             <LocalizedText text="Your AI-powered learning platform" />
           </CardDescription>
         </CardHeader>
         
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">
+            <TabsList className="grid w-full grid-cols-2 bg-muted">
+              <TabsTrigger value="signin" className="data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <LocalizedText text="Sign In" />
               </TabsTrigger>
-              <TabsTrigger value="signup">
+              <TabsTrigger value="signup" className="data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <LocalizedText text="Sign Up" />
               </TabsTrigger>
             </TabsList>
             
             {error && (
-              <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-md">
-                <AlertCircle className="h-4 w-4 text-red-500" />
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="flex items-center space-x-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <p className="text-sm text-destructive">{error}</p>
               </div>
             )}
 
@@ -254,13 +260,13 @@ const Auth = () => {
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="email"
                       placeholder="Email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-background border-input text-foreground"
                       required
                     />
                   </div>
@@ -268,13 +274,13 @@ const Auth = () => {
 
                 <div className="space-y-2">
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="Password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 pr-10"
+                      className="pl-10 pr-10 bg-background border-input text-foreground"
                       required
                     />
                     <Button
@@ -285,15 +291,15 @@ const Auth = () => {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Eye className="h-4 w-4 text-gray-400" />
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                       )}
                     </Button>
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
                   {isLoading ? (
                     <LocalizedText text="Signing in..." />
                   ) : (
@@ -311,10 +317,10 @@ const Auth = () => {
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+                    <span className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
+                    <span className="bg-card px-2 text-muted-foreground">
                       <LocalizedText text="Or continue with" />
                     </span>
                   </div>
@@ -326,6 +332,7 @@ const Auth = () => {
                     variant="outline"
                     onClick={handleGoogleAuth}
                     disabled={isLoading}
+                    className="border-input hover:bg-accent hover:text-accent-foreground"
                   >
                     <LocalizedText text="Google" />
                   </Button>
@@ -334,6 +341,7 @@ const Auth = () => {
                     variant="outline"
                     onClick={handleLinkedInAuth}
                     disabled={isLoading}
+                    className="border-input hover:bg-accent hover:text-accent-foreground"
                   >
                     <LocalizedText text="LinkedIn" />
                   </Button>
@@ -345,24 +353,24 @@ const Auth = () => {
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="text"
                       placeholder="First name"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-background border-input text-foreground"
                       required
                     />
                   </div>
                   <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="text"
                       placeholder="Last name"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-background border-input text-foreground"
                       required
                     />
                   </div>
@@ -370,13 +378,13 @@ const Auth = () => {
 
                 <div className="space-y-2">
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="email"
                       placeholder="Email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-background border-input text-foreground"
                       required
                     />
                   </div>
@@ -384,13 +392,13 @@ const Auth = () => {
 
                 <div className="space-y-2">
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="Password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 pr-10"
+                      className="pl-10 pr-10 bg-background border-input text-foreground"
                       required
                     />
                     <Button
@@ -401,14 +409,14 @@ const Auth = () => {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Eye className="h-4 w-4 text-gray-400" />
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                       )}
                     </Button>
                   </div>
                   {passwordErrors.length > 0 && (
-                    <div className="text-xs text-red-600 space-y-1">
+                    <div className="text-xs text-destructive space-y-1">
                       {passwordErrors.map((error, index) => (
                         <div key={index}>• {error}</div>
                       ))}
@@ -417,7 +425,7 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                  <label className="text-sm font-medium text-foreground">
                     <LocalizedText text="I want to join as:" />
                   </label>
                   <div className="flex gap-2">
@@ -438,7 +446,7 @@ const Auth = () => {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading || passwordErrors.length > 0}>
+                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading || passwordErrors.length > 0}>
                   {isLoading ? (
                     <LocalizedText text="Creating account..." />
                   ) : (
@@ -456,10 +464,10 @@ const Auth = () => {
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+                    <span className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
+                    <span className="bg-card px-2 text-muted-foreground">
                       <LocalizedText text="Or continue with" />
                     </span>
                   </div>
@@ -471,6 +479,7 @@ const Auth = () => {
                     variant="outline"
                     onClick={handleGoogleAuth}
                     disabled={isLoading}
+                    className="border-input hover:bg-accent hover:text-accent-foreground"
                   >
                     <LocalizedText text="Google" />
                   </Button>
@@ -479,6 +488,7 @@ const Auth = () => {
                     variant="outline"
                     onClick={handleLinkedInAuth}
                     disabled={isLoading}
+                    className="border-input hover:bg-accent hover:text-accent-foreground"
                   >
                     <LocalizedText text="LinkedIn" />
                   </Button>

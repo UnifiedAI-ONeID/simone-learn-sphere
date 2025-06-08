@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Users, Brain, Trophy, Smartphone } from 'lucide-react';
@@ -10,6 +9,7 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PlatformButton } from '@/components/platform/PlatformButton';
 import { PlatformCard } from '@/components/platform/PlatformCard';
 import { PlatformLayout } from '@/components/platform/PlatformLayout';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { Badge } from '@/components/ui/badge';
 
@@ -30,12 +30,16 @@ export const MobileIndex = () => {
 
   if (authLoading || roleLoading || user) {
     return (
-      <PlatformLayout className="flex items-center justify-center">
+      <PlatformLayout className="flex items-center justify-center bg-background text-foreground transition-colors duration-300">
+        {/* Theme Toggle */}
+        <div className="absolute top-4 right-4 z-10">
+          <ThemeToggle />
+        </div>
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 mx-auto bg-[var(--platform-primary)] rounded-full flex items-center justify-center animate-pulse">
-            <Brain className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center animate-pulse">
+            <Brain className="w-8 h-8 text-primary-foreground" />
           </div>
-          <p className="text-[var(--platform-text-secondary)]">
+          <p className="text-muted-foreground">
             <LocalizedText text="Loading..." />
           </p>
         </div>
@@ -81,33 +85,33 @@ export const MobileIndex = () => {
   const getHeroIconStyles = () => {
     switch (platform) {
       case 'ios':
-        return "rounded-2xl shadow-xl bg-[var(--platform-primary)]";
+        return "rounded-2xl shadow-xl bg-primary";
       case 'android':
-        return "rounded-full shadow-2xl bg-[var(--platform-primary)]";
+        return "rounded-full shadow-2xl bg-primary";
       default:
-        return "rounded-xl shadow-xl bg-[var(--platform-primary)]";
+        return "rounded-xl shadow-xl bg-primary";
     }
   };
 
   const getBadgeStyles = () => {
     switch (platform) {
       case 'ios':
-        return "px-4 py-2 bg-[var(--platform-primary)]/10 text-[var(--platform-primary)] rounded-full";
+        return "px-4 py-2 bg-primary/10 text-primary rounded-full";
       case 'android':
-        return "px-4 py-2 bg-[var(--platform-primary)]/10 text-[var(--platform-primary)] rounded-full uppercase tracking-wide text-xs";
+        return "px-4 py-2 bg-primary/10 text-primary rounded-full uppercase tracking-wide text-xs";
       default:
-        return "px-4 py-2 bg-[var(--platform-primary)]/10 text-[var(--platform-primary)]";
+        return "px-4 py-2 bg-primary/10 text-primary";
     }
   };
 
   const getHeadingStyles = () => {
     switch (platform) {
       case 'ios':
-        return "text-4xl tracking-tight text-[var(--platform-text)] font-semibold";
+        return "text-4xl tracking-tight text-foreground font-semibold";
       case 'android':
-        return "text-4xl tracking-tight text-[var(--platform-text)] font-medium";
+        return "text-4xl tracking-tight text-foreground font-medium";
       default:
-        return "text-4xl tracking-tight text-[var(--platform-text)] font-bold";
+        return "text-4xl tracking-tight text-foreground font-bold";
     }
   };
 
@@ -125,21 +129,26 @@ export const MobileIndex = () => {
   const getFeatureIconStyles = () => {
     switch (platform) {
       case 'ios':
-        return "w-10 h-10 bg-[var(--platform-primary)] flex items-center justify-center text-white rounded-lg";
+        return "w-10 h-10 bg-primary flex items-center justify-center text-white rounded-lg";
       case 'android':
-        return "w-12 h-12 bg-[var(--platform-primary)] flex items-center justify-center text-white rounded-2xl";
+        return "w-12 h-12 bg-primary flex items-center justify-center text-white rounded-2xl";
       default:
-        return "w-10 h-10 bg-[var(--platform-primary)] flex items-center justify-center text-white rounded-lg";
+        return "w-10 h-10 bg-primary flex items-center justify-center text-white rounded-lg";
     }
   };
 
   return (
-    <PlatformLayout>
+    <PlatformLayout className="bg-background text-foreground transition-colors duration-300">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
+
       {/* Hero Section */}
       <div className="px-4 pt-12 pb-8">
         <div className="text-center space-y-6">
           <div className={`flex h-20 w-20 items-center justify-center mx-auto ${getHeroIconStyles()}`}>
-            <Brain className="h-10 w-10 text-white" />
+            <Brain className="h-10 w-10 text-primary-foreground" />
           </div>
           
           <div className="space-y-4">
@@ -150,12 +159,12 @@ export const MobileIndex = () => {
             
             <h1 className={getHeadingStyles()}>
               <LocalizedText text="Learn & Teach" />
-              <span className="block bg-gradient-to-r from-[var(--platform-primary)] to-[var(--platform-secondary)] bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                 <LocalizedText text="Anywhere" />
               </span>
             </h1>
             
-            <p className="text-lg text-[var(--platform-text-secondary)] max-w-sm mx-auto leading-relaxed">
+            <p className="text-lg text-muted-foreground max-w-sm mx-auto leading-relaxed">
               <LocalizedText text="Access powerful educational tools designed for your device. Create, learn, and connect with a global community." />
             </p>
           </div>
@@ -164,11 +173,11 @@ export const MobileIndex = () => {
             onClick={handleGetStarted}
             disabled={isLoading}
             size="lg" 
-            className="w-full py-4 text-lg"
+            className="w-full py-4 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {isLoading ? (
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                 <span><LocalizedText text="Starting..." /></span>
               </div>
             ) : (
@@ -176,7 +185,7 @@ export const MobileIndex = () => {
             )}
           </PlatformButton>
           
-          <p className="text-sm text-[var(--platform-text-secondary)]">
+          <p className="text-sm text-muted-foreground">
             <LocalizedText text="Free to start • No credit card required" />
           </p>
         </div>
@@ -188,26 +197,26 @@ export const MobileIndex = () => {
           <h2 className={getHeadingStyles().replace('text-4xl', 'text-2xl')}>
             <LocalizedText text="Everything You Need" />
           </h2>
-          <p className="text-[var(--platform-text-secondary)] mt-2">
+          <p className="text-muted-foreground mt-2">
             <LocalizedText text="Powerful features designed for mobile learning" />
           </p>
         </div>
         
         <div className="grid grid-cols-1 gap-4">
           {features.map((feature, index) => (
-            <PlatformCard key={index} className={getFeatureCardStyles()}>
+            <PlatformCard key={index} className={`${getFeatureCardStyles()} bg-card border-border`}>
               <div className="flex items-center space-x-4 p-2">
                 <div className={getFeatureIconStyles()}>
                   <feature.icon className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
-                  <h3 className={`text-[var(--platform-text)] ${
+                  <h3 className={`text-foreground ${
                     platform === 'ios' ? 'text-lg font-medium' : 
                     platform === 'android' ? 'text-lg font-medium' : 'text-lg font-semibold'
                   }`}>
                     <LocalizedText text={feature.title} />
                   </h3>
-                  <p className="text-[var(--platform-text-secondary)] text-sm">
+                  <p className="text-muted-foreground text-sm">
                     <LocalizedText text={feature.description} />
                   </p>
                 </div>
@@ -219,21 +228,21 @@ export const MobileIndex = () => {
 
       {/* CTA Section */}
       <div className="px-4 py-8">
-        <PlatformCard className="bg-gradient-to-r from-[var(--platform-primary)]/10 to-[var(--platform-secondary)]/10">
+        <PlatformCard className="bg-gradient-to-r from-primary/10 to-primary/5 border-border">
           <div className="py-8 text-center">
-            <h3 className={`text-xl text-[var(--platform-text)] mb-3 ${
+            <h3 className={`text-xl text-foreground mb-3 ${
               platform === 'ios' ? 'font-semibold' : 
               platform === 'android' ? 'font-medium' : 'font-bold'
             }`}>
               <LocalizedText text="Ready to Transform Your Learning?" />
             </h3>
-            <p className="text-[var(--platform-text-secondary)] mb-6">
+            <p className="text-muted-foreground mb-6">
               <LocalizedText text="Join thousands of learners already using SimoneLabs" />
             </p>
             <PlatformButton 
               onClick={handleGetStarted}
               disabled={isLoading}
-              className="px-8 py-3"
+              className="px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <LocalizedText text="Get Started Free" />
             </PlatformButton>

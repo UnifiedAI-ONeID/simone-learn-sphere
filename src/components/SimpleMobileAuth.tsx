@@ -166,14 +166,14 @@ export const SimpleMobileAuth = () => {
 
   return (
     <PlatformCard 
-      className="bg-[var(--platform-surface)]/90 backdrop-blur-sm"
+      className="bg-card/90 backdrop-blur-sm border-border"
       title={isSignUp ? "Create Account" : "Sign In"}
       description={isSignUp ? "Join SimoneLabs today" : "Access your learning dashboard"}
     >
       {error && (
-        <div className="flex items-center space-x-2 p-3 mb-4 bg-red-50 border border-red-200 rounded-md">
-          <AlertCircle className="h-4 w-4 text-red-500" />
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="flex items-center space-x-2 p-3 mb-4 bg-destructive/10 border border-destructive/20 rounded-md">
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <p className="text-sm text-destructive">{error}</p>
         </div>
       )}
 
@@ -181,13 +181,13 @@ export const SimpleMobileAuth = () => {
         {isSignUp && (
           <div className="grid grid-cols-2 gap-2">
             <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-[var(--platform-text-secondary)]" />
+              <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="First name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className={`pl-10 bg-[var(--platform-background)] border-[var(--platform-border)] text-[var(--platform-text)] ${
+                className={`pl-10 bg-background border-input text-foreground ${
                   platform === 'ios' ? 'rounded-lg' : 
                   platform === 'android' ? 'rounded-xl' : 'rounded-lg'
                 }`}
@@ -195,13 +195,13 @@ export const SimpleMobileAuth = () => {
               />
             </div>
             <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-[var(--platform-text-secondary)]" />
+              <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Last name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className={`pl-10 bg-[var(--platform-background)] border-[var(--platform-border)] text-[var(--platform-text)] ${
+                className={`pl-10 bg-background border-input text-foreground ${
                   platform === 'ios' ? 'rounded-lg' : 
                   platform === 'android' ? 'rounded-xl' : 'rounded-lg'
                 }`}
@@ -213,13 +213,13 @@ export const SimpleMobileAuth = () => {
 
         <div className="space-y-2">
           <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-[var(--platform-text-secondary)]" />
+            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`pl-10 bg-[var(--platform-background)] border-[var(--platform-border)] text-[var(--platform-text)] ${
+              className={`pl-10 bg-background border-input text-foreground ${
                 platform === 'ios' ? 'rounded-lg' : 
                 platform === 'android' ? 'rounded-xl' : 'rounded-lg'
               }`}
@@ -230,13 +230,13 @@ export const SimpleMobileAuth = () => {
 
         <div className="space-y-2">
           <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-[var(--platform-text-secondary)]" />
+            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`pl-10 pr-10 bg-[var(--platform-background)] border-[var(--platform-border)] text-[var(--platform-text)] ${
+              className={`pl-10 pr-10 bg-background border-input text-foreground ${
                 platform === 'ios' ? 'rounded-lg' : 
                 platform === 'android' ? 'rounded-xl' : 'rounded-lg'
               }`}
@@ -250,14 +250,14 @@ export const SimpleMobileAuth = () => {
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? (
-                <EyeOff className="h-4 w-4 text-[var(--platform-text-secondary)]" />
+                <EyeOff className="h-4 w-4 text-muted-foreground" />
               ) : (
-                <Eye className="h-4 w-4 text-[var(--platform-text-secondary)]" />
+                <Eye className="h-4 w-4 text-muted-foreground" />
               )}
             </PlatformButton>
           </div>
           {passwordErrors.length > 0 && (
-            <div className="text-xs text-red-600 space-y-1">
+            <div className="text-xs text-destructive space-y-1">
               {passwordErrors.map((error, index) => (
                 <div key={index}>• {error}</div>
               ))}
@@ -267,7 +267,7 @@ export const SimpleMobileAuth = () => {
 
         {isSignUp && (
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[var(--platform-text)]">
+            <label className="text-sm font-medium text-foreground">
               <LocalizedText text="I want to join as:" />
             </label>
             <div className="flex gap-2">
@@ -299,7 +299,7 @@ export const SimpleMobileAuth = () => {
 
         <PlatformButton
           type="submit"
-          className="w-full"
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
           disabled={isLoading || (isSignUp && passwordErrors.length > 0)}
         >
           <LocalizedText text={
@@ -313,10 +313,10 @@ export const SimpleMobileAuth = () => {
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-[var(--platform-border)]" />
+            <span className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-[var(--platform-surface)] px-2 text-[var(--platform-text-secondary)]">
+            <span className="bg-card px-2 text-muted-foreground">
               <LocalizedText text="Or continue with" />
             </span>
           </div>
@@ -328,6 +328,7 @@ export const SimpleMobileAuth = () => {
             variant="secondary"
             onClick={handleGoogleAuth}
             disabled={isLoading}
+            className="border-input hover:bg-accent hover:text-accent-foreground"
           >
             <LocalizedText text="Google" />
           </PlatformButton>
@@ -336,6 +337,7 @@ export const SimpleMobileAuth = () => {
             variant="secondary"
             onClick={handleLinkedInAuth}
             disabled={isLoading}
+            className="border-input hover:bg-accent hover:text-accent-foreground"
           >
             <LocalizedText text="LinkedIn" />
           </PlatformButton>
@@ -350,7 +352,7 @@ export const SimpleMobileAuth = () => {
               setError('');
               setPasswordErrors([]);
             }}
-            className="text-sm text-[var(--platform-text-secondary)] hover:text-[var(--platform-text)]"
+            className="text-sm text-muted-foreground hover:text-foreground"
           >
             <LocalizedText text={isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"} />
           </PlatformButton>
