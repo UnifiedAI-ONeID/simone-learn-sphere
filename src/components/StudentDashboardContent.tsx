@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -318,7 +319,7 @@ export const StudentDashboardContent = () => {
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h3 className="font-semibold text-foreground">{course.title}</h3>
-                      <p className="text-sm text-muted-foreground">{course.instructor}</p>
+                      <p className="text-sm text-muted-foreground">Course Materials</p>
                     </div>
                     <Button size="sm" variant="outline">
                       <Play className="h-4 w-4 mr-2" />
@@ -366,8 +367,8 @@ export const StudentDashboardContent = () => {
                       <Trophy className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-foreground">{achievement.title}</p>
-                      <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                      <p className="font-medium text-foreground">{achievement.name}</p>
+                      <p className="text-sm text-muted-foreground">Achievement earned</p>
                     </div>
                     <Badge variant="secondary">
                       {achievement.earnedAt}
