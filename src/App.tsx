@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { PlatformThemeProvider } from '@/contexts/PlatformThemeContext';
-import { LanguageProvider } from '@/contexts/LanguageContext';
+import { LocalizationProvider } from '@/contexts/LocalizationContext';
 import { SecurityProvider } from '@/components/SecurityProvider';
 import { SecurityHeadersProvider } from '@/components/security/SecurityHeadersProvider';
 import { EnhancedSecurityAlert } from '@/components/security/EnhancedSecurityAlert';
@@ -43,7 +43,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider attribute="class" defaultTheme="light">
             <PlatformThemeProvider>
-              <LanguageProvider>
+              <LocalizationProvider>
                 <TranslationErrorBoundary>
                   <AuthProvider>
                     <SecurityProvider>
@@ -69,7 +69,7 @@ function App() {
                     </SecurityProvider>
                   </AuthProvider>
                 </TranslationErrorBoundary>
-              </LanguageProvider>
+              </LocalizationProvider>
             </PlatformThemeProvider>
           </ThemeProvider>
         </QueryClientProvider>
