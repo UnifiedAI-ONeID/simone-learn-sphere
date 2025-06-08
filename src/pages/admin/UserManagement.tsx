@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -5,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users, Search, Filter, Edit, Trash2, Shield } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -122,10 +122,10 @@ export const UserManagement = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
-          <UnifiedLocalizedText text="User Management" />
+          User Management
         </CardTitle>
         <CardDescription>
-          <UnifiedLocalizedText text="Manage user accounts and roles" />
+          Manage user accounts and roles
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -144,7 +144,7 @@ export const UserManagement = () => {
               />
             </div>
             <Button onClick={handleSearch}>
-              <UnifiedLocalizedText text="Search" />
+              Search
             </Button>
           </div>
 
@@ -154,16 +154,16 @@ export const UserManagement = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">
-                <UnifiedLocalizedText text="All Roles" />
+                All Roles
               </SelectItem>
               <SelectItem value="student">
-                <UnifiedLocalizedText text="Student" />
+                Student
               </SelectItem>
               <SelectItem value="educator">
-                <UnifiedLocalizedText text="Educator" />
+                Educator
               </SelectItem>
               <SelectItem value="admin">
-                <UnifiedLocalizedText text="Admin" />
+                Admin
               </SelectItem>
             </SelectContent>
           </Select>
@@ -171,7 +171,7 @@ export const UserManagement = () => {
 
         {isLoading ? (
           <p>
-            <UnifiedLocalizedText text="Loading users..." />
+            Loading users...
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -179,19 +179,19 @@ export const UserManagement = () => {
               <thead>
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <UnifiedLocalizedText text="Email" />
+                    Email
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <UnifiedLocalizedText text="Name" />
+                    Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <UnifiedLocalizedText text="Role" />
+                    Role
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <UnifiedLocalizedText text="Status" />
+                    Status
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <UnifiedLocalizedText text="Actions" />
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -214,24 +214,20 @@ export const UserManagement = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="student">
-                            <UnifiedLocalizedText text="Student" />
+                            Student
                           </SelectItem>
                           <SelectItem value="educator">
-                            <UnifiedLocalizedText text="Educator" />
+                            Educator
                           </SelectItem>
                           <SelectItem value="admin">
-                            <UnifiedLocalizedText text="Admin" />
+                            Admin
                           </SelectItem>
                         </SelectContent>
                       </Select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <Badge variant={user.email_verified ? "outline" : "destructive"}>
-                        {user.email_verified ? (
-                          <UnifiedLocalizedText text="Verified" />
-                        ) : (
-                          <UnifiedLocalizedText text="Unverified" />
-                        )}
+                        {user.email_verified ? "Verified" : "Unverified"}
                       </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

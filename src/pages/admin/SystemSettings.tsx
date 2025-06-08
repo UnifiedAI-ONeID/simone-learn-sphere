@@ -21,17 +21,16 @@ import {
   CheckCircle, 
   Save 
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const SystemSettings = () => {
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
-          <UnifiedLocalizedText text="System Settings" />
+          System Settings
         </h1>
         <p className="text-gray-600">
-          <UnifiedLocalizedText text="Configure platform-wide settings and preferences." />
+          Configure platform-wide settings and preferences.
         </p>
       </div>
 
@@ -40,16 +39,16 @@ export const SystemSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="General Settings" />
+              General Settings
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Manage basic system configurations." />
+              Manage basic system configurations.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="siteName">
-                <UnifiedLocalizedText text="Site Name" />
+                Site Name
               </Label>
               <Input
                 id="siteName"
@@ -59,7 +58,7 @@ export const SystemSettings = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="defaultLanguage">
-                <UnifiedLocalizedText text="Default Language" />
+                Default Language
               </Label>
               <Select>
                 <SelectTrigger>
@@ -79,16 +78,16 @@ export const SystemSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="Database Settings" />
+              Database Settings
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Configure database connection settings." />
+              Configure database connection settings.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="databaseUrl">
-                <UnifiedLocalizedText text="Database URL" />
+                Database URL
               </Label>
               <Input
                 id="databaseUrl"
@@ -99,7 +98,7 @@ export const SystemSettings = () => {
             </div>
             <Button>
               <Database className="h-4 w-4 mr-2" />
-              <UnifiedLocalizedText text="Test Connection" />
+              Test Connection
             </Button>
           </CardContent>
         </Card>
@@ -108,16 +107,16 @@ export const SystemSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="Regional Settings" />
+              Regional Settings
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Configure regional settings such as timezone and currency." />
+              Configure regional settings such as timezone and currency.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="timezone">
-                <UnifiedLocalizedText text="Timezone" />
+                Timezone
               </Label>
               <Select>
                 <SelectTrigger>
@@ -133,7 +132,7 @@ export const SystemSettings = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="currency">
-                <UnifiedLocalizedText text="Currency" />
+                Currency
               </Label>
               <Select>
                 <SelectTrigger>
@@ -154,20 +153,20 @@ export const SystemSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="Security Settings" />
+              Security Settings
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Configure security settings to protect your platform." />
+              Configure security settings to protect your platform.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label htmlFor="enable2FA">
-                  <UnifiedLocalizedText text="Enable Two-Factor Authentication" />
+                  Enable Two-Factor Authentication
                 </Label>
                 <p className="text-sm text-gray-500">
-                  <UnifiedLocalizedText text="Require users to use two-factor authentication for added security." />
+                  Require users to use two-factor authentication for added security.
                 </p>
               </div>
               <Switch id="enable2FA" defaultChecked />
@@ -175,7 +174,7 @@ export const SystemSettings = () => {
             <Separator />
             <div className="space-y-2">
               <Label htmlFor="passwordPolicy">
-                <UnifiedLocalizedText text="Password Policy" />
+                Password Policy
               </Label>
               <Select>
                 <SelectTrigger>
@@ -196,20 +195,20 @@ export const SystemSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              <UnifiedLocalizedText text="Notification Settings" />
+              Notification Settings
             </CardTitle>
             <CardDescription>
-              <UnifiedLocalizedText text="Configure system-wide notification settings." />
+              Configure system-wide notification settings.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label htmlFor="enableEmailNotifications">
-                  <UnifiedLocalizedText text="Enable Email Notifications" />
+                  Enable Email Notifications
                 </Label>
                 <p className="text-sm text-gray-500">
-                  <UnifiedLocalizedText text="Send email notifications for important system events." />
+                  Send email notifications for important system events.
                 </p>
               </div>
               <Switch id="enableEmailNotifications" defaultChecked />
@@ -217,7 +216,7 @@ export const SystemSettings = () => {
             <Separator />
             <div className="space-y-2">
               <Label htmlFor="notificationProvider">
-                <UnifiedLocalizedText text="Notification Provider" />
+                Notification Provider
               </Label>
               <Select>
                 <SelectTrigger>

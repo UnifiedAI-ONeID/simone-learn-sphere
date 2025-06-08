@@ -24,7 +24,6 @@ import {
   DollarSign,
   TrendingUp
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useAdminDashboardData } from '@/hooks/useDashboardData';
 
 export const AdminDashboardContent = () => {
@@ -43,10 +42,10 @@ export const AdminDashboardContent = () => {
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          <UnifiedLocalizedText text="Failed to load admin data. Please try again." />
+          Failed to load admin data. Please try again.
           <Button variant="outline" size="sm" onClick={refetch} className="ml-2">
             <RefreshCw className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Retry" />
+            Retry
           </Button>
         </AlertDescription>
       </Alert>
@@ -62,24 +61,24 @@ export const AdminDashboardContent = () => {
               <Users className="h-16 w-16 text-blue-600" />
             </div>
             <CardTitle className="text-2xl">
-              <UnifiedLocalizedText text="Welcome to Admin Dashboard" />
+              Welcome to Admin Dashboard
             </CardTitle>
             <CardDescription className="text-lg">
-              <UnifiedLocalizedText text="Start managing your platform by adding users and courses" />
+              Start managing your platform by adding users and courses
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              <UnifiedLocalizedText text="Your platform is ready to go! Invite educators and students to get started." />
+              Your platform is ready to go! Invite educators and students to get started.
             </p>
             <div className="flex justify-center space-x-4">
               <Button>
                 <Users className="h-4 w-4 mr-2" />
-                <UnifiedLocalizedText text="Invite Users" />
+                Invite Users
               </Button>
               <Button variant="outline">
                 <Settings className="h-4 w-4 mr-2" />
-                <UnifiedLocalizedText text="Platform Settings" />
+                Platform Settings
               </Button>
             </div>
           </CardContent>
@@ -94,20 +93,20 @@ export const AdminDashboardContent = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">
-            <UnifiedLocalizedText text="Admin Dashboard" />
+            Admin Dashboard
           </h1>
           <p className="text-muted-foreground">
-            <UnifiedLocalizedText text="Manage and monitor your platform" />
+            Manage and monitor your platform
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={refetch}>
             <RefreshCw className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Refresh" />
+            Refresh
           </Button>
           <Button>
             <Download className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Export Data" />
+            Export Data
           </Button>
         </div>
       </div>
@@ -116,7 +115,7 @@ export const AdminDashboardContent = () => {
       <Alert>
         <Server className="h-4 w-4" />
         <AlertDescription>
-          <UnifiedLocalizedText text="All systems operational. Platform is running smoothly." />
+          All systems operational. Platform is running smoothly.
         </AlertDescription>
       </Alert>
 
@@ -125,7 +124,7 @@ export const AdminDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Total Users" />
+              Total Users
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -140,14 +139,14 @@ export const AdminDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Active Users" />
+              Active Users
             </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{adminData.activeUsers.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Currently online" />
+              Currently online
             </p>
           </CardContent>
         </Card>
@@ -155,14 +154,14 @@ export const AdminDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Total Courses" />
+              Total Courses
             </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{adminData.totalCourses.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Published courses" />
+              Published courses
             </p>
           </CardContent>
         </Card>
@@ -170,14 +169,14 @@ export const AdminDashboardContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <UnifiedLocalizedText text="Platform Revenue" />
+              Platform Revenue
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${adminData.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Total revenue" />
+              Total revenue
             </p>
           </CardContent>
         </Card>
@@ -187,17 +186,17 @@ export const AdminDashboardContent = () => {
       <Card>
         <CardHeader>
           <CardTitle>
-            <UnifiedLocalizedText text="User Distribution by Role" />
+            User Distribution by Role
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Breakdown of users by their roles" />
+            Breakdown of users by their roles
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="font-medium">
-                <UnifiedLocalizedText text="Students" />
+                Students
               </span>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-muted-foreground">{adminData.usersByRole.students}</span>
@@ -209,7 +208,7 @@ export const AdminDashboardContent = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="font-medium">
-                <UnifiedLocalizedText text="Educators" />
+                Educators
               </span>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-muted-foreground">{adminData.usersByRole.educators}</span>
@@ -221,7 +220,7 @@ export const AdminDashboardContent = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="font-medium">
-                <UnifiedLocalizedText text="Admins" />
+                Admins
               </span>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-muted-foreground">{adminData.usersByRole.admins}</span>
@@ -239,10 +238,10 @@ export const AdminDashboardContent = () => {
       <Card>
         <CardHeader>
           <CardTitle>
-            <UnifiedLocalizedText text="Recent Platform Activity" />
+            Recent Platform Activity
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Latest events and system updates" />
+            Latest events and system updates
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -250,7 +249,7 @@ export const AdminDashboardContent = () => {
             <div className="text-center py-8">
               <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">
-                <UnifiedLocalizedText text="No recent activity to display. Activity will appear here as users interact with the platform." />
+                No recent activity to display. Activity will appear here as users interact with the platform.
               </p>
             </div>
           ) : (
@@ -260,7 +259,7 @@ export const AdminDashboardContent = () => {
                   <div className="flex items-center space-x-3">
                     <div className={`w-2 h-2 rounded-full bg-blue-500`}></div>
                     <span className="text-sm">
-                      <UnifiedLocalizedText text={activity.message} />
+                      {activity.message}
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground">{activity.time}</span>
@@ -275,10 +274,10 @@ export const AdminDashboardContent = () => {
       <Card>
         <CardHeader>
           <CardTitle>
-            <UnifiedLocalizedText text="System Health" />
+            System Health
           </CardTitle>
           <CardDescription>
-            <UnifiedLocalizedText text="Real-time system performance metrics" />
+            Real-time system performance metrics
           </CardDescription>
         </CardHeader>
         <CardContent>

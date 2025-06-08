@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +22,6 @@ import {
   AlertTriangle,
   CheckCircle
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 export const AdminPanelDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -46,20 +46,20 @@ export const AdminPanelDashboard = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">
-            <UnifiedLocalizedText text="Admin Dashboard" />
+            Admin Dashboard
           </h1>
           <p className="text-muted-foreground">
-            <UnifiedLocalizedText text="Manage and monitor your platform" />
+            Manage and monitor your platform
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
             <RefreshCw className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Refresh" />
+            Refresh
           </Button>
           <Button>
             <Download className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Export Data" />
+            Export Data
           </Button>
         </div>
       </div>
@@ -68,7 +68,7 @@ export const AdminPanelDashboard = () => {
       <Alert>
         <Server className="h-4 w-4" />
         <AlertDescription>
-          <UnifiedLocalizedText text="All systems operational. Last updated 2 minutes ago." />
+          All systems operational. Last updated 2 minutes ago.
         </AlertDescription>
       </Alert>
 
@@ -76,16 +76,16 @@ export const AdminPanelDashboard = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">
-            <UnifiedLocalizedText text="Overview" />
+            Overview
           </TabsTrigger>
           <TabsTrigger value="users">
-            <UnifiedLocalizedText text="Users" />
+            Users
           </TabsTrigger>
           <TabsTrigger value="security">
-            <UnifiedLocalizedText text="Security" />
+            Security
           </TabsTrigger>
           <TabsTrigger value="reports">
-            <UnifiedLocalizedText text="Reports" />
+            Reports
           </TabsTrigger>
         </TabsList>
 
@@ -95,14 +95,14 @@ export const AdminPanelDashboard = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  <UnifiedLocalizedText text="Total Users" />
+                  Total Users
                 </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">12,457</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">+12%</span> <UnifiedLocalizedText text="from last month" />
+                  <span className="text-green-600">+12%</span> from last month
                 </p>
               </CardContent>
             </Card>
@@ -110,14 +110,14 @@ export const AdminPanelDashboard = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  <UnifiedLocalizedText text="Active Sessions" />
+                  Active Sessions
                 </CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">1,834</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">+5%</span> <UnifiedLocalizedText text="from yesterday" />
+                  <span className="text-green-600">+5%</span> from yesterday
                 </p>
               </CardContent>
             </Card>
@@ -125,7 +125,7 @@ export const AdminPanelDashboard = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  <UnifiedLocalizedText text="System Health" />
+                  System Health
                 </CardTitle>
                 <Server className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
@@ -133,7 +133,7 @@ export const AdminPanelDashboard = () => {
                 <div className="text-2xl font-bold">98.5%</div>
                 <p className="text-xs text-muted-foreground">
                   <CheckCircle className="h-3 w-3 inline mr-1 text-green-600" />
-                  <UnifiedLocalizedText text="Excellent" />
+                  Excellent
                 </p>
               </CardContent>
             </Card>
@@ -141,7 +141,7 @@ export const AdminPanelDashboard = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  <UnifiedLocalizedText text="Security Score" />
+                  Security Score
                 </CardTitle>
                 <Shield className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
@@ -158,10 +158,10 @@ export const AdminPanelDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                <UnifiedLocalizedText text="Recent Platform Activity" />
+                Recent Platform Activity
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Latest events and system updates" />
+                Latest events and system updates
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -179,7 +179,7 @@ export const AdminPanelDashboard = () => {
                         activity.status === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
                       }`}></div>
                       <span className="text-sm">
-                        <UnifiedLocalizedText text={activity.message} />
+                        {activity.message}
                       </span>
                     </div>
                     <span className="text-xs text-muted-foreground">{activity.time}</span>
@@ -194,17 +194,17 @@ export const AdminPanelDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                <UnifiedLocalizedText text="User Management" />
+                User Management
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Manage user accounts and permissions" />
+                Manage user accounts and permissions
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
                 <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  <UnifiedLocalizedText text="User management interface coming soon..." />
+                  User management interface coming soon...
                 </p>
               </div>
             </CardContent>
@@ -215,17 +215,17 @@ export const AdminPanelDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                <UnifiedLocalizedText text="Security Center" />
+                Security Center
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Monitor security threats and system vulnerabilities" />
+                Monitor security threats and system vulnerabilities
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
                 <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  <UnifiedLocalizedText text="Security monitoring dashboard coming soon..." />
+                  Security monitoring dashboard coming soon...
                 </p>
               </div>
             </CardContent>
@@ -236,17 +236,17 @@ export const AdminPanelDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>
-                <UnifiedLocalizedText text="System Reports" />
+                System Reports
               </CardTitle>
               <CardDescription>
-                <UnifiedLocalizedText text="Generate and download system reports" />
+                Generate and download system reports
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  <UnifiedLocalizedText text="Reporting system coming soon..." />
+                  Reporting system coming soon...
                 </p>
               </div>
             </CardContent>

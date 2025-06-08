@@ -21,7 +21,6 @@ import {
   Settings,
   RotateCcw
 } from 'lucide-react';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 import { useToast } from '@/hooks/use-toast';
 
 interface AccessibilitySettings {
@@ -134,82 +133,79 @@ export const AccessibilityControls: React.FC = () => {
     setSettings(defaultSettings);
     toast({
       title: "Settings Reset",
-      description: "Accessibility settings have been reset to defaults.",
+      description: "All accessibility settings have been reset to defaults.",
     });
   };
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Accessibility className="h-5 w-5" />
-          <UnifiedLocalizedText text="Accessibility Controls" />
-        </CardTitle>
-        <CardDescription>
-          <UnifiedLocalizedText text="Customize your experience for better accessibility" />
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Accessibility className="h-6 w-6 text-primary" />
+            <div>
+              <CardTitle>Accessibility Controls</CardTitle>
+              <CardDescription>
+                Customize your experience with accessibility features
+              </CardDescription>
+            </div>
+          </div>
+          <Badge variant="secondary" className="text-sm">
+            <Settings className="h-3 w-3 mr-1" />
+            Active
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Visual Settings */}
+        {/* Visual Accessibility */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-3">
             <Eye className="h-4 w-4" />
-            <UnifiedLocalizedText text="Visual Settings" />
-          </h3>
+            <h3 className="font-semibold">Visual</h3>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="high-contrast" className="flex items-center gap-2">
-                <Contrast className="h-4 w-4" />
-                <UnifiedLocalizedText text="High Contrast" />
-              </Label>
-              <Switch
-                id="high-contrast"
-                checked={settings.highContrast}
-                onCheckedChange={(checked) => updateSetting('highContrast', checked)}
-              />
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="highContrast">High Contrast Mode</Label>
+              <p className="text-sm text-muted-foreground">
+                Increase contrast for better visibility
+              </p>
             </div>
+            <Switch
+              id="highContrast"
+              checked={settings.highContrast}
+              onCheckedChange={(checked) => updateSetting('highContrast', checked)}
+            />
+          </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="large-text" className="flex items-center gap-2">
-                <Type className="h-4 w-4" />
-                <UnifiedLocalizedText text="Large Text" />
-              </Label>
-              <Switch
-                id="large-text"
-                checked={settings.largeText}
-                onCheckedChange={(checked) => updateSetting('largeText', checked)}
-              />
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="largeText">Large Text</Label>
+              <p className="text-sm text-muted-foreground">
+                Increase default text size
+              </p>
             </div>
+            <Switch
+              id="largeText"
+              checked={settings.largeText}
+              onCheckedChange={(checked) => updateSetting('largeText', checked)}
+            />
           </div>
 
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Type className="h-4 w-4" />
-              <UnifiedLocalizedText text="Font Size" />
-            </Label>
-            <div className="flex items-center gap-4">
-              <span className="text-sm">12px</span>
-              <Slider
-                value={[settings.fontSize]}
-                onValueChange={([value]) => updateSetting('fontSize', value)}
-                min={12}
-                max={24}
-                step={1}
-                className="flex-1"
-              />
-              <span className="text-sm">24px</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              <UnifiedLocalizedText text="Current size" />: {settings.fontSize}px
-            </p>
+            <Label>Font Size: {settings.fontSize}px</Label>
+            <Slider
+              value={[settings.fontSize]}
+              onValueChange={(value) => updateSetting('fontSize', value[0])}
+              min={12}
+              max={24}
+              step={1}
+              className="w-full"
+            />
           </div>
 
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Monitor className="h-4 w-4" />
-              <UnifiedLocalizedText text="Color Scheme" />
-            </Label>
+            <Label>Color Scheme</Label>
             <Select
               value={settings.colorScheme}
               onValueChange={(value: 'light' | 'dark' | 'auto') => 
@@ -220,22 +216,22 @@ export const AccessibilityControls: React.FC = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="auto">
+                  <div className="flex items-center gap-2">
+                    <Monitor className="h-4 w-4" />
+                    Auto (System)
+                  </div>
+                </SelectItem>
                 <SelectItem value="light">
                   <div className="flex items-center gap-2">
                     <Sun className="h-4 w-4" />
-                    <UnifiedLocalizedText text="Light" />
+                    Light
                   </div>
                 </SelectItem>
                 <SelectItem value="dark">
                   <div className="flex items-center gap-2">
                     <Moon className="h-4 w-4" />
-                    <UnifiedLocalizedText text="Dark" />
-                  </div>
-                </SelectItem>
-                <SelectItem value="auto">
-                  <div className="flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    <UnifiedLocalizedText text="System" />
+                    Dark
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -243,99 +239,97 @@ export const AccessibilityControls: React.FC = () => {
           </div>
         </div>
 
-        {/* Motion Settings */}
+        {/* Motion & Navigation */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-3">
             <MousePointer className="h-4 w-4" />
-            <UnifiedLocalizedText text="Motion & Interaction" />
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="reduced-motion" className="flex items-center gap-2">
-                <UnifiedLocalizedText text="Reduced Motion" />
-              </Label>
-              <Switch
-                id="reduced-motion"
-                checked={settings.reducedMotion}
-                onCheckedChange={(checked) => updateSetting('reducedMotion', checked)}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label htmlFor="focus-visible" className="flex items-center gap-2">
-                <UnifiedLocalizedText text="Focus Indicators" />
-              </Label>
-              <Switch
-                id="focus-visible"
-                checked={settings.focusVisible}
-                onCheckedChange={(checked) => updateSetting('focusVisible', checked)}
-              />
-            </div>
+            <h3 className="font-semibold">Motion & Navigation</h3>
           </div>
-        </div>
 
-        {/* Navigation Settings */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Keyboard className="h-4 w-4" />
-            <UnifiedLocalizedText text="Navigation" />
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="keyboard-navigation" className="flex items-center gap-2">
-                <UnifiedLocalizedText text="Keyboard Navigation" />
-              </Label>
-              <Switch
-                id="keyboard-navigation"
-                checked={settings.keyboardNavigation}
-                onCheckedChange={(checked) => updateSetting('keyboardNavigation', checked)}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label htmlFor="screen-reader" className="flex items-center gap-2">
-                <UnifiedLocalizedText text="Screen Reader Support" />
-              </Label>
-              <Switch
-                id="screen-reader"
-                checked={settings.screenReader}
-                onCheckedChange={(checked) => updateSetting('screenReader', checked)}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Audio Settings */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Volume2 className="h-4 w-4" />
-            <UnifiedLocalizedText text="Audio" />
-          </h3>
-          
           <div className="flex items-center justify-between">
-            <Label htmlFor="audio-descriptions" className="flex items-center gap-2">
-              <UnifiedLocalizedText text="Audio Descriptions" />
-            </Label>
+            <div>
+              <Label htmlFor="reducedMotion">Reduced Motion</Label>
+              <p className="text-sm text-muted-foreground">
+                Minimize animations and transitions
+              </p>
+            </div>
             <Switch
-              id="audio-descriptions"
+              id="reducedMotion"
+              checked={settings.reducedMotion}
+              onCheckedChange={(checked) => updateSetting('reducedMotion', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="keyboardNavigation">Enhanced Keyboard Navigation</Label>
+              <p className="text-sm text-muted-foreground">
+                Improve keyboard navigation experience
+              </p>
+            </div>
+            <Switch
+              id="keyboardNavigation"
+              checked={settings.keyboardNavigation}
+              onCheckedChange={(checked) => updateSetting('keyboardNavigation', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="focusVisible">Visible Focus Indicators</Label>
+              <p className="text-sm text-muted-foreground">
+                Show clear focus outlines on interactive elements
+              </p>
+            </div>
+            <Switch
+              id="focusVisible"
+              checked={settings.focusVisible}
+              onCheckedChange={(checked) => updateSetting('focusVisible', checked)}
+            />
+          </div>
+        </div>
+
+        {/* Screen Reader & Audio */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Volume2 className="h-4 w-4" />
+            <h3 className="font-semibold">Screen Reader & Audio</h3>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="screenReader">Screen Reader Optimization</Label>
+              <p className="text-sm text-muted-foreground">
+                Optimize content for screen readers
+              </p>
+            </div>
+            <Switch
+              id="screenReader"
+              checked={settings.screenReader}
+              onCheckedChange={(checked) => updateSetting('screenReader', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="audioDescriptions">Audio Descriptions</Label>
+              <p className="text-sm text-muted-foreground">
+                Enable audio descriptions for media content
+              </p>
+            </div>
+            <Switch
+              id="audioDescriptions"
               checked={settings.audioDescriptions}
               onCheckedChange={(checked) => updateSetting('audioDescriptions', checked)}
             />
           </div>
         </div>
 
-        {/* Status and Actions */}
-        <div className="flex items-center justify-between pt-4 border-t">
-          <Badge variant="outline" className="flex items-center gap-1">
-            <Accessibility className="h-3 w-3" />
-            <UnifiedLocalizedText text="Accessibility Enabled" />
-          </Badge>
-          
-          <Button onClick={resetSettings} variant="outline" size="sm">
+        {/* Reset */}
+        <div className="pt-4 border-t">
+          <Button variant="outline" onClick={resetSettings} className="w-full">
             <RotateCcw className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Reset" />
+            Reset to Defaults
           </Button>
         </div>
       </CardContent>

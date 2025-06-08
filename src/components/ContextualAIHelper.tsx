@@ -15,7 +15,6 @@ import {
   HelpCircle 
 } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
-import { UnifiedLocalizedText } from '@/components/UnifiedLocalizedText';
 
 interface ContextualAIHelperProps {
   currentPage: string;
@@ -142,10 +141,10 @@ export const ContextualAIHelper: React.FC<ContextualAIHelperProps> = ({
           <div className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
             <CardTitle className="text-sm">
-              <UnifiedLocalizedText text="AI Assistant" />
+              AI Assistant
             </CardTitle>
             <Badge variant="secondary" className="text-xs">
-              <UnifiedLocalizedText text="Smart Help" />
+              Smart Help
             </Badge>
           </div>
           <Button
@@ -158,7 +157,7 @@ export const ContextualAIHelper: React.FC<ContextualAIHelperProps> = ({
           </Button>
         </div>
         <CardDescription className="text-xs">
-          <UnifiedLocalizedText text="Contextual suggestions for your current page" />
+          Contextual suggestions for your current page
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -182,7 +181,7 @@ export const ContextualAIHelper: React.FC<ContextualAIHelperProps> = ({
             onClick={() => onSuggestionClick('I need help with something else')}
           >
             <MessageCircle className="h-4 w-4 mr-2" />
-            <UnifiedLocalizedText text="Ask Custom Question" />
+            Ask Custom Question
           </Button>
         </div>
       </CardContent>
