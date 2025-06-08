@@ -16,7 +16,7 @@ export const MobileLayout = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex flex-col">
+      <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-300">
         <MobileAppHeader />
         <main className="flex-1 overflow-auto pb-20 px-4">
           <div className="max-w-md mx-auto">

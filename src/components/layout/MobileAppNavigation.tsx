@@ -5,7 +5,10 @@ import { Home, BookOpen, Users, Settings, Brain, Shield } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
 import { cn } from '@/lib/utils';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
+
+// Define UserRole type locally since it's not exported from supabase types
+type UserRole = 'student' | 'educator' | 'admin';
 
 export const MobileAppNavigation = () => {
   const { role } = useUserRole();
@@ -22,7 +25,7 @@ export const MobileAppNavigation = () => {
   const getNavItems = () => {
     if (role === 'student') {
       return [
-        { icon: Home, label: 'Dashboard', path: getRoleBasedRoute('student', true) },
+        { icon: Home, label: 'Dashboard', path: getMobileRoleBasedRoute('student', true) },
         { icon: BookOpen, label: 'Courses', path: '/student-dashboard' },
         { icon: Brain, label: 'AI Tutor', path: '/student-dashboard' },
         { icon: Settings, label: 'Settings', path: '/profile-settings' },
@@ -31,7 +34,7 @@ export const MobileAppNavigation = () => {
 
     if (role === 'educator') {
       return [
-        { icon: Home, label: 'Dashboard', path: getRoleBasedRoute('educator', true) },
+        { icon: Home, label: 'Dashboard', path: getMobileRoleBasedRoute('educator', true) },
         { icon: BookOpen, label: 'Courses', path: '/educator-dashboard' },
         { icon: Brain, label: 'AI Tools', path: '/educator-dashboard' },
         { icon: Settings, label: 'Settings', path: '/profile-settings' },
@@ -40,7 +43,7 @@ export const MobileAppNavigation = () => {
 
     if (role === 'admin') {
       return [
-        { icon: Home, label: 'Dashboard', path: getRoleBasedRoute('admin', true) },
+        { icon: Home, label: 'Dashboard', path: getMobileRoleBasedRoute('admin', true) },
         { icon: Users, label: 'Users', path: '/admin-dashboard' },
         { icon: Shield, label: 'Security', path: '/admin-dashboard' },
         { icon: Settings, label: 'Settings', path: '/profile-settings' },
@@ -57,7 +60,7 @@ export const MobileAppNavigation = () => {
   const navItems = getNavItems();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-purple-100 px-4 py-2 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 py-2 z-50">
       <div className="flex justify-around items-center max-w-md mx-auto">
         {navItems.map((item, index) => {
           const isActive = location.pathname === item.path || 
@@ -73,8 +76,8 @@ export const MobileAppNavigation = () => {
               className={cn(
                 "flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-200 min-w-0 flex-1",
                 isActive 
-                  ? "text-purple-600 bg-purple-50 shadow-sm scale-105" 
-                  : "text-gray-500 hover:text-gray-700 active:scale-95"
+                  ? "text-primary bg-primary/10 shadow-sm scale-105" 
+                  : "text-muted-foreground hover:text-foreground active:scale-95"
               )}
             >
               <item.icon className={cn("h-6 w-6", isActive && "animate-pulse")} />

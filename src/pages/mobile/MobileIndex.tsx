@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Users, Brain, Trophy, Smartphone } from 'lucide-react';
@@ -24,7 +25,7 @@ export const MobileIndex = () => {
   const { role, loading: roleLoading } = useUserRole();
   const { platform, theme } = usePlatformTheme();
 
-  // Redirect authenticated users using mobile routing
+  // Redirect authenticated users using mobile routing - only redirect once
   useEffect(() => {
     if (!authLoading && !roleLoading && user && role) {
       console.log('MobileIndex: Authenticated user detected, redirecting to mobile dashboard');

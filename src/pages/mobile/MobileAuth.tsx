@@ -9,8 +9,11 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { usePlatformTheme } from '@/contexts/PlatformThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import toast from 'react-hot-toast';
+
+// Define UserRole type locally since it's not exported from supabase types
+type UserRole = 'student' | 'educator' | 'admin';
 
 export const MobileAuth = () => {
   const { platform } = usePlatformTheme();
@@ -18,10 +21,10 @@ export const MobileAuth = () => {
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
 
-  // Redirect authenticated users
+  // Redirect authenticated users using mobile routing
   useEffect(() => {
     if (!authLoading && !roleLoading && user && role) {
-      const redirectRoute = getRoleBasedRoute(role, true);
+      const redirectRoute = getMobileRoleBasedRoute(role as UserRole, true);
       navigate(redirectRoute, { replace: true });
       toast.success('Welcome back!');
     }

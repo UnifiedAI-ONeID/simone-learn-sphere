@@ -4,8 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { Brain } from 'lucide-react';
 import { LocalizedText } from '@/components/LocalizedText';
 import { supabase } from '@/integrations/supabase/client';
-import { getRoleBasedRoute } from '@/utils/roleRouting';
+import { getMobileRoleBasedRoute } from '@/utils/mobileRouting';
 import toast from 'react-hot-toast';
+
+// Define UserRole type locally since it's not exported from supabase types
+type UserRole = 'student' | 'educator' | 'admin';
 
 export const MobileAuthCallback = () => {
   const navigate = useNavigate();
@@ -39,8 +42,8 @@ export const MobileAuthCallback = () => {
           
           toast.success(`Welcome! Successfully signed in as ${userRole}.`);
           
-          // Redirect to appropriate dashboard using isLoginContext=true for proper prioritization
-          const redirectRoute = getRoleBasedRoute(userRole, true);
+          // Use mobile-specific routing
+          const redirectRoute = getMobileRoleBasedRoute(userRole as UserRole, true);
           console.log('MobileAuthCallback: Redirecting to:', redirectRoute);
           
           navigate(redirectRoute, { replace: true });
@@ -60,15 +63,15 @@ export const MobileAuthCallback = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 transition-colors duration-300">
       <div className="text-center space-y-4">
-        <div className="w-16 h-16 mx-auto bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center animate-pulse">
-          <Brain className="w-8 h-8 text-white" />
+        <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center animate-pulse">
+          <Brain className="w-8 h-8 text-primary-foreground" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-foreground">
           <LocalizedText text="Completing Sign In..." />
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           <LocalizedText text="Please wait while we set up your account" />
         </p>
       </div>
